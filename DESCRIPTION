@@ -1,5 +1,5 @@
 Package: IPD
-Title: Perform Statistically Valid and Efficient Infernece with Predicted Data (IPD) using State-of-the-art Methods
+Title: Perform Statistically Valid and Efficient Inference with Predicted Data (IPD) using State-of-the-art Methods
 Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
