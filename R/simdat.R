@@ -9,8 +9,8 @@
 #  @inheritParams gam::gam
 #'
 #' @return A data frame containing 4 regressors, labelled outcome, predicted
-#' outcome and a character variable indicating which dat set the observartion
-#' belongs to (training, test, validation).
+#' outcome and a character variable indicating which data set the observation
+#' belongs to (training, test/labeled, validation/unlabeled).
 #'
 #' @examples
 #'
