@@ -8,6 +8,8 @@
 [![R-CMD-check](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
+## <img src="man/figures/IPD_LOGO.png" align="right" height="200" style="float:right; height:200px;">
+
 With the rapid advancement of artificial intelligence (AI), machine
 learning (ML) algorithms and owing to financial and domain-specific
 constraints, researchers from a wide variety of disciplines are now
