@@ -19,12 +19,6 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param n (int): Number of labeled observations.
-#'
-#' @param p (int): Number of covariates (features) of interest.
-#'
-#' @param N (int): Number of unlabeled observations.
-#'
 #' @param lhat (float, optional): Power-tuning parameter.
 #' The default value `NULL` will estimate the optimal value from data.
 #' Setting `lhat = 1` recovers PPI with no power tuning.
@@ -59,26 +53,21 @@
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
-#'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' ppi_ols_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_ols_est(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_ols_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+ppi_ols_est <- function(X_l, Y_l, f_l, X_u, f_u,
 
-                             lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
+  lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
 
-  X_u <- as.matrix(X_u)
+  n <- nrow(f_l)
 
-  n <- nrow(X_l)
-  N <- nrow(X_u)
+  N <- nrow(f_u)
+
+  p <- ncol(X_u)
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
@@ -88,29 +77,29 @@ ppi_ols_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
   if (is.null(lhat)) {
 
-    imputed_theta <- wls(X_u, f_u, w = w_u)
+    theta_hat <- wls(X_u, f_u, w = w_u)
 
-    rectifier <- wls(X_l, Y_l - f_l, w = w_l)
+    delta_hat <- wls(X_l, Y_l - f_l, w = w_l)
 
-    est <- imputed_theta + rectifier
+    est <- theta_hat + delta_hat
 
     stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
 
     lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-                          stats$grads_hat_unlabeled, stats$inv_hessian, coord, clip = T)
+      stats$grads_hat_unlabeled, stats$inv_hessian, coord, clip = T)
 
     return(ppi_ols_est(X_l, Y_l, f_l, X_u, f_u,
 
-                            lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
+      lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
 
   } else {
 
-    imputed_theta <- wls(X_u, lhat * f_u, w = w_u)
+    theta_hat <- wls(X_u, lhat * f_u, w = w_u)
 
-    rectifier <- wls(X_l, Y_l - lhat * f_l, w = w_l)
+    delta_hat <- wls(X_l, Y_l - lhat * f_l, w = w_l)
 
-    est <- imputed_theta + rectifier
+    est <- theta_hat + delta_hat
 
     return(est)
   }
@@ -133,12 +122,6 @@ ppi_ols_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 #' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
-#'
-#' @param n (int): Number of labeled observations.
-#'
-#' @param p (int): Number of covariates (features) of interest.
-#'
-#' @param N (int): Number of unlabeled observations.
 #'
 #' @param alpha (float): Significance level in \[0,1\]
 #'
@@ -183,26 +166,21 @@ ppi_ols_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
-#'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-                         alpha = 0.05, alternative = "two-sided", lhat = NULL,
+  lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
 
-                         coord = NULL, w_l = NULL, w_u = NULL) {
+  n <- nrow(f_l)
 
-  X_l <- as.matrix(X_l)                                                          # Need in wrapper?
-  X_u <- as.matrix(X_u)                                                          # Need in wrapper?
+  N <- nrow(f_u)
+
+  p <- ncol(X_u)
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
@@ -216,26 +194,24 @@ ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
   stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
 
-  inv_hessian <- stats$inv_hessian
-
   if (is.null(lhat)) {
 
     lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-                          stats$grads_hat_unlabeled, inv_hessian, coord, clip = T)
+      stats$grads_hat_unlabeled, stats$inv_hessian, coord, clip = T)
 
     return(ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
-                        alpha = alpha, alternative = alternative, lhat = lhat, coord = coord,
+      alpha = alpha, alternative = alternative, lhat = lhat, coord = coord,
 
-                        w_l = w_l, w_u = w_u))
+      w_l = w_l, w_u = w_u))
   }
 
   var_u <- cov(lhat * stats$grads_hat_unlabeled)
 
   var_l <- cov(stats$grads - lhat * stats$grads_hat)
 
-  Sigma_hat <- inv_hessian %*% (n/N * var_u + var_l) %*% inv_hessian
+  Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
 
   return(list(est = est, se = sqrt(diag(Sigma_hat) / n)))
 }

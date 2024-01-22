@@ -137,7 +137,7 @@
 #' @param seed (int, optional): an integer value provided as seed.
 #'
 #' @param alpha (float, optional): specified level of significance of the the
-#' confidence interval; defaults to 0.95.
+#' confidence interval; defaults to 0.05.
 #'
 #' @param alternative (string, optional): Specify the alternative hypothesis,
 #' must be one of "two.sided", "greater" or "less"; defaults to "two.sided".
@@ -154,11 +154,11 @@
 #'
 #' @export
 
-ipd <- function(formula, method, model, data, label_index = NULL,
+ipd <- function(formula, method, model, data,
 
-                df_unlabeled = NULL, seed = NULL,
+  label_index = NULL, df_unlabeled = NULL, seed = NULL,
 
-                alpha = 0.05, alternative = "two-sided", ...) {
+  alpha = 0.05, alternative = "two-sided", ...) {
 
   #--- 1. CHECKS & ASSERTIONS --------------------------------------------------
 
@@ -172,7 +172,7 @@ ipd <- function(formula, method, model, data, label_index = NULL,
 
     stop(paste("at least one of 'label_index' and 'df_unlabeled' must be specified.",
 
-               "\nSee the help('ipd') documentation for more information."))
+      "\nSee the help('ipd') documentation for more information."))
   }
 
   #-- A3. CHECK IF BOTH 'label_index' AND 'df_unlabeled' args are SPECIFIED
@@ -181,7 +181,7 @@ ipd <- function(formula, method, model, data, label_index = NULL,
 
     stop(paste("specify only one of 'label_index' and 'df_unlabeled' argument.",
 
-               "\nSee the help('ipd') documentation for more information."))
+      "\nSee the help('ipd') documentation for more information."))
   }
 
   #-- A4. CHECK IF SPECIFIED 'label_index' exists in data
@@ -190,7 +190,7 @@ ipd <- function(formula, method, model, data, label_index = NULL,
 
     stop(paste(label_index, "does not exist in the data set.",
 
-               "\nSee the help('ipd') documentation for more information."))
+      "\nSee the help('ipd') documentation for more information."))
   }
 
   #-- B. CHECK FOR VALID METHOD
@@ -201,26 +201,20 @@ ipd <- function(formula, method, model, data, label_index = NULL,
 
     stop(paste("'method' must be one of",
 
-               "c('postpi_analytic', 'postpi_boot', 'postpi_mi',
+      "c('postpi_analytic', 'postpi_boot', 'postpi_mi', 'ppi', 'popinf').",
 
-               'ppi', 'popinf').",
-
-               "See the 'Details' section of the documentation for more
-                information."))
+      "See the 'Details' section of the documentation for more information."))
   }
 
   #-- C. CHECK FOR VALID MODEL
 
-  if (!(model %in%
-
-        c("ols", "logistic", "mean", "quantile"))) {
+  if (!(model %in% c("mean", "quantile", "ols", "logistic", "multiclass"))) {
 
     stop(paste("'model' must be one of",
 
-               "c('ols', 'logistic', 'mean', 'quantile')",
+      "c('mean', 'quantile', 'ols', 'logistic', 'multiclass').",
 
-               "See the 'Details' section of the documentation for more
-                information."))
+      "See the 'Details' section of the documentation for more information."))
   }
 
   #--- D. CHECK FOR VALID METHOD-MODEL COMBINATION
