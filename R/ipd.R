@@ -197,13 +197,13 @@ ipd <- function(formula, method, model, data, label_index = NULL,
 
   if (!(method %in% c("postpi_analytic", "postpi_boot", "postpi_mi",
 
-                      "ppi", "ppi_plusplus", "popinf"))) {
+                      "ppi", "popinf"))) {
 
     stop(paste("'method' must be one of",
 
                "c('postpi_analytic', 'postpi_boot', 'postpi_mi',
 
-               'ppi', 'ppi_plusplus', 'popinf').",
+               'ppi', 'popinf').",
 
                "See the 'Details' section of the documentation for more
                 information."))

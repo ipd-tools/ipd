@@ -69,13 +69,13 @@
 #'
 #' N <- nrow(X_u)
 #'
-#' ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
                                       lhat = NULL, coord = NULL, opts = NULL,
 
@@ -136,7 +136,7 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
                           stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-    return(ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+    return(ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
                                  opts = opts, lhat = lhat, coord = coord, w_l = w_l,
 
@@ -211,7 +211,7 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 #'
 #' N <- nrow(X_u)
 #'
-#' est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
 #'
 #' w_l <- rep(1, n)
 #'
@@ -363,13 +363,13 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' N <- nrow(X_u)
 #'
-#' ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_logistic(X_l, Y_l, f_l, X_u, f_u, n, p, N)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_plusplus_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05,
+ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05,
 
                               alternative = "two-sided", lhat = NULL, coord = NULL, opts = NULL,
 
@@ -385,7 +385,7 @@ ppi_plusplus_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05
 
   use_u <- is.null(lhat) || lhat != 0
 
-  est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N, opts = opts,
+  est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N, opts = opts,
 
                                lhat = lhat, coord = coord, w_l = w_l, w_u = w_u)
 
@@ -399,7 +399,7 @@ ppi_plusplus_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05
 
                           stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-    return(ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+    return(ppi_logistic(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
                              alpha = alpha, opts = opts, alternative = alternative,
 

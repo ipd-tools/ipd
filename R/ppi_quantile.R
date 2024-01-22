@@ -202,11 +202,11 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' ppi_plusplus_quantile_est(Y_l, f_l, f_u, q = 0.5)
+#' ppi_quantile_est(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
-ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
+ppi_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
 
                                   w_l = NULL, w_u = NULL) {
 
@@ -281,11 +281,11 @@ ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' ppi_plusplus_quantile(Y_l, f_l, f_u, q = 0.5)
+#' ppi_quantile(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
-ppi_plusplus_quantile <- function(Y_l, f_l, f_u, q, alpha = 0.05,
+ppi_quantile <- function(Y_l, f_l, f_u, q, alpha = 0.05,
 
                               exact_grid = FALSE, w_l = NULL, w_u = NULL) {
 

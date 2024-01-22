@@ -1,60 +1,171 @@
 #===============================================================================
-#
-#  PROGRAM: ppi_ols.R
-#
-#  AUTHORS: (UPDATE THIS)
-#
-#  PURPOSE: Implementation of PPI OLS algorithm from Angelopoulos et al. (2023)
-#
-#           Prediction-Powered Inference
-#
-#  INPUTS:  N/A
-#
-#  OUTPUS:  Prediction-powered inference functions for various target estimands:
-#
-#           1. ppi: Linear Regression
-#
-#  NOTES:   1. NEED TO ADD REFERENCES
-#
-#  Updated: 2023-12-27
-#
+# PPI++ ORDINARY LEAST SQUARES
 #===============================================================================
 
-#=== ORDINARY LEAST SQUARES ====================================================
+#=== PPI++ OLS POINT ESTIMATE ==================================================
 
-#' PPI Linear Regression using Angelopoulos et al. (2023) Analytic Form
+#' PPI++ OLS Point Estimate (helper function)
 #'
 #' @description
 #' Computes the prediction-powered point estimate of the OLS coefficients.
 #'
-#' @details
-#' Additional details...
+#' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
-#' @param X_l (ndarray): Covariates corresponding to the gold-standard labels.
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param Y_l (ndarray): Gold-standard labels.
+#' @param f_l (vector): n-vector of predictions in the labeled data.
 #'
-#' @param f_l (ndarray): Predictions corresponding to the gold-standard labels.
+#' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
-#' @param X_u (ndarray): Covariates corresponding to the unlabeled data.
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param f_u (ndarray): Predictions corresponding to the unlabeled data.
+#' @param n (int): Number of labeled observations.
 #'
-#' @param n (int): Number of labeled data points.
+#' @param p (int): Number of covariates (features) of interest.
 #'
-#' @param p (int): Dimension of the covariates.
+#' @param N (int): Number of unlabeled observations.
 #'
-#' @param N (int): Number of unlabeled data points.
+#' @param lhat (float, optional): Power-tuning parameter.
+#' The default value `NULL` will estimate the optimal value from data.
+#' Setting `lhat = 1` recovers PPI with no power tuning.
+#' Setting `lhat = 0` recovers the classical point estimate.
 #'
-#' @param lhat (float, optional): Power-tuning parameter (see `[ADZ23] <https://arxiv.org/abs/2311.01453>`__). The default value `None` will estimate the optimal value from data. Setting `lhat=1` recovers PPI with no power tuning, and setting `lhat=0` recovers the classical point estimate.
+#' @param coord (int, optional): Coordinate for which to optimize `lhat`.
+#' If `None`, it optimizes the total variance over all coordinates.
+#' Must be in {1, ..., p} where p is the shape of the estimand.
 #'
-#' @param coord (int, optional): Coordinate for which to optimize `lhat`. If `None`, it optimizes the total variance over all coordinates. Must be in {1, ..., d} where d is the shape of the estimand.
+#' @param w_l (vector, optional): n-vector of sample weights for the
+#' labeled data.
 #'
-#' @param w (ndarray, optional): Sample weights for the labeled data set.
+#' @param w_u (vector, optional): N-vector of sample weights for the
+#' unlabeled data.
 #'
-#' @param w_unlabeled (ndarray, optional): Sample weights for the unlabeled data set.
+#' @returns (vector): p-vector of prediction-powered point estimates of the
+#' OLS coefficients.
 #'
-#' @returns A list of outputs: estimate of inference model parameters and corresponding standard errors
+#' @examples
+#'
+#' dat <- simdat()
+#'
+#' form <- Y - Yhat ~ X1
+#'
+#' X_l <- model.matrix(form, data = dat[dat$set == "tst",])
+#'
+#' Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set == "val",])
+#'
+#' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' n <- nrow(X_l)
+#'
+#' p <- ncol(X_l)
+#'
+#' N <- nrow(X_u)
+#'
+#' ppi_ols_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#'
+#' @import stats
+#'
+#' @export
+
+ppi_ols_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+
+                             lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
+
+  X_u <- as.matrix(X_u)
+
+  n <- nrow(X_l)
+  N <- nrow(X_u)
+
+  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+
+  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+
+  use_u <- is.null(lhat) || lhat != 0
+
+  if (is.null(lhat)) {
+
+    imputed_theta <- wls(X_u, f_u, w = w_u)
+
+    rectifier <- wls(X_l, Y_l - f_l, w = w_l)
+
+    est <- imputed_theta + rectifier
+
+    stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
+
+    lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
+
+                          stats$grads_hat_unlabeled, stats$inv_hessian, coord, clip = T)
+
+    return(ppi_ols_est(X_l, Y_l, f_l, X_u, f_u,
+
+                            lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
+
+  } else {
+
+    imputed_theta <- wls(X_u, lhat * f_u, w = w_u)
+
+    rectifier <- wls(X_l, Y_l - lhat * f_l, w = w_l)
+
+    est <- imputed_theta + rectifier
+
+    return(est)
+  }
+}
+
+#=== PPI++ OLS =================================================================
+
+#' PPI++ OLS Estimator and Inference
+#'
+#' @description
+#' Computes the prediction-powered estimator and confidence interval for the
+#' OLS coefficients using the PPI++ algorithm.
+#'
+#' @param X_l (matrix): n x p matrix of covariates in the labeled data.
+#'
+#' @param Y_l (vector): n-vector of labeled outcomes.
+#'
+#' @param f_l (vector): n-vector of predictions in the labeled data.
+#'
+#' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
+#'
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
+#'
+#' @param n (int): Number of labeled observations.
+#'
+#' @param p (int): Number of covariates (features) of interest.
+#'
+#' @param N (int): Number of unlabeled observations.
+#'
+#' @param alpha (float): Significance level in \[0,1\]
+#'
+#' @param alternative (string): Alternative hypothesis, either 'two-sided',
+#' 'larger' or 'smaller'.
+#'
+#' @param lhat (float, optional): Power-tuning parameter.
+#' The default value `NULL` will estimate the optimal value from data.
+#' Setting `lhat = 1` recovers PPI with no power tuning.
+#' Setting `lhat = 0` recovers the classical point estimate.
+#'
+#' @param coord (int, optional): Coordinate for which to optimize `lhat`.
+#' If `None`, it optimizes the total variance over all coordinates.
+#' Must be in {1, ..., p} where p is the shape of the estimand.
+#'
+#' @param w_l (vector, optional): n-vector of sample weights for the
+#' labeled data.
+#'
+#' @param w_u (vector, optional): N-vector of sample weights for the
+#' unlabeled data.
+#'
+#' @returns (list): A list containing the following:
+#'
+#' \describe{
+#'    \item{est}{(vector): p-vector of PPI++ OLS coefficient estimates.}
+#'    \item{se}{(vector): p-vector of standard errors of the coefficients.}
+#' }
 #'
 #' @examples
 #'
@@ -86,59 +197,47 @@
 
 ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
-                       lhat = NULL, coord = NULL, w = NULL, w_unlabeled = NULL) {
+                         alpha = 0.05, alternative = "two-sided", lhat = NULL,
 
-  #- 1. Prediction-Powered Estimator
+                         coord = NULL, w_l = NULL, w_u = NULL) {
 
-  theta_tilde_f <- solve(crossprod(X_u)) %*% t(X_u) %*% f_u
+  X_l <- as.matrix(X_l)                                                          # Need in wrapper?
+  X_u <- as.matrix(X_u)                                                          # Need in wrapper?
 
-  delta_hat_f   <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
+  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  theta_hat_pp  <- theta_tilde_f - delta_hat_f
+  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  #- 2. Meat and Bread for Imputed Estimate
+  use_u <- is.null(lhat) || lhat != 0
 
-  Sigma_tilde <- crossprod(X_u) / N
+  est <- ppi_ols_est(
 
-  M_tilde <- sapply(1:N, function(i) {
+    X_l, Y_l, f_l, X_u, f_u, n, p, N, lhat, coord, w_l, w_u)
 
-    (c(f_u[i] - crossprod(X_u[i,], theta_tilde_f)))^2 *
+  stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
 
-      tcrossprod(X_u[i,])}) |>
+  inv_hessian <- stats$inv_hessian
 
-    rowMeans() |> matrix(nrow = p)
+  if (is.null(lhat)) {
 
-  iSigma_tilde <- solve(Sigma_tilde)
+    lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-  #- 3. Sandwich Variance Estimator for Imputed Estimate
+                          stats$grads_hat_unlabeled, inv_hessian, coord, clip = T)
 
-  V_tilde <- iSigma_tilde %*% M_tilde %*% iSigma_tilde
+    return(ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
-  #- 4. Meat and Bread for Empirical Rectifier
+                        alpha = alpha, alternative = alternative, lhat = lhat, coord = coord,
 
-  Sigma <- crossprod(X_l) / n
+                        w_l = w_l, w_u = w_u))
+  }
 
-  M <- sapply(1:n, function(i) {
+  var_u <- cov(lhat * stats$grads_hat_unlabeled)
 
-    (c(f_l[i] - Y_l[i] - crossprod(X_l[i,], delta_hat_f)))^2 *
+  var_l <- cov(stats$grads - lhat * stats$grads_hat)
 
-      tcrossprod(X_l[i,])}) |>
+  Sigma_hat <- inv_hessian %*% (n/N * var_u + var_l) %*% inv_hessian
 
-    rowMeans() |> matrix(nrow = p)
-
-  iSigma <- solve(Sigma)
-
-  #- 5. Sandwich Variance Estimator for Empirical Rectifier
-
-  V <- iSigma %*% M %*% iSigma
-
-  #- 6. Standard Error Estimates
-
-  se <- sqrt(diag(V) / n + diag(V_tilde) / N)
-
-  #- Output
-
-  return(list(est = as.vector(theta_hat_pp), se = as.vector(se)))
+  return(list(est = est, se = sqrt(diag(Sigma_hat) / n)))
 }
 
 #=== END =======================================================================
