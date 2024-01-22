@@ -1,18 +1,20 @@
-#' Data generation for OLS examples
+#' Data generation functions for OLS regression example
 #'
 #' @param n vector of size 3 indicating the sample size in the training,
-#' labelled, and unlabelled data sets
+#' labeled/test, and unlabeled/validation data sets
 #'
 #' @param beta1 first regression coefficient (or, regression coefficient of
 #' variable of interest for inference)
 #'
 #  @inheritParams gam::gam
 #'
-#' @return A data frame containing 4 regressors, labelled outcome, predicted
+#' @return A data frame containing 4 columns: labeled outcome, predicted
 #' outcome and a character variable indicating which data set the observation
 #' belongs to (training, test/labeled, validation/unlabeled).
 #'
 #' @examples
+#'
+#' # Return a stacked data set with 100 observations for each individual sets
 #'
 #' simdat(c(100, 100, 100), 1)
 #'
@@ -47,16 +49,18 @@ simdat <- function(n = c(300, 300, 300), beta1 = 1) {
 #' Data generation for logistic regression examples
 #'
 #' @param n vector of size 3 indicating the sample size in the training,
-#' labelled, and unlabelled data sets
+#' labeled/test, and unlabeled/validation data sets
 #'
 #' @param betac first regression coefficient (or, regression coefficient of
 #' variable of interest for inference)
 #'
-#' @return A data frame containing 4 regressors, labelled outcome, predicted
-#' outcome and a character variable indicating which dat set the observartion
-#' belongs to (training, test, validation).
+#' @return A data frame containing 4 columns: labeled outcome, predicted
+#' outcome and a character variable indicating which data set the observation
+#' belongs to (training, test/labeled, validation/unlabeled).
 #'
 #' @examples
+#'
+#' # Return a stacked data set with 100 observations for each individual sets
 #'
 #' simdat(c(100, 100, 100), 1)
 #'

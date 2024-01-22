@@ -12,6 +12,7 @@ RoxygenNote: 7.2.3
 Imports: 
     caret,
     gam,
+    ranger,
     stats
 Suggests: 
     testthat (>= 3.0.0)

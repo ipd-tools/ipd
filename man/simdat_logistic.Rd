@@ -8,20 +8,22 @@ simdat_logistic(n = c(300, 300, 300), betac = 1)
 }
 \arguments{
 \item{n}{vector of size 3 indicating the sample size in the training,
-labelled, and unlabelled data sets}
+labeled/test, and unlabeled/validation data sets}
 
 \item{betac}{first regression coefficient (or, regression coefficient of
 variable of interest for inference)}
 }
 \value{
-A data frame containing 4 regressors, labelled outcome, predicted
-outcome and a character variable indicating which dat set the observartion
-belongs to (training, test, validation).
+A data frame containing 4 columns: labeled outcome, predicted
+outcome and a character variable indicating which data set the observation
+belongs to (training, test/labeled, validation/unlabeled).
 }
 \description{
 Data generation for logistic regression examples
 }
 \examples{
+
+# Return a stacked data set with 100 observations for each individual sets
 
 simdat(c(100, 100, 100), 1)
 
