@@ -61,7 +61,7 @@ where $\epsilon^* = N(0, 1)$.
 
 We will now obtain the estimates from each method below:
 
-```{r example, eval = T}
+```{r example, eval = F}
 ## Load the library
 library(IPD)
 
@@ -72,7 +72,7 @@ dat <- simdat(n = c(300, 300, 300), beta1 = 1)
 
 #### 1.1) Analytic correction method from Wang et al. (2020)
 
-```{r wangAnalytic, eval = T}
+```{r wangAnalytic, eval = F}
 # Requires the specification of 
 ## 1. relationship model between observed y and predicted Y-hat 
 rel_form <- Y ~ Yhat  ## we consider a basic linear function
@@ -84,7 +84,7 @@ IPD::postpi_analytic_ols(rel_form, inf_form, dat = dat)
 
 #### 1.2) Bootstrap method from Wang et al. (2020)
 
-```{r wangBoot, eval = T}
+```{r wangBoot, eval = F}
 # Requires the specification of 
 ## 1. relationship model between observed y and predicted Y-hat 
 rel_form <- Y ~ Yhat  ## we consider a basic linear function
@@ -100,7 +100,7 @@ IPD::postpi_boot_ols(rel_form, inf_form, dat = dat, nboot)
 
 #### 2. Prediction-powered inference method (Angelopoulos et al., 2023)
 
-```{r predPI_ols, eval = T}
+```{r predPI_ols, eval = F}
 form <- Y - Yhat ~ X1 ## formula
 
 # Labeled data set
@@ -120,7 +120,7 @@ IPD::ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
 
-```{r ppi_plusplus, eval = T}
+```{r ppi_plusplus, eval = F}
 form <- Y - Yhat ~ X1 ## formula
 
 # Labeled data set
@@ -141,7 +141,7 @@ IPD::ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
 
 #### 4. Assumption-lean and data-adaptive Post-Prediction Inference (POP-Inf) (Miao et al., 2023)
 
-```{r popinf, eval = T}
+```{r popinf, eval = F}
 ## rectifier formula
 rec_form <- Y - Yhat ~ X1
 
@@ -154,7 +154,7 @@ IPD::popinf_ols(rec_form, inf_form, dat = dat)
 
 #### 5. Multiple-imputation method from Leek et al., (2023)
 
-```{r postpiMI, eval = T}
+```{r postpiMI, eval = F}
 # Requires the specification of 
 ## 1. relationship model between observed y and predicted Y-hat 
 rel_form <- Y ~ Yhat  ## we consider a basic linear function

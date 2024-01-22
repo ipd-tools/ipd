@@ -48,12 +48,14 @@
 #'
 #' @export
 
-ppi_mean_est <- function(Y_l, f_l, f_u, lhat = NULL, coord = NULL,
+ppi_mean_est <- function(Y_l, f_l, f_u,
 
-                              w_l = NULL, w_u = NULL) {
+  lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
 
-  n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
-  N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
+  n <- nrow(Y_l)
+
+  N <- nrow(f_u)
+
   p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n

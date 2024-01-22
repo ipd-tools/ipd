@@ -20,12 +20,6 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param n (int): Number of labeled observations.
-#'
-#' @param p (int): Number of covariates (features) of interest.
-#'
-#' @param N (int): Number of unlabeled observations.
-#'
 #' @param lhat (float, optional): Power-tuning parameter.
 #' The default value `NULL` will estimate the optimal value from data.
 #' Setting `lhat = 1` recovers PPI with no power tuning.
@@ -63,27 +57,21 @@
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
-#'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 
-                                      lhat = NULL, coord = NULL, opts = NULL,
+  lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
 
-                                      w_l = NULL, w_u = NULL) {
+  n <- nrow(f_l)
 
-  n <- nrow(Y_l)
-  p <- ncol(X_l)
   N <- nrow(f_u)
+
+  p <- ncol(X_u)
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
@@ -94,9 +82,9 @@ ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
     opts <- list(factr = 1e-15)
   }
 
-  theta <- coef(glm(Y_l ~ . - 1, data = data.frame(Y_l, X_l),
+  theta <- coef(glm(Y_l ~ . - 1,
 
-                    family = binomial))
+    data = data.frame(Y_l, X_l), family = binomial))
 
   theta <- matrix(theta, ncol = 1)
 
@@ -106,9 +94,13 @@ ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
     sum(w_u * (-f_u * (X_u %*% theta) + log1pexp(X_u %*% theta))) *
 
-      lhat_curr / N - sum(w_l * (-f_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) *
+      lhat_curr / N - sum(
 
-      lhat_curr / n + sum(w_l * (-Y_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) / n
+        w_l * (-f_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) *
+
+      lhat_curr / n + sum(
+
+        w_l * (-Y_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) / n
   }
 
   rectified_logistic_grad <- function(theta) {
@@ -122,25 +114,21 @@ ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
   est <- optim(par = theta, fn = rectified_logistic_loss,
 
-               gr = rectified_logistic_grad, method = "L-BFGS-B",
+    gr = rectified_logistic_grad, method = "L-BFGS-B",
 
-               control = list(factr = opts$factr))$par
+    control = list(factr = opts$factr))$par
 
   if (is.null(lhat)) {
 
-    stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u,
-
-                                f_u, w_l, w_u)
+    stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u)
 
     lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-                          stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
+      stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-    return(ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+    return(ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
-                                 opts = opts, lhat = lhat, coord = coord, w_l = w_l,
-
-                                 w_u = w_u))
+      opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
 
   } else {
 
@@ -205,29 +193,21 @@ ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
+#' est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u)
 #'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
-#'
-#' w_l <- rep(1, n)
-#'
-#' w_u <- rep(1, N)
-#'
-#' stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u = TRUE)
+#' stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @export
 
 logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
-                               w_l = NULL, w_u = NULL, use_u = TRUE) {
+  w_l = NULL, w_u = NULL, use_u = TRUE) {
 
-  n <- nrow(Y_l)
-  p <- ncol(X_l)
+  n <- nrow(f_l)
+
   N <- nrow(f_u)
+
+  p <- ncol(X_u)
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
@@ -283,7 +263,7 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
     list(grads = grads, grads_hat = grads_hat,
 
-         grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
+      grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
 }
 
 #=== PPI++ LOGISTIC REGRESSION =================================================
@@ -303,17 +283,6 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
-#'
-#' @param n (int): Number of labeled observations.
-#'
-#' @param p (int): Number of covariates (features) of interest.
-#'
-#' @param N (int): Number of unlabeled observations.
-#'
-#' @param alpha (float): Significance level in \[0,1\]
-#'
-#' @param alternative (string): Alternative hypothesis, either 'two-sided',
-#' 'larger' or 'smaller'.
 #'
 #' @param lhat (float, optional): Power-tuning parameter.
 #' The default value `NULL` will estimate the optimal value from data.
@@ -357,27 +326,21 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
-#'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' ppi_logistic(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_logistic(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05,
+ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
-                              alternative = "two-sided", lhat = NULL, coord = NULL, opts = NULL,
+  lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
 
-                              w_l = NULL, w_u = NULL) {
+  n <- nrow(f_l)
 
-  n <- nrow(Y_l)
-  p <- ncol(X_l)
   N <- nrow(f_u)
+
+  p <- ncol(X_u)
 
   w_l <- if (is.null(w_l)) rep(1, n) else w_l / sum(w_l) * n
 
@@ -385,25 +348,23 @@ ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05,
 
   use_u <- is.null(lhat) || lhat != 0
 
-  est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u, n, p, N, opts = opts,
+  est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
-                               lhat = lhat, coord = coord, w_l = w_l, w_u = w_u)
+    opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u)
 
   stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u,
 
-                              use_u = use_u)
+    use_u = use_u)
 
   if (is.null(lhat)) {
 
     lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-                          stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
+      stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-    return(ppi_logistic(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+    return(ppi_logistic(X_l, Y_l, f_l, X_u, f_u,
 
-                             alpha = alpha, opts = opts, alternative = alternative,
-
-                             lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
+      lhat = lhat, coord = coord, opts = opts, w_l = w_l, w_u = w_u))
   }
 
   var_u <- cov(lhat * stats$grads_hat_unlabeled)
@@ -412,9 +373,7 @@ ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N, alpha = 0.05,
 
   Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
 
-  return(zconfint_generic(est, sqrt(diag(Sigma_hat) / n),
-
-                          alpha = alpha, alternative = alternative))
+  return(list(est = est, se = sqrt(diag(Sigma_hat) / n)))
 }
 
 #=== END =======================================================================

@@ -285,9 +285,9 @@ ppi_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
 #'
 #' @export
 
-ppi_quantile <- function(Y_l, f_l, f_u, q, alpha = 0.05,
+ppi_quantile <- function(Y_l, f_l, f_u, q,
 
-                              exact_grid = FALSE, w_l = NULL, w_u = NULL) {
+  alpha = 0.05, exact_grid = FALSE, w_l = NULL, w_u = NULL) {
 
   Y_l <- c(Y_l)
 

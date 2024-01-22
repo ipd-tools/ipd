@@ -113,11 +113,6 @@ rel_form <- Y ~ Yhat  ## we consider a basic linear function
 inf_form <- Yhat ~ X1
 
 IPD::postpi_analytic_ols(rel_form, inf_form, dat = dat)
-#> $est
-#> [1] 11.561038  0.955248
-#> 
-#> $se
-#> [1] 0.2401493 0.1706713
 ```
 
 #### 1.2) Bootstrap method from Wang et al. (2020)
@@ -132,14 +127,6 @@ inf_form <- Yhat ~ X1
 nboot <- 200
 
 IPD::postpi_boot_ols(rel_form, inf_form, dat = dat, nboot)
-#> $est
-#> [1] 11.5462734  0.9444002
-#> 
-#> $se_par
-#> [1] 0.2394565 0.1706623
-#> 
-#> $se_npar
-#> [1] 0.2364742 0.1807781
 # the function returns both parametric (par) and 
 # non-parametric (npar) estimate of std.error (se)
 ```
@@ -162,11 +149,6 @@ n <- nrow(X_l)
 p <- ncol(X_l)
 N <- nrow(X_u)
 IPD::ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
-#> $est
-#> [1] 11.697627  0.817898
-#> 
-#> $se
-#> [1] 0.2357630 0.1790149
 ```
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
@@ -188,12 +170,6 @@ p <- ncol(X_l)
 N <- nrow(X_u)
 
 IPD::ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
-#> $est
-#> X(Intercept)          XX1 
-#>   11.7737782    0.8460529 
-#> 
-#> $se
-#> [1] 0.2200044 0.1615084
 ```
 
 #### 4. Assumption-lean and data-adaptive Post-Prediction Inference (POP-Inf) (Miao et al., 2023)
@@ -206,18 +182,6 @@ rec_form <- Y - Yhat ~ X1
 inf_form <- Yhat ~ X1
 
 IPD::popinf_ols(rec_form, inf_form, dat = dat)
-#> j: 6.474096e-09j: 1
-#> $est
-#>                   [,1]
-#> (Intercept) 11.8378384
-#> X1           0.8697373
-#> 
-#> $se
-#> (Intercept)          X1 
-#>   0.2465003   0.1804958 
-#> 
-#> $w
-#> [1] 6.474096e-09 1.000000e+00
 ```
 
 #### 5. Multiple-imputation method from Leek et al., (2023)
@@ -231,11 +195,6 @@ inf_form <- Yhat ~ X1
 m <- 100
 
 IPD::postpi_mi_ols(rel_form, inf_form, dat = dat, m)
-#> $est
-#> [1] 11.5855979  0.9351817
-#> 
-#> $se
-#> [1] 0.3228812 0.2336300
 ```
 
 ## Vignette

@@ -57,7 +57,7 @@ and 'df_unlabeled' arguments will result in an error message.}
 \item{seed}{(int, optional): an integer value provided as seed.}
 
 \item{alpha}{(float, optional): specified level of significance of the the
-confidence interval; defaults to 0.95.}
+confidence interval; defaults to 0.05.}
 
 \item{alternative}{(string, optional): Specify the alternative hypothesis,
 must be one of "two.sided", "greater" or "less"; defaults to "two.sided".}

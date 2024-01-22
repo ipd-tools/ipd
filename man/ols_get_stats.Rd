@@ -71,18 +71,8 @@ X_u <- model.matrix(form, data = dat[dat$set == "val",])
 
 f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 
-n <- nrow(X_l)
+est <- ppi_ols_est(X_l, Y_l, f_l, X_u, f_u)
 
-p <- ncol(X_l)
-
-N <- nrow(X_u)
-
-est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
-
-w_l <- rep(1, n)
-
-w_u <- rep(1, N)
-
-stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u = TRUE)
+stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, use_u = TRUE)
 
 }

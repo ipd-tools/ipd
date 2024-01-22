@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppi_ols.R
 \name{ppi_ols}
 \alias{ppi_ols}
-\title{PPI Linear Regression using Angelopoulos et al. (2023) Analytic Form}
+\title{PPI++ OLS Estimator and Inference}
 \usage{
 ppi_ols(
   X_l,
@@ -10,48 +10,49 @@ ppi_ols(
   f_l,
   X_u,
   f_u,
-  n,
-  p,
-  N,
   lhat = NULL,
   coord = NULL,
-  w = NULL,
-  w_unlabeled = NULL
+  w_l = NULL,
+  w_u = NULL
 )
 }
 \arguments{
-\item{X_l}{(ndarray): Covariates corresponding to the gold-standard labels.}
+\item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
 
-\item{Y_l}{(ndarray): Gold-standard labels.}
+\item{Y_l}{(vector): n-vector of labeled outcomes.}
 
-\item{f_l}{(ndarray): Predictions corresponding to the gold-standard labels.}
+\item{f_l}{(vector): n-vector of predictions in the labeled data.}
 
-\item{X_u}{(ndarray): Covariates corresponding to the unlabeled data.}
+\item{X_u}{(matrix): N x p matrix of covariates in the unlabeled data.}
 
-\item{f_u}{(ndarray): Predictions corresponding to the unlabeled data.}
+\item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{n}{(int): Number of labeled data points.}
+\item{lhat}{(float, optional): Power-tuning parameter.
+The default value \code{NULL} will estimate the optimal value from data.
+Setting \code{lhat = 1} recovers PPI with no power tuning.
+Setting \code{lhat = 0} recovers the classical point estimate.}
 
-\item{p}{(int): Dimension of the covariates.}
+\item{coord}{(int, optional): Coordinate for which to optimize \code{lhat}.
+If \code{None}, it optimizes the total variance over all coordinates.
+Must be in {1, ..., p} where p is the shape of the estimand.}
 
-\item{N}{(int): Number of unlabeled data points.}
+\item{w_l}{(vector, optional): n-vector of sample weights for the
+labeled data.}
 
-\item{lhat}{(float, optional): Power-tuning parameter (see \verb{[ADZ23] <https://arxiv.org/abs/2311.01453>}__). The default value \code{None} will estimate the optimal value from data. Setting \code{lhat=1} recovers PPI with no power tuning, and setting \code{lhat=0} recovers the classical point estimate.}
-
-\item{coord}{(int, optional): Coordinate for which to optimize \code{lhat}. If \code{None}, it optimizes the total variance over all coordinates. Must be in {1, ..., d} where d is the shape of the estimand.}
-
-\item{w}{(ndarray, optional): Sample weights for the labeled data set.}
-
-\item{w_unlabeled}{(ndarray, optional): Sample weights for the unlabeled data set.}
+\item{w_u}{(vector, optional): N-vector of sample weights for the
+unlabeled data.}
 }
 \value{
-A list of outputs: estimate of inference model parameters and corresponding standard errors
+(list): A list containing the following:
+
+\describe{
+\item{est}{(vector): p-vector of PPI++ OLS coefficient estimates.}
+\item{se}{(vector): p-vector of standard errors of the coefficients.}
+}
 }
 \description{
-Computes the prediction-powered point estimate of the OLS coefficients.
-}
-\details{
-Additional details...
+Computes the prediction-powered estimator and confidence interval for the
+OLS coefficients using the PPI++ algorithm.
 }
 \examples{
 
@@ -69,12 +70,6 @@ X_u <- model.matrix(form, data = dat[dat$set == "val",])
 
 f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 
-n <- nrow(X_l)
-
-p <- ncol(X_l)
-
-N <- nrow(X_u)
-
-ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 
 }

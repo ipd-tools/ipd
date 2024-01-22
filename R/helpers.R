@@ -176,29 +176,21 @@ wls <- function(X, Y, w = NULL, return_se = F) {
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
+#' est <- ppi_ols_est(X_l, Y_l, f_l, X_u, f_u)
 #'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
-#'
-#' w_l <- rep(1, n)
-#'
-#' w_u <- rep(1, N)
-#'
-#' stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u = TRUE)
+#' stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, use_u = TRUE)
 #'
 #' @export
 
 ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
-                          w_l = NULL, w_u = NULL, use_u = TRUE) {
+  w_l = NULL, w_u = NULL, use_u = TRUE) {
 
-  n <- nrow(X_l)
+  n <- nrow(f_l)
+
+  N <- nrow(f_u)
+
   p <- ncol(X_l)
-  N <- nrow(X_u)
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
@@ -244,7 +236,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
   return(list(grads = grads, grads_hat = grads_hat,
 
-              grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
+    grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
 }
 
 #--- ESTIMATE POWER TUNING PARAMETER -------------------------------------------
@@ -292,22 +284,13 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
+#' est <- ppi_ols_est(X_l, Y_l, f_l, X_u, f_u)
 #'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u, n, p, N)
-#'
-#' w_l <- rep(1, n)
-#'
-#' w_u <- rep(1, N)
-#'
-#' stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u = TRUE)
+#' stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
 #'
 #' calc_lhat_glm(stats$grads, stats$grads_hat, stats$grads_hat_unlabeled,
-#'               stats$inv_hessian, coord = NULL, clip = FALSE)
+#'
+#'   stats$inv_hessian, coord = NULL, clip = FALSE)
 #'
 #' @returns (float): Optimal value of `lhat` in \[0,1\].
 #'
@@ -315,7 +298,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
 calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
 
-                          coord = NULL, clip = FALSE) {
+  coord = NULL, clip = FALSE) {
 
   if (is.null(dim(grads))) {
 
@@ -333,7 +316,9 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
   }
 
   n <- nrow(grads)
+
   N <- nrow(grads_hat_unlabeled)
+
   p <- ncol(inv_hessian)
 
   cov_grads <- matrix(0, nrow = p, ncol = p)
@@ -342,11 +327,11 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
 
     cov_grads <- cov_grads + (1/n) * (outer(grads[i,] - colMeans(grads),
 
-                                            grads_hat[i,] - colMeans(grads_hat)) +
+      grads_hat[i,] - colMeans(grads_hat)) +
 
-                                        outer(grads_hat[i,] - colMeans(grads_hat),
+        outer(grads_hat[i,] - colMeans(grads_hat),
 
-                                              grads[i,] - colMeans(grads)))
+          grads[i,] - colMeans(grads)))
   }
 
   var_grads_hat <- cov(rbind(grads_hat, grads_hat_unlabeled))
@@ -364,13 +349,13 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
 
     num <- ifelse(is.null(coord),
 
-                  sum(diag(vhat %*% cov_grads %*% vhat)), vhat %*% cov_grads %*% vhat)
+      sum(diag(vhat %*% cov_grads %*% vhat)), vhat %*% cov_grads %*% vhat)
 
     denom <- ifelse(is.null(coord),
 
-                    2*(1 + n/N) * sum(diag(vhat %*% var_grads_hat %*% vhat)),
+      2*(1 + n/N) * sum(diag(vhat %*% var_grads_hat %*% vhat)),
 
-                    2*(1 + n/N) * vhat %*% var_grads_hat %*% vhat)
+      2*(1 + n/N) * vhat %*% var_grads_hat %*% vhat)
 
   } else {
 
