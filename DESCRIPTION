@@ -1,10 +1,10 @@
 Package: IPD
-Title: Perform Statistically Valid and Efficient Inference with Predicted Data (IPD) using State-of-the-art Methods
+Title: Perform Statistically Valid and Efficient Inference on Predicted Data (IPD) using State-of-the-art Methods
 Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: A comprehensive r-package for peforming valid statistical inference on predicted data utilizing all extant state-of-the-art methods. The package offers an all-encompassing wrapper function with specified defaults for ease of use and provides the output in summary format. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
