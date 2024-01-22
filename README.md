@@ -66,16 +66,16 @@ functions included in `IPD`. We build the premise in the following
 manner to build an unifying example to be used across all available
 methods.
 
-1)  Assume that we have access to a well-performing accurate AI/ML/DL
-    algorithm $f_{\text{x}}(\cdot)$ that can predict our outcome of
-    interest $Y$.
+(i). Assume that we have access to a well-performing and fairly accurate
+AI/ML/DL algorithm $f_{\text{x}}(\cdot)$ that can predict our outcome of
+interest $Y$.
 
-2)  Next, consider that we have 2 data sets, a labeled data set (which
-    we will call the **test set** $(X_{te}, Y_{te})$), and an unlabeled
-    data set (which we call the **validation set** $(X_{val)}$).
-    Typically the the labeled/test set is considerably smaller in size
-    compared to the unlabeled/validation set. Here we will consider them
-    to be equal for brevity.
+(ii). Next, consider that we have 2 data sets, a labeled data set (which
+we will call the **test set** $(X_{te}, Y_{te})$), and an unlabeled data
+set (which we call the **validation set** $(X_{val)}$). Typically the
+the labeled/test set is considerably smaller in size compared to the
+unlabeled/validation set. Here we will consider them to be equal for
+brevity.
 
 - We consider the regressors, $X = (X_1, X_2, X_3, X_4)$ and let $Y$ be
   a scalar.
@@ -95,5 +95,21 @@ $$
 where $\epsilon^* = N(0, 1)$.
 
 (iv). However, we do not observe $Y_{val}$. We instead only have access
-to the predicted $\hat Y_{val} = f(X_{val})$ or the pre-trained
-prediction model $\hat{f}$.
+to the predicted $\hat Y_{val} = f_{\text{x}}(X_{val})$.
+
+## Vignette
+
+For more advanced users and researchers, we provide more use cases and
+examples in the package `vignettes`.
+
+``` r
+vignette("IPD")
+```
+
+This provides an extensive tutorial on `IPD` and discusses
+method-specific usage in details.
+
+## Feedback
+
+For questions and comments or any other feedback, please contact the
+developers.
