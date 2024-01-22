@@ -143,7 +143,7 @@ wls <- function(X, Y, w = NULL, return_se = F) {
 #'
 #' @param w_u (vector, optional): Sample weights for the unlabeled data set.
 #'
-#' @param use_u (bool, optional): Whether to use the unlabeled data set.
+#' @param use_u (boolean, optional): Whether to use the unlabeled data set.
 #'
 #' @returns (list): A list containing the following:
 #'
@@ -273,7 +273,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #' If `None`, it optimizes the total variance over all coordinates.
 #' Must be in {1, ..., d} where d is the shape of the estimand.
 #'
-#' @param clip (bool, optional): Whether to clip the value of lhat to be
+#' @param clip (boolean, optional): Whether to clip the value of lhat to be
 #' non-negative. Defaults to `False`.
 #'
 #' @examples

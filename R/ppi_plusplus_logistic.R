@@ -77,7 +77,9 @@
 
 ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
 
-                                  lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
+                                      lhat = NULL, coord = NULL, opts = NULL,
+
+                                      w_l = NULL, w_u = NULL) {
 
   n <- nrow(Y_l)
   p <- ncol(X_l)

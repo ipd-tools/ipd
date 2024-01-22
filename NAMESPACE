@@ -3,6 +3,7 @@
 export(calc_lhat_glm)
 export(compute_cdf)
 export(compute_cdf_diff)
+export(ipd)
 export(logistic_get_stats)
 export(ols)
 export(ols_get_stats)

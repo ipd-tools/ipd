@@ -33,7 +33,7 @@ ols_get_stats(
 
 \item{w_u}{(vector, optional): Sample weights for the unlabeled data set.}
 
-\item{use_u}{(bool, optional): Whether to use the unlabeled data set.}
+\item{use_u}{(boolean, optional): Whether to use the unlabeled data set.}
 }
 \value{
 (list): A list containing the following:

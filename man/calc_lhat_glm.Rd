@@ -32,7 +32,7 @@ loss function with respect to the parameter.}
 If \code{None}, it optimizes the total variance over all coordinates.
 Must be in {1, ..., d} where d is the shape of the estimand.}
 
-\item{clip}{(bool, optional): Whether to clip the value of lhat to be
+\item{clip}{(boolean, optional): Whether to clip the value of lhat to be
 non-negative. Defaults to \code{False}.}
 }
 \value{
