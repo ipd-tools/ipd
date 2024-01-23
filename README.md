@@ -148,7 +148,7 @@ f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
 n <- nrow(X_l)
 p <- ncol(X_l)
 N <- nrow(X_u)
-IPD::ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+IPD::ppi_ols(X_l, Y_l, f_l, X_u, f_u, lhat = 1)
 ```
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
@@ -169,7 +169,7 @@ n <- nrow(X_l)
 p <- ncol(X_l)
 N <- nrow(X_u)
 
-IPD::ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+IPD::ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 ```
 
 #### 4. Assumption-lean and data-adaptive Post-Prediction Inference (POP-Inf) (Miao et al., 2023)
