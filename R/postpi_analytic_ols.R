@@ -30,17 +30,19 @@
 #' @details
 #' Additional details...
 #'
-#' @param rel_form A formula defining the relationship model. This should be
-#' of the form Y ~ Yhat, where Y is the name of the column corresponding to
-#' the observed outcome in the labeled data and Yhat is the name of the column
-#' corresponding to the predicted outcome in the labeled data.
+#' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
-#' @param inf_form A formula defining the inference model. This should be of
-#' the form Yhat ~ X, where Yhat is the name of the column corresponding to the
-#' predicted outcome in the unlabeled data, and X generally corresponds to the
-#' features of interest (e.g., X1 + X2).
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param dat data in the form of the simdat function
+#' @param f_l (vector): n-vector of predictions in the labeled data.
+#'
+#' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
+#'
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
+#'
+#' @param X_in_rel (boolean, optional): Logical argument for whether or not to
+#' include the features of interest in the relationship model.
+#' Defaults to FALSE.
 #'
 #' @returns A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
@@ -63,31 +65,48 @@
 
 #-- PostPI - ANALYTIC for OLS
 
-postpi_analytic_ols <- function(rel_form, inf_form, dat) {
+postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u, X_in_rel = FALSE) {
 
-  #- 1. Estimate Prediction Model (Done in Data Step)
+  #- 0. Setup
 
-  #- 2. Estimate Relationship Model
+  inf_form <- reformulate(
 
-  fit_rel <- lm(rel_form, data = dat[dat$set == "tst",])
+    all.vars(formula)[-(1:2)], response = all.vars(formula)[2])
 
-  #- 3. Estimate Inference Model
+  if(X_in_rel) {
 
-  fit_inf <- lm(inf_form, data = dat[dat$set == "val",])
+    rel_form <- reformulate(
 
-  #- 4. Coefficient Estimator
+      all.vars(formula)[-1], response = all.vars(formula)[1])
 
-  X_val <- model.matrix(inf_form, data = dat[dat$set == "val",])
+  } else {
+
+    rel_form <- reformulate(
+
+      all.vars(formula)[2], response = all.vars(formula)[1])
+  }
+
+  #- 1. Estimate Relationship Model
+
+  fit_rel <- lm(rel_form, data = as.data.frame(cbind(Y_l, f_l, X_l)))
+
+  #- 2. Estimate Inference Model
+
+  fit_inf <- lm(inf_form, data = as.data.frame(cbind(f_u, X_u)))
+
+  #- 3. Coefficient Estimator
+
+  X_val <- model.matrix(inf_form, data = as.data.frame(cbind(f_u, X_u)))
 
   est <- solve(crossprod(X_val)) %*% t(X_val) %*%
 
     (coef(fit_rel)[1] + coef(fit_rel)[2]*X_val %*% coef(fit_inf))
 
-  #- 5. SE of Coefficient Estimator
+  #- 4. SE of Coefficient Estimator
 
   se <- sqrt(diag(solve(crossprod(X_val))*(sigma(fit_rel)^2 +
 
-                                             (coef(fit_rel)[2]^2)*sigma(fit_inf)^2)))
+    (coef(fit_rel)[2]^2)*sigma(fit_inf)^2)))
 
   #- Output
 

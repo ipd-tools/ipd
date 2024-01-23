@@ -61,17 +61,17 @@ dat <- simdat()
 
 form <- Y - Yhat ~ X1
 
-X_l <- model.matrix(form, data = dat[dat$set == "tst",])
+X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 
-Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 
-f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-X_u <- model.matrix(form, data = dat[dat$set == "val",])
+X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 
-f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-est <- ppi_ols_est(X_l, Y_l, f_l, X_u, f_u)
+est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u)
 
 stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, use_u = TRUE)
 

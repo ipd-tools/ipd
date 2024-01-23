@@ -131,7 +131,7 @@
 #' @param df_unlabeled (string, optional): a data frame containing only the
 #' unlabeled data set. Specify this argument ONLY if the data provided is not
 #' already stacked. This data frame consists of the predicted outcomes (Yhat)
-#' for the unlabeled dataand the features (X). Specifying both 'label_index'
+#' for the unlabeled data and the features (X). Specifying both 'label_index'
 #' and 'df_unlabeled' arguments will result in an error message.
 #'
 #' @param seed (int, optional): an integer value provided as seed.
@@ -197,7 +197,7 @@ ipd <- function(formula, method, model, data,
 
   if (!(method %in% c("postpi_analytic", "postpi_boot", "postpi_mi",
 
-                      "ppi", "popinf"))) {
+    "ppi", "popinf"))) {
 
     stop(paste("'method' must be one of",
 
@@ -219,28 +219,18 @@ ipd <- function(formula, method, model, data,
 
   #--- D. CHECK FOR VALID METHOD-MODEL COMBINATION
 
-  ## NEED to fix this.
-
+  # if (!exists(paste(method, model, sep = "_"), inherits = FALSE))  {
+  #
+  #   stop(paste0("This method/model combination (",
+  #
+  #     paste(method, model, sep = "_"), ") has not yet been implemented. ",
+  #
+  #     "See the 'Details' section of the documentation for more information."))
+  # }
 
   #--- E. SET SEED
 
   if (!is.null(seed)) set.seed(seed)
-
-
-  #--- F. PREPARE FORMULAS -----------------------------------------------------
-
-  #--- i) Define inference model
-
-  inf_form <- reformulate(all.vars(formula)[-(1:2)], response = all.vars(formula)[2])
-
-  #--- ii) relationship model with X  [for newer postpi methods]
-
-  rel_form <- reformulate(all.vars(formula)[-1], response = all.vars(formula)[1])
-
-  #--- iii) relationship model without X  [for older postpi methods]
-
-  # rel_form_wo_X <- reformulate(all.vars(formula)[2], response = all.vars(formula)[1])
-
 
   #--- PREPARE DATA ------------------------------------------------------------
 
@@ -248,20 +238,23 @@ ipd <- function(formula, method, model, data,
 
   ##--- CHECK ONE OF EACH labeled AND unlabeled IDENTIFIERS EXIST
 
-  valid_labeled_df_id <- c("tst", "test", 1, TRUE, "lab", "label", "labeled", "labelled")
+  valid_labeled_df_id <- c(
 
-  valid_unlabeled_df_id <- c("val", "validation", 0, FALSE, "unlab", "unlabeled", "unlabelled")
+    "tst", "test", 1, TRUE, "lab", "label", "labeled", "labelled")
 
-  if(!( (sum(unique(data[[label_index]]) %in% valid_labeled_df_id) == 1) &
+  valid_unlabeled_df_id <- c(
 
-        (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
+    "val", "validation", 0, FALSE, "unlab", "unlabeled", "unlabelled")
 
-    stop(paste(label_index, "must have one valid idenfier for labeled and unlabeled
+  if(!((sum(unique(data[[label_index]]) %in% valid_labeled_df_id) == 1) &
 
-               data set each.",
+    (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
 
-               "See the 'Details' section of the documentation for more
-                information."))
+    stop(paste(label_index,
+
+      "must have one valid identifier for labeled and unlabeled data set each.",
+
+      "See the 'Details' section of the documentation for more information."))
   }
 
   ##-- IF STACKED DATA IS PROVIDED
@@ -271,7 +264,6 @@ ipd <- function(formula, method, model, data,
     data_l <- data[data[[label_index]] %in% valid_labeled_df_id, ]
 
     data_u <- data[data[[label_index]] %in% valid_unlabeled_df_id, ]
-
   }
 
   if(is.null(label_index) & !is.null(df_unlabeled)) {
@@ -281,10 +273,9 @@ ipd <- function(formula, method, model, data,
     data_l <- data
 
     data_u <- df_unlabeled
-
   }
 
-  ## Extract columns
+  #-- LABELED DATA
 
   X_l <- model.matrix(formula, data = data_l)
 
@@ -297,14 +288,6 @@ ipd <- function(formula, method, model, data,
   X_u <- model.matrix(formula, data = data_u)
 
   f_u <- data_u[ , all.vars(formula)[2]] |> matrix(ncol = 1)
-
-  #-- DIMENSIONS
-
-  n <- nrow(X_l)
-
-  p <- ncol(X_l)
-
-  N <- nrow(X_u)
 
   #--- METHOD ------------------------------------------------------------------
 

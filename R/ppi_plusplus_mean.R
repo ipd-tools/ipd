@@ -48,7 +48,7 @@
 #'
 #' @export
 
-ppi_mean_est <- function(Y_l, f_l, f_u,
+ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
 
   lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
 
@@ -78,7 +78,7 @@ ppi_mean_est <- function(Y_l, f_l, f_u,
 
       grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord, clip = T)
 
-    return(ppi_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
+    return(ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
 
   } else {
 
@@ -135,7 +135,7 @@ ppi_mean_est <- function(Y_l, f_l, f_u,
 #'
 #' @export
 
-ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided",
+ppi_plusplus_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided",
 
                           lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
 
@@ -151,7 +151,7 @@ ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided",
 
   if (is.null(lhat)) {
 
-    est <- ppi_mean_est(Y_l, f_l, f_u, 1, w_l, w_u)
+    est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, 1, w_l, w_u)
 
     grads <- w_l * (Y_l - est)
 
@@ -165,10 +165,10 @@ ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided",
 
       grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord, clip = T)
 
-    return(ppi_mean(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
+    return(ppi_plusplus_mean(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
   }
 
-  est <- ppi_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u)
+  est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u)
 
   imputed_std <- sd(w_u * (lhat * f_u)) * sqrt((N - 1) / N) / sqrt(N)
 

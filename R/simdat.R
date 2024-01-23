@@ -31,17 +31,21 @@ simdat <- function(n = c(300, 300, 300), beta1 = 1) {
 
   Y <- c(beta1*X1 + 0.5*X2 + 3*smooth(X3) + 4*smooth(X4) + rnorm(sum(n)))
 
-  set <- rep(c("trn", "tst", "val"), n)
+  set <- rep(c("training", "labeled", "unlabeled"), n)
 
   dat <- data.frame(X1, X2, X3, X4, Y, Yhat = NA, set)
 
   fit_gam <- gam::gam(
 
-    Y ~ s(X1) + s(X2) + s(X3) + s(X4), data = dat[set == "trn",])
+    Y ~ s(X1) + s(X2) + s(X3) + s(X4), data = dat[set == "training",])
 
-  dat[set == "tst", "Yhat"] <- predict(fit_gam, newdat = dat[set == "tst",])
+  dat[set == "labeled", "Yhat"] <- predict(
 
-  dat[set == "val", "Yhat"] <- predict(fit_gam, newdat = dat[set == "val",])
+    fit_gam, newdat = dat[set == "labeled",])
+
+  dat[set == "unlabeled", "Yhat"] <- predict(
+
+    fit_gam, newdat = dat[set == "unlabeled",])
 
   return(dat)
 }
@@ -74,33 +78,35 @@ simdat_logistic <- function(n = c(300, 300, 300), betac = 1) {
   X2 <- rnorm(sum(n), 2)
   Xc <- sample(0:2, sum(n), replace = T)
 
-  p_Y <- plogis(c(betac*as.numeric(Xc == 2) + 1*as.numeric(Xc == 1) +
+  p_Y <- plogis(c(betac*as.numeric(Xc == 2) +
 
-                    1*smooth(X1) - 2*smooth(X2) + rnorm(sum(n))))
+    1*as.numeric(Xc == 1) + 1*smooth(X1) - 2*smooth(X2) + rnorm(sum(n))))
 
-  Y <- rbinom(sum(n), 1, p_Y)    #factor()
+  Y <- rbinom(sum(n), 1, p_Y)
 
-  set <- rep(c("trn", "tst", "val"), n)
+  set <- rep(c("training", "labeled", "unlabeled"), n)
 
   dat <- data.frame(X1, X2, Xc, Y, Yhat = NA, set)
 
-  knn_tune <- caret::train(factor(Y) ~ X1 + X2 + Xc, data = dat[set == "trn",],
+  knn_tune <- caret::train(
 
-                           method = "knn", trControl = trainControl(method = "cv"),
+    factor(Y) ~ X1 + X2 + Xc, data = dat[set == "training",],
 
-                           tuneGrid = data.frame(k = c(1:10)))
+    method = "knn", trControl = trainControl(method = "cv"),
 
-  fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + Xc, data = dat[set == "trn",],
+    tuneGrid = data.frame(k = c(1:10)))
 
-                         k = knn_tune$bestTune$k)
+  fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + Xc,
 
-  dat[set == "tst", "Yhat"] <- predict(
+    data = dat[set == "training",], k = knn_tune$bestTune$k)
 
-    fit_knn, dat[set == "tst",], type = "class")
+  dat[set == "labeled", "Yhat"] <- predict(
 
-  dat[set == "val", "Yhat"] <- predict(
+    fit_knn, dat[set == "labeled",], type = "class")
 
-    fit_knn, dat[set == "val",], type = "class")
+  dat[set == "unlabeled", "Yhat"] <- predict(
+
+    fit_knn, dat[set == "unlabeled",], type = "class")
 
   return(dat)
 }

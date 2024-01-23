@@ -196,17 +196,17 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #'
 #' form <- Y - Yhat ~ X1
 #'
-#' Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' ppi_quantile_est(Y_l, f_l, f_u, q = 0.5)
+#' ppi_plusplus_quantile_est(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
-ppi_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
+ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
 
                                   w_l = NULL, w_u = NULL) {
 
@@ -275,17 +275,17 @@ ppi_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
 #'
 #' form <- Y - Yhat ~ X1
 #'
-#' Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' ppi_quantile(Y_l, f_l, f_u, q = 0.5)
+#' ppi_plusplus_quantile(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
-ppi_quantile <- function(Y_l, f_l, f_u, q,
+ppi_plusplus_quantile <- function(Y_l, f_l, f_u, q,
 
   alpha = 0.05, exact_grid = FALSE, w_l = NULL, w_u = NULL) {
 

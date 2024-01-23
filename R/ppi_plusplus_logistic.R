@@ -47,23 +47,23 @@
 #'
 #' form <- Y - Yhat ~ Xc
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set == "tst",])
+#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
-#' Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set == "val",])
+#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 #'
-#' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u)
+#' ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
+ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 
   lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
 
@@ -126,7 +126,7 @@ ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 
       stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-    return(ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u,
+    return(ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
       opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
 
@@ -183,17 +183,17 @@ ppi_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' form <- Y - Yhat ~ Xc
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set == "tst",])
+#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
-#' Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set == "val",])
+#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 #'
-#' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u)
+#' est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -316,23 +316,23 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' form <- Y - Yhat ~ Xc
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set == "tst",])
+#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
-#' Y_l <- dat[dat$set == "tst", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set == "tst", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set == "val",])
+#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 #'
-#' f_u <- dat[dat$set == "val", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' ppi_logistic(X_l, Y_l, f_l, X_u, f_u)
+#' ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
+ppi_plusplus_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
   lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
 
@@ -348,7 +348,7 @@ ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
   use_u <- is.null(lhat) || lhat != 0
 
-  est <- ppi_logistic_est(X_l, Y_l, f_l, X_u, f_u,
+  est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
     opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u)
 
@@ -362,7 +362,7 @@ ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
       stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-    return(ppi_logistic(X_l, Y_l, f_l, X_u, f_u,
+    return(ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u,
 
       lhat = lhat, coord = coord, opts = opts, w_l = w_l, w_u = w_u))
   }

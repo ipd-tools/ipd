@@ -73,15 +73,15 @@ popinf_ols <- function(rec_form, inf_form, dat,
 
   #- 0. Inputs
 
-  X_l <- model.matrix(rec_form, data = dat[dat$set == "tst",])
+  X_l <- model.matrix(rec_form, data = dat[dat$set == "labeled",])
 
-  Y_l <- dat[dat$set == "tst", all.vars(rec_form)[1]]
+  Y_l <- dat[dat$set == "labeled", all.vars(rec_form)[1]]
 
-  f_l <- dat[dat$set == "tst", all.vars(rec_form)[2]]
+  f_l <- dat[dat$set == "labeled", all.vars(rec_form)[2]]
 
-  X_u <- model.matrix(inf_form, data = dat[dat$set == "val",])
+  X_u <- model.matrix(inf_form, data = dat[dat$set == "unlabeled",])
 
-  f_u <- dat[dat$set == "val", all.vars(inf_form)[1]]
+  f_u <- dat[dat$set == "unlabeled", all.vars(inf_form)[1]]
 
   #- 1. Pre-Compute Common Values
 
@@ -209,15 +209,15 @@ popinf_ols <- function(rec_form, inf_form, dat,
 #
 #   Y <- c(beta1*X1 + 0.5*X2 + 3*smooth(X3) + 4*smooth(X4) + rnorm(sum(n)))
 #
-#   set <- rep(c("trn", "tst", "val"), n)
+#   set <- rep(c("trn", "labeled", "unlabeled"), n)
 #
 #   dat <- data.frame(X1, X2, X3, X4, Y, Yhat = NA, set)
 #
 #   fit_gam <- gam(Y ~ s(X1) + s(X2) + s(X3) + s(X4), data = dat[set == "trn",])
 #
-#   dat[set == "tst", "Yhat"] <- predict(fit_gam, newdat = dat[set == "tst",])
+#   dat[set == "labeled", "Yhat"] <- predict(fit_gam, newdat = dat[set == "labeled",])
 #
-#   dat[set == "val", "Yhat"] <- predict(fit_gam, newdat = dat[set == "val",])
+#   dat[set == "unlabeled", "Yhat"] <- predict(fit_gam, newdat = dat[set == "unlabeled",])
 #
 #   return(dat)
 # }

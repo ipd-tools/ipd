@@ -4,20 +4,22 @@
 \alias{postpi_analytic_ols}
 \title{PostPI Linear Regression using Wang et al. (2020) Analytic Correction}
 \usage{
-postpi_analytic_ols(rel_form, inf_form, dat)
+postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, X_in_rel = FALSE)
 }
 \arguments{
-\item{rel_form}{A formula defining the relationship model. This should be
-of the form Y ~ Yhat, where Y is the name of the column corresponding to
-the observed outcome in the labeled data and Yhat is the name of the column
-corresponding to the predicted outcome in the labeled data.}
+\item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
 
-\item{inf_form}{A formula defining the inference model. This should be of
-the form Yhat ~ X, where Yhat is the name of the column corresponding to the
-predicted outcome in the unlabeled data, and X generally corresponds to the
-features of interest (e.g., X1 + X2).}
+\item{Y_l}{(vector): n-vector of labeled outcomes.}
 
-\item{dat}{data in the form of the simdat function}
+\item{f_l}{(vector): n-vector of predictions in the labeled data.}
+
+\item{X_u}{(matrix): N x p matrix of covariates in the unlabeled data.}
+
+\item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
+
+\item{X_in_rel}{(boolean, optional): Logical argument for whether or not to
+include the features of interest in the relationship model.
+Defaults to FALSE.}
 }
 \value{
 A list of outputs: estimate of the inference model parameters and

@@ -77,15 +77,15 @@ postpi_boot_ols <- function(rel_form, inf_form, dat, nboot = 100, rel_func = "lm
 
   if (rel_func == "lm") {
 
-    fit_rel <- lm(rel_form, data = dat[dat$set == "tst",])
+    fit_rel <- lm(rel_form, data = dat[dat$set == "labeled",])
 
   } else if (rel_func == "rf") {
 
-    fit_rel <- ranger(rel_form, data = dat[dat$set == "tst",], keep.inbag = T)
+    fit_rel <- ranger(rel_form, data = dat[dat$set == "labeled",], keep.inbag = T)
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- gam(rel_form, data = dat[dat$set == "tst",])
+    fit_rel <- gam(rel_form, data = dat[dat$set == "labeled",])
 
   } else {
 
@@ -96,7 +96,7 @@ postpi_boot_ols <- function(rel_form, inf_form, dat, nboot = 100, rel_func = "lm
 
   set.seed(12345)
 
-  dat_val <- dat[dat$set == "val",]
+  dat_val <- dat[dat$set == "unlabeled",]
 
   n_val <- nrow(dat_val)
 

@@ -51,7 +51,7 @@ logical: TRUE (labeled) and FALSE (unlabled)).}
 \item{df_unlabeled}{(string, optional): a data frame containing only the
 unlabeled data set. Specify this argument ONLY if the data provided is not
 already stacked. This data frame consists of the predicted outcomes (Yhat)
-for the unlabeled dataand the features (X). Specifying both 'label_index'
+for the unlabeled data and the features (X). Specifying both 'label_index'
 and 'df_unlabeled' arguments will result in an error message.}
 
 \item{seed}{(int, optional): an integer value provided as seed.}
