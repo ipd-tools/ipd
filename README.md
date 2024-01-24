@@ -73,7 +73,7 @@ $D = L \cup U$, consisting of
 - $U = \{(f_i, \boldsymbol{X}_i, R_i);\ i = n + 1, \ldots, n + N\}$
   *unlabeled* samples, where the outcome is not observed.
 
-- Here, $R$ is a variable indicating whether the $i$th observation is
+- Here, $R$ is a variable indicating whether the $i^{th}$ observation is
   considered *labeled*, where $R_i = 1$ for the $n$ *labeled*
   observations and $R_i = 0$ for the $N$ *unlabeled* observations.
 
