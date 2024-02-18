@@ -1,24 +1,24 @@
 #===============================================================================
-# POP-Inf ORDINARY LEAST SQUARES
+# POP-Inf POISSON REGRESSION
 #===============================================================================
 
-#' POP-Inf OLS Point Estimate (helper function)
+#' POP-Inf Poisson regression (helper function)
 #'
 #' @description
-#' POP-Inf OLS for linear regression
+#' POP-Inf Poisson regression
 #'
 #' @details
 #' Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) <https://arxiv.org/abs/2311.14220>
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
-#' @param Y_l (vector): n-vector of labeled outcomes.
+#' @param Y_l (vector): n-vector of count labeled outcomes.
 #'
-#' @param f_l (vector): n-vector of predictions in the labeled data.
+#' @param f_l (vector): n-vector of binary predictions in the labeled data.
 #'
 #' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
-#' @param f_u (vector): N-vector of predictions in the unlabeled data.
+#' @param f_u (vector): N-vector of binary predictions in the unlabeled data.
 #'
 #' @param weights (array): p-dimensional array of weights vector for variance reudction. POP-Inf will estimate the weights if not specified.
 #'
@@ -39,20 +39,23 @@
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
 #' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- round(Y_l - min(Y_l))
 #'
 #' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- round(f_l - min(f_l))
 #'
 #' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 #'
 #' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- round(f_u - min(f_u))
 #'
-#' popinf_ols(X_l, Y_l, f_l, X_u, f_u)
+#' popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats POPInf
 #'
 #' @export
 
-popinf_ols <- function(X_l, Y_l, f_l, X_u, f_u,
+popinf_poisson <- function(X_l, Y_l, f_l, X_u, f_u,
                        weights = NA,
                        alpha = 0.05, delta = 0.05, K = 100) {
 
@@ -61,7 +64,7 @@ popinf_ols <- function(X_l, Y_l, f_l, X_u, f_u,
            intercept = TRUE,
            max_iterations = K, convergence_threshold = delta,
            weights = weights,
-           alpha = alpha, method = "ols")
+           alpha = alpha, method = "poisson")
 
   fit <- as.data.frame(fit)
   est <- fit$Estimate
