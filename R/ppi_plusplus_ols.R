@@ -143,6 +143,7 @@ ppi_plusplus_ols_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #' \describe{
 #'    \item{est}{(vector): p-vector of PPI++ OLS coefficient estimates.}
 #'    \item{se}{(vector): p-vector of standard errors of the coefficients.}
+#'    \item{lambda}{(float): estimated power-tuning parameter.}
 #' }
 #'
 #' @examples

@@ -90,6 +90,8 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 
   lhat_curr <- ifelse(is.null(lhat), 1, lhat)
 
+  #-- Rectified Logistic Regression Loss Function
+
   rectified_logistic_loss <- function(theta) {
 
     sum(w_u * (-f_u * (X_u %*% theta) + log1pexp(X_u %*% theta))) *
@@ -102,6 +104,8 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 
         w_l * (-Y_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) / n
   }
+
+  #-- Rectified Logistic Regression Gradient
 
   rectified_logistic_grad <- function(theta) {
 
@@ -308,6 +312,7 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'    \item{est}{(vector): p-vector of PPI++ logistic regression coefficient
 #'    estimates.}
 #'    \item{se}{(vector): p-vector of standard errors of the coefficients.}
+#'    \item{lambda}{(float): estimated power-tuning parameter.}
 #' }
 #'
 #' @examples
@@ -373,7 +378,7 @@ ppi_plusplus_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
   Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
 
-  return(list(est = est, se = sqrt(diag(Sigma_hat) / n)))
+  return(list(est = est, se = sqrt(diag(Sigma_hat) / n), lambda = lhat))
 }
 
 #=== END =======================================================================
