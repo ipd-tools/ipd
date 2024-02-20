@@ -176,13 +176,18 @@ IPD::ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u)
 #### 4. Assumption-lean and data-adaptive Post-Prediction Inference (POP-Inf) (Miao et al., 2023)
 
 ``` r
-## rectifier formula
-rec_form <- Y - Yhat ~ X1
+form <- Y - Yhat ~ X1 ## formula
 
-## inference model 
-inf_form <- Yhat ~ X1
+# Labeled data set
+X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-IPD::popinf_ols(rec_form, inf_form, dat = dat)
+# Unlabeled data set
+X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+IPD::popinf_ols(X_l, Y_l, f_l, X_u, f_u)
 ```
 
 #### 5. Multiple-imputation method from Leek et al., (2023)

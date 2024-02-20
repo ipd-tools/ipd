@@ -13,9 +13,12 @@ Imports:
     caret,
     gam,
     ranger,
-    stats
+    stats,
+    POPInf
 Suggests: 
     testthat (>= 3.0.0)
+Remotes:
+    qlu-lab/POPInf
 Config/testthat/edition: 3
 URL: https://github.com/awanafiaz/IPD
 BugReports: https://github.com/awanafiaz/IPD/issues
