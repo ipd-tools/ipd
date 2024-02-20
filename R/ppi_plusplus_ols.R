@@ -204,7 +204,7 @@ ppi_plusplus_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
 
-  return(list(est = est, se = sqrt(diag(Sigma_hat) / n, lambda = lhat)))
+  return(list(est = est, se = sqrt(diag(Sigma_hat) / n), lambda = lhat))
 }
 
 #=== END =======================================================================
