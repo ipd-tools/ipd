@@ -102,55 +102,46 @@ IPD::postpi_boot_ols(rel_form, inf_form, dat = dat, nboot)
 #### 2. Prediction-powered inference method (Angelopoulos et al., 2023)
 
 ```{r ppi_ols, eval = F}
-form <- Y - Yhat ~ X1 ## formula
+# Define the inference formula
+formula <- Y - Yhat ~ X1
 
-# Labeled data set
-X_l <- model.matrix(form, data = dat[dat$set == "labeled",]) 
-Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
-f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+# Generate data and keep only the labeled and unlabeled sets
+dat <- IPD::simdat()
+dat <- dat[dat$set %in% c("labeled", "unlabeled"), ]
 
-# Unlabeled data set
-X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
-f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
-
-n <- nrow(X_l)
-p <- ncol(X_l)
-N <- nrow(X_u)
-
-IPD::ppi_ols(X_l, Y_l, f_l, X_u, f_u, lhat = 1)
+# use the wrapper function to run the method directly
+IPD::ipd(formula, method = "ppi", model = "ols", 
+         data = dat, label_index = "set")
 ```
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
 
 ```{r ppi_plusplus, eval = F}
-form <- Y - Yhat ~ X1 ## formula
+# Define the inference formula
+formula <- Y - Yhat ~ X1
 
-# Labeled data set
-X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
-Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
-f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+# Generate data and keep only the labeled and unlabeled sets
+dat <- IPD::simdat()
+dat <- dat[dat$set %in% c("labeled", "unlabeled"), ]
 
-# Unlabeled data set
-X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
-f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
-
-n <- nrow(X_l)
-p <- ncol(X_l)
-N <- nrow(X_u)
-
-IPD::ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u)
+# use the wrapper function to run the method directly
+IPD::ipd(formula, method = "ppi_plusplus", model = "ols", 
+         data = dat, label_index = "set")
 ```
 
 #### 4. Assumption-lean and data-adaptive Post-Prediction Inference (POP-Inf) (Miao et al., 2023)
 
 ```{r popinf, eval = F}
-## rectifier formula
-rec_form <- Y - Yhat ~ X1
+# Define the inference formula
+formula <- Y - Yhat ~ X1
 
-## inference model 
-inf_form <- Yhat ~ X1
+# Generate data and keep only the labeled and unlabeled sets
+dat <- IPD::simdat()
+dat <- dat[dat$set %in% c("labeled", "unlabeled"), ]
 
-IPD::popinf_ols(rec_form, inf_form, dat = dat)
+# use the wrapper function to run the method directly
+IPD::ipd(formula, method = "popinf", model = "ols", 
+         data = dat, label_index = "set")
 ```
 
 
@@ -166,7 +157,6 @@ m <- 100
 
 IPD::postpi_mi_ols(rel_form, inf_form, dat = dat, m)
 ```
-
 
 
 ## Vignette 
