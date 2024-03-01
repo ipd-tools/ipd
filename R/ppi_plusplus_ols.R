@@ -171,11 +171,11 @@ ppi_plusplus_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
 
-  n <- nrow(f_l)
+  n <- NROW(f_l)
 
-  N <- nrow(f_u)
+  N <- NROW(f_u)
 
-  p <- ncol(X_u)
+  p <- NCOL(X_u)
 
   if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
