@@ -10,9 +10,6 @@ ppi_ols(
   f_l,
   X_u,
   f_u,
-  n,
-  p,
-  N,
   lhat = NULL,
   coord = NULL,
   w = NULL,
@@ -29,12 +26,6 @@ ppi_ols(
 \item{X_u}{(ndarray): Covariates corresponding to the unlabeled data.}
 
 \item{f_u}{(ndarray): Predictions corresponding to the unlabeled data.}
-
-\item{n}{(int): Number of labeled data points.}
-
-\item{p}{(int): Dimension of the covariates.}
-
-\item{N}{(int): Number of unlabeled data points.}
 
 \item{lhat}{(float, optional): Power-tuning parameter (see \verb{[ADZ23] <https://arxiv.org/abs/2311.01453>}__). The default value \code{None} will estimate the optimal value from data. Setting \code{lhat=1} recovers PPI with no power tuning, and setting \code{lhat=0} recovers the classical point estimate.}
 
@@ -69,12 +60,6 @@ X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-n <- nrow(X_l)
-
-p <- ncol(X_l)
-
-N <- nrow(X_u)
-
-ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 
 }

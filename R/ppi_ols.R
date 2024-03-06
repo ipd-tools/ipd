@@ -18,12 +18,6 @@
 #'
 #' @param f_u (ndarray): Predictions corresponding to the unlabeled data.
 #'
-#' @param n (int): Number of labeled data points.
-#'
-#' @param p (int): Dimension of the covariates.
-#'
-#' @param N (int): Number of unlabeled data points.
-#'
 #' @param lhat (float, optional): Power-tuning parameter (see `[ADZ23] <https://arxiv.org/abs/2311.01453>`__). The default value `None` will estimate the optimal value from data. Setting `lhat=1` recovers PPI with no power tuning, and setting `lhat=0` recovers the classical point estimate.
 #'
 #' @param coord (int, optional): Coordinate for which to optimize `lhat`. If `None`, it optimizes the total variance over all coordinates. Must be in {1, ..., d} where d is the shape of the estimand.
@@ -50,21 +44,21 @@
 #'
 #' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' n <- nrow(X_l)
-#'
-#' p <- ncol(X_l)
-#'
-#' N <- nrow(X_u)
-#'
-#' ppi_ols(X_l, Y_l, f_l, X_u, f_u, n, p, N)
+#' ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, n, p, N,
+ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   lhat = NULL, coord = NULL, w = NULL, w_unlabeled = NULL) {
+
+  n <- NROW(X_l)
+
+  p <- NCOL(X_l)
+
+  N <- NROW(X_u)
 
   #- 1. Prediction-Powered Estimator
 
