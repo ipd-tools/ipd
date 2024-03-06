@@ -1,0 +1,115 @@
+---
+title: "Test POP-Inf in IPD R package"
+author: "Jiacheng Miao <jiacheng.miao@wisc.edu>"
+date: "2024-02-19"
+output: html_document
+---
+
+## Mean Estimation
+```{r}
+rm(list = ls())
+#- Generate Example Data
+set.seed(42)
+dat <- IPD::simdat()
+
+form <- Y - Yhat ~ X1
+
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+IPD::popinf_mean(Y_l, f_l, f_u)
+```
+
+## Linear regression
+```{r}
+rm(list = ls())
+#- Generate Example Data
+set.seed(42)
+dat <- IPD::simdat()
+
+form <- Y - Yhat ~ X1
+
+X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+IPD::popinf_ols(X_l, Y_l, f_l, X_u, f_u)
+```
+
+## Logistic regression
+```{r}
+rm(list = ls())
+#- Generate Example Data
+set.seed(42)
+dat <- IPD::simdat()
+
+form <- Y - Yhat ~ X1
+
+X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- ifelse(Y_l > quantile(Y_l, 0.75), 1, 0)
+
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- ifelse(f_l > quantile(f_l, 0.75), 1, 0)
+
+X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_u <- ifelse(f_u > quantile(f_u, 0.75), 1, 0)
+
+IPD::popinf_logistic(X_l, Y_l, f_l, X_u, f_u)
+
+```
+
+## Poisson regression
+```{r}
+rm(list = ls())
+#- Generate Example Data
+set.seed(42)
+dat <- IPD::simdat()
+
+form <- Y - Yhat ~ X1
+
+X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- round(Y_l - min(Y_l))
+
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- round(f_l - min(f_l))
+
+X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_u <- round(f_u - min(f_u))
+
+IPD::popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
+```
+
+## Quantile Estimation
+```{r}
+rm(list = ls())
+#- Generate Example Data
+set.seed(42)
+dat <- IPD::simdat()
+
+form <- Y - Yhat ~ X1
+
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+IPD::popinf_quantile(Y_l, f_l, f_u, q = 0.5)
+```
