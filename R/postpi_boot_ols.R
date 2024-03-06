@@ -50,15 +50,23 @@
 #'
 #' @examples
 #'
-#' rel_form <- Y ~ Yhat
-#'
-#' inf_form <- Yhat ~ X1
-#'
 #' dat <- simdat()
+#'
+#' form <- Y - Yhat ~ X1
+#'
+#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+#'
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+#'
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
 #' nboot <- 100
 #'
-#' postpi_boot_ols(rel_form, inf_form, dat = dat, nboot)
+#' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot)
 #'
 #' @export
 #'
@@ -69,7 +77,9 @@
 
 #-- PostPI - BOOTSTRAP
 
-postpi_boot_ols <- function(rel_form, inf_form, dat, nboot = 100, rel_func = "lm") {
+postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
+
+  nboot = 100, rel_func = "lm") {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
@@ -77,15 +87,15 @@ postpi_boot_ols <- function(rel_form, inf_form, dat, nboot = 100, rel_func = "lm
 
   if (rel_func == "lm") {
 
-    fit_rel <- lm(rel_form, data = dat[dat$set == "labeled",])
+    fit_rel <- lm(Y_l ~ f_l)
 
   } else if (rel_func == "rf") {
 
-    fit_rel <- ranger(rel_form, data = dat[dat$set == "labeled",], keep.inbag = T)
+    fit_rel <- ranger(Y_l ~ f_l, keep.inbag = T)
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- gam(rel_form, data = dat[dat$set == "labeled",])
+    fit_rel <- gam(Y_l ~ f_l)
 
   } else {
 
@@ -96,39 +106,31 @@ postpi_boot_ols <- function(rel_form, inf_form, dat, nboot = 100, rel_func = "lm
 
   set.seed(12345)
 
-  dat_val <- dat[dat$set == "unlabeled",]
-
-  n_val <- nrow(dat_val)
-
-  inf_form_b <- reformulate(all.vars(inf_form)[-1], response = "Y_tilde_b")
+  n_u <- nrow(X_u)
 
   ests_b <- sapply(1:nboot, function(b) {
 
     #-   i. Sample Predicted Values and Covariates with Replacement
 
-    idx_b <- sample(1:n_val, n_val, replace = T)
+    idx_b <- sample(1:n_u, n_u, replace = T)
 
-    dat_val_b <- dat_val[idx_b, ]
+    X_u_b <- X_u_b[idx_b, ]
 
     #-  ii. Simulate Values from Relationship Model
 
     if (rel_func == "lm") {
 
-      dat_val_b$Y_tilde_b <- rnorm(
-
-        n_val, predict(fit_rel, dat_val_b), sigma(fit_rel))
+      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b), sigma(fit_rel))
 
     } else if (rel_func == "rf") {
 
-      rel_preds <- predict(fit_rel, data = dat_val_b, type = "se")
+      rel_preds <- predict(fit_rel, data = X_u_b, type = "se")
 
-      dat_val_b$Y_tilde_b <- rnorm(n_val, rel_preds$predictions, rel_preds$se)
+      Y_u_b <- rnorm(n_u, rel_preds$predictions, rel_preds$se)
 
     } else if (rel_func == "gam") {
 
-      dat_val_b$Y_tilde_b <- rnorm(
-
-        n_val, predict(fit_rel, dat_val_b), sigma(fit_rel))
+      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b), sigma(fit_rel))
 
     } else {
 
@@ -137,7 +139,7 @@ postpi_boot_ols <- function(rel_form, inf_form, dat, nboot = 100, rel_func = "lm
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(inf_form_b, data = dat_val_b)
+    fit_inf_b <- lm(Y_u_b ~ X_u_b)
 
     #-  iv. Extract Coefficient Estimator
 

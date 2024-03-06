@@ -48,13 +48,21 @@
 #'
 #' @examples
 #'
-#' rel_form <- Y ~ Yhat
-#'
-#' inf_form <- Yhat ~ X1
-#'
 #' dat <- simdat()
 #'
-#' postpi_analytic_ols(rel_form, inf_form, dat = dat)
+#' form <- Y - Yhat ~ X1
+#'
+#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+#'
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+#'
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @export
 #'
@@ -63,27 +71,25 @@
 
 #-- PostPI - ANALYTIC for OLS
 
-postpi_analytic_ols <- function(rel_form, inf_form, dat) {
+postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u) {
 
   #- 1. Estimate Relationship Model
 
-  fit_rel <- lm(rel_form, data = dat[dat$set == "labeled",])
+  fit_rel <- lm(Y_l ~ f_l)
 
   #- 2. Estimate Inference Model
 
-  fit_inf <- lm(inf_form, data = dat[dat$set == "unlabeled",])
+  fit_inf <- lm(f_u ~ X_u)
 
   #- 3. Coefficient Estimator
 
-  X_val <- model.matrix(inf_form, dat[dat$set == "unlabeled",])
+  est <- solve(crossprod(X_u)) %*% t(X_u) %*%
 
-  est <- solve(crossprod(X_val)) %*% t(X_val) %*%
-
-    (coef(fit_rel)[1] + coef(fit_rel)[2]*X_val %*% coef(fit_inf))
+    (coef(fit_rel)[1] + coef(fit_rel)[2]*X_u %*% coef(fit_inf))
 
   #- 4. SE of Coefficient Estimator
 
-  se <- sqrt(diag(solve(crossprod(X_val))*(sigma(fit_rel)^2 +
+  se <- sqrt(diag(solve(crossprod(X_u))*(sigma(fit_rel)^2 +
 
     (coef(fit_rel)[2]^2)*sigma(fit_inf)^2)))
 
