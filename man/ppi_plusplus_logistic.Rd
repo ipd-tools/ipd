@@ -53,6 +53,7 @@ unlabeled data.}
 \item{est}{(vector): p-vector of PPI++ logistic regression coefficient
 estimates.}
 \item{se}{(vector): p-vector of standard errors of the coefficients.}
+\item{lambda}{(float): estimated power-tuning parameter.}
 }
 }
 \description{

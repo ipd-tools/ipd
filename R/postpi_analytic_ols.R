@@ -24,27 +24,18 @@
 
 #' PostPI Linear Regression using Wang et al. (2020) Analytic Correction
 #'
-#' @description
-#' A short description.
+#' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
-#' @details
-#' Additional details...
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param rel_form A formula defining the relationship model. This should be
-#' of the form Y ~ Yhat, where Y is the name of the column corresponding to
-#' the observed outcome in the labeled data and Yhat is the name of the column
-#' corresponding to the predicted outcome in the labeled data.
+#' @param f_l (vector): n-vector of predictions in the labeled data.
 #'
-#' @param inf_form A formula defining the inference model. This should be of
-#' the form Yhat ~ X, where Yhat is the name of the column corresponding to the
-#' predicted outcome in the unlabeled data, and X generally corresponds to the
-#' features of interest (e.g., X1 + X2).
+#' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
-#' @param dat data in the form of the simdat function
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
 #' @returns A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
-#'
 #'
 #' @examples
 #'
@@ -79,7 +70,7 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u) {
 
   #- 2. Estimate Inference Model
 
-  fit_inf <- lm(f_u ~ X_u)
+  fit_inf <- lm(f_u ~ X_u - 1)
 
   #- 3. Coefficient Estimator
 

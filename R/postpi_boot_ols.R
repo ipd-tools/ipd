@@ -24,23 +24,15 @@
 
 #' IPD Linear Regression using Wang et al. (2020) Bootstrap Correction
 #'
-#' @description
-#' A short description...
+#' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
-#' @details
-#' Additional details...
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param rel_form A formula defining the relationship model. This should be
-#' of the form Y ~ Yhat, where Y is the name of the column corresponding to
-#' the observed outcome in the labeled data and Yhat is the name of the column
-#' corresponding to the predicted outcome in the labeled data.
+#' @param f_l (vector): n-vector of predictions in the labeled data.
 #'
-#' @param inf_form A formula defining the inference model. This should be of
-#' the form Yhat ~ X, where Yhat is the name of the column corresponding to the
-#' predicted outcome in the unlabeled data, and X generally corresponds to the
-#' features of interest (e.g., X1 + X2).
+#' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
-#' @param dat data in the form of the simdat function
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
 #' @param nboot number of bootstraps
 #'
@@ -66,7 +58,7 @@
 #'
 #' nboot <- 100
 #'
-#' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot)
+#' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
 #' @export
 #'
@@ -106,37 +98,39 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   set.seed(12345)
 
-  n_u <- nrow(X_u)
+  n <- nrow(X_l)
+
+  N <- nrow(X_u)
 
   ests_b <- sapply(1:nboot, function(b) {
 
     #-   i. Sample Predicted Values and Covariates with Replacement
 
-    idx_b <- sample(1:n_u, n_u, replace = T)
+    idx_b <- sample(1:N, N, replace = T)
 
-    X_u_b <- X_u_b[idx_b, ]
+    X_u_b <- X_u[idx_b, ]
 
     #-  ii. Simulate Values from Relationship Model
 
     if (rel_func == "lm") {
 
-      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b),
+      Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
 
-        sigma(fit_rel) * sqrt(nrow(X_u) / nrow(X_l)))
+        sigma(fit_rel) * sqrt(N / n))
 
     } else if (rel_func == "rf") {
 
-      rel_preds <- predict(fit_rel, data = X_u_b, type = "se")
+      rel_preds <- predict(fit_rel, data = as.data.frame(X_u_b), type = "se")
 
-      Y_u_b <- rnorm(n_u, rel_preds$predictions,
+      Y_u_b <- rnorm(N, rel_preds$predictions,
 
-        rel_preds$se * sqrt(nrow(X_u) / nrow(X_l)))
+        rel_preds$se * sqrt(N / n))
 
     } else if (rel_func == "gam") {
 
-      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b),
+      Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
 
-        sigma(fit_rel) * sqrt(nrow(X_u) / nrow(X_l)))
+        sigma(fit_rel) * sqrt(N / n))
 
     } else {
 
@@ -145,7 +139,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b)
+    fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
 
     #-  iv. Extract Coefficient Estimator
 

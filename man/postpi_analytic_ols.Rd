@@ -4,39 +4,42 @@
 \alias{postpi_analytic_ols}
 \title{PostPI Linear Regression using Wang et al. (2020) Analytic Correction}
 \usage{
-postpi_analytic_ols(rel_form, inf_form, dat)
+postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 }
 \arguments{
-\item{rel_form}{A formula defining the relationship model. This should be
-of the form Y ~ Yhat, where Y is the name of the column corresponding to
-the observed outcome in the labeled data and Yhat is the name of the column
-corresponding to the predicted outcome in the labeled data.}
+\item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
 
-\item{inf_form}{A formula defining the inference model. This should be of
-the form Yhat ~ X, where Yhat is the name of the column corresponding to the
-predicted outcome in the unlabeled data, and X generally corresponds to the
-features of interest (e.g., X1 + X2).}
+\item{Y_l}{(vector): n-vector of labeled outcomes.}
 
-\item{dat}{data in the form of the simdat function}
+\item{f_l}{(vector): n-vector of predictions in the labeled data.}
+
+\item{X_u}{(matrix): N x p matrix of covariates in the unlabeled data.}
+
+\item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 }
 \value{
 A list of outputs: estimate of the inference model parameters and
 corresponding standard error estimate.
 }
 \description{
-A short description.
-}
-\details{
-Additional details...
+PostPI Linear Regression using Wang et al. (2020) Analytic Correction
 }
 \examples{
 
-rel_form <- Y ~ Yhat
-
-inf_form <- Yhat ~ X1
-
 dat <- simdat()
 
-postpi_analytic_ols(rel_form, inf_form, dat = dat)
+form <- Y - Yhat ~ X1
+
+X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+
+Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+
+f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 
 }
