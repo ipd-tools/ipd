@@ -48,7 +48,7 @@ column must have the following pairs of values for labeled and unlabeled data:
 string: 'labeled' and 'unlabeled', or integer: 1 (labeled) and 0 (unlabeled), or
 logical: TRUE (labeled) and FALSE (unlabled)).}
 
-\item{df_unlabeled}{(string, optional): a data frame containing only the
+\item{df_unlabeled}{(data.frame, optional): a data frame containing only the
 unlabeled data set. Specify this argument ONLY if the data provided is not
 already stacked. This data frame consists of the predicted outcomes (Yhat)
 for the unlabeled data and the features (X). Specifying both 'label_index'
@@ -87,7 +87,7 @@ Since the PostPI methods (requiring a relationship model) are
 the only ones to deviate from the 'rectifier' model framework (used in PPI,
 PPI++, and POP-Inf), we will create the relationship model formula internally
 when calling the PostPI methods under the assumption that the relationship
-model is the same as the rectifier model.
+model arguments can be recovered from the rectifier model.
 }
 \examples{
 # example code

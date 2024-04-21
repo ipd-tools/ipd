@@ -4,7 +4,16 @@
 \alias{postpi_boot_ols}
 \title{IPD Linear Regression using Wang et al. (2020) Bootstrap Correction}
 \usage{
-postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot = 100, rel_func = "lm")
+postpi_boot_ols(
+  X_l,
+  Y_l,
+  f_l,
+  X_u,
+  f_u,
+  nboot = 100,
+  rel_func = "lm",
+  scale_se = T
+)
 }
 \arguments{
 \item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
@@ -20,6 +29,8 @@ postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot = 100, rel_func = "lm")
 \item{nboot}{number of bootstraps}
 
 \item{rel_func}{relationship function model form (lm, gam, glm, etc)}
+
+\item{scale_se}{(boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).}
 }
 \value{
 A list of outputs: estimate of inference model parameters and corresponding standard error based on both parametric and non-parametric bootstrap methods.
