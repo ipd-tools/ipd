@@ -204,7 +204,7 @@ ipd <- function(formula, method, model, data,
 
     stop(paste("'method' must be one of",
 
-      "c('postpi_analytic', 'postpi_boot', 'postpi_mi', 'ppi', 'popinf').",
+      "c('postpi_analytic', 'postpi_boot', 'postpi_mi', 'ppi', 'popinf', 'ppi_plusplus').",
 
       "See the 'Details' section of the documentation for more information."))
   }
@@ -237,32 +237,32 @@ ipd <- function(formula, method, model, data,
 
   #--- PREPARE DATA ------------------------------------------------------------
 
-  #---- DEFINE VALID label_index IDENTIFERS
-
-  ##--- CHECK ONE OF EACH labeled AND unlabeled IDENTIFIERS EXIST
-
-  valid_labeled_df_id <- c(
-
-    "tst", "test", 1, TRUE, "lab", "label", "labeled", "labelled")
-
-  valid_unlabeled_df_id <- c(
-
-    "val", "validation", 0, FALSE, "unlab", "unlabeled", "unlabelled")
-
-  if(!((sum(unique(data[[label_index]]) %in% valid_labeled_df_id) == 1) &
-
-    (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
-
-    stop(paste(label_index,
-
-      "must have one valid identifier for labeled and unlabeled data set each.",
-
-      "See the 'Details' section of the documentation for more information."))
-  }
-
   ##-- IF STACKED DATA IS PROVIDED
 
   if(!is.null(label_index) & is.null(df_unlabeled)) {
+
+    #---- DEFINE VALID label_index IDENTIFERS
+
+    ##--- CHECK ONE OF EACH labeled AND unlabeled IDENTIFIERS EXIST
+
+    valid_labeled_df_id <- c(
+
+      "tst", "test", 1, TRUE, "lab", "label", "labeled", "labelled")
+
+    valid_unlabeled_df_id <- c(
+
+      "val", "validation", 0, FALSE, "unlab", "unlabeled", "unlabelled")
+
+    if(!((sum(unique(data[[label_index]]) %in% valid_labeled_df_id) == 1) &
+
+         (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
+
+      stop(paste(label_index,
+
+                 "must have one valid identifier for labeled and unlabeled data set each.",
+
+                 "See the 'Details' section of the documentation for more information."))
+    }
 
     data_l <- data[data[[label_index]] %in% valid_labeled_df_id, ]
 
