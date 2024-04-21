@@ -13,6 +13,7 @@ ipd(
   label_index = NULL,
   df_unlabeled = NULL,
   seed = NULL,
+  intercept = T,
   alpha = 0.05,
   alternative = "two-sided",
   ...
@@ -46,7 +47,7 @@ unlabeled data sets, and the features (X).}
 indexing variable that identifies the labeled and unlabeled data sets. This
 column must have the following pairs of values for labeled and unlabeled data:
 string: 'labeled' and 'unlabeled', or integer: 1 (labeled) and 0 (unlabeled), or
-logical: TRUE (labeled) and FALSE (unlabled)).}
+logical: TRUE (labeled) and FALSE (unlabeled)).}
 
 \item{df_unlabeled}{(data.frame, optional): a data frame containing only the
 unlabeled data set. Specify this argument ONLY if the data provided is not
@@ -55,6 +56,9 @@ for the unlabeled data and the features (X). Specifying both 'label_index'
 and 'df_unlabeled' arguments will result in an error message.}
 
 \item{seed}{(int, optional): an integer value provided as seed.}
+
+\item{intercept}{(bool): a logical argument specifying whether to include an
+intercept in the inference model or not (defaults to TRUE).}
 
 \item{alpha}{(float, optional): specified level of significance of the the
 confidence interval; defaults to 0.05.}

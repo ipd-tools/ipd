@@ -1,11 +1,8 @@
 #===============================================================================
-#
-#  PROGRAM: ipd.R [This is the development version of ipd.R]
-#
-#  AUTHORS: Awan Afiaz (aafiaz@uw.edu)
-#           Kentaro Hoffman (khoffm3@uw.edu)
-#           Stephen Salerno (ssalerno@fredhutch.org)
-#
+# IPD
+#===============================================================================
+
+
 #  PURPOSE: A complete user-friendly wrapper function with necessary defaults
 #           that calls each individual Inference-on-predicted-data (IPD) methods
 #           (postpi, ppi, ppi++, popinf, etc) with a specified model
@@ -54,7 +51,7 @@
 #           4. Model: Use a model "model" argument to signify what model
 #              (e.g., ols, logistic, cox, etc). The wrapper will concatenate
 #              the Method and Model arguments to identify the required helper
-#              function, all of which will have the same naming convention:
+#              function, all of which have the same naming convention:
 #              "method_model.R".
 #
 #           5. Auxiliary arguments: The wrapper will take method-specific
@@ -126,7 +123,7 @@
 #' indexing variable that identifies the labeled and unlabeled data sets. This
 #' column must have the following pairs of values for labeled and unlabeled data:
 #' string: 'labeled' and 'unlabeled', or integer: 1 (labeled) and 0 (unlabeled), or
-#' logical: TRUE (labeled) and FALSE (unlabled)).
+#' logical: TRUE (labeled) and FALSE (unlabeled)).
 #'
 #' @param df_unlabeled (data.frame, optional): a data frame containing only the
 #' unlabeled data set. Specify this argument ONLY if the data provided is not
@@ -135,6 +132,9 @@
 #' and 'df_unlabeled' arguments will result in an error message.
 #'
 #' @param seed (int, optional): an integer value provided as seed.
+#'
+#' @param intercept (bool): a logical argument specifying whether to include an
+#' intercept in the inference model or not (defaults to TRUE).
 #'
 #' @param alpha (float, optional): specified level of significance of the the
 #' confidence interval; defaults to 0.05.
@@ -158,7 +158,7 @@ ipd <- function(formula, method, model, data,
 
   label_index = NULL, df_unlabeled = NULL, seed = NULL,
 
-  alpha = 0.05, alternative = "two-sided", ...) {
+  intercept = T, alpha = 0.05, alternative = "two-sided", ...) {
 
   #--- 1. CHECKS & ASSERTIONS --------------------------------------------------
 
@@ -170,9 +170,9 @@ ipd <- function(formula, method, model, data,
 
   if(is.null(label_index) & is.null(df_unlabeled)) {
 
-    stop(paste("at least one of 'label_index' and 'df_unlabeled' must be specified.",
+    stop(paste("at least one of 'label_index' and 'df_unlabeled' must be",
 
-      "\nSee the help('ipd') documentation for more information."))
+      "specified.\nSee the help('ipd') documentation for more information."))
   }
 
   #-- A3. CHECK IF BOTH 'label_index' AND 'df_unlabeled' args are SPECIFIED
@@ -190,34 +190,32 @@ ipd <- function(formula, method, model, data,
 
     if (!exists(label_index, where = data)) {
 
-      stop(paste(label_index, "does not exist in the data set.",
+      stop(paste(label_index, "does not exist in the data set.\nSee the",
 
-        "\nSee the help('ipd') documentation for more information."))
+        "help('ipd') documentation for more information."))
     }
   }
 
   #-- B. CHECK FOR VALID METHOD
 
-  if (!(method %in% c("postpi_analytic", "postpi_boot", "postpi_mi",
+  if (!(method %in% c("postpi_analytic", "postpi_boot", "ppi", "popinf",
 
-    "ppi", "popinf", "ppi_plusplus"))) {
+    "ppi_plusplus"))) {
 
-    stop(paste("'method' must be one of",
+    stop(paste("'method' must be one of c('postpi_analytic', 'postpi_boot',",
 
-      "c('postpi_analytic', 'postpi_boot', 'postpi_mi', 'ppi', 'popinf', 'ppi_plusplus').",
+      "'ppi', 'popinf', 'ppi_plusplus').\nSee the 'Details' section of the",
 
-      "See the 'Details' section of the documentation for more information."))
+      "documentation for more information."))
   }
 
   #-- C. CHECK FOR VALID MODEL
 
-  if (!(model %in% c("mean", "quantile", "ols", "logistic", "multiclass"))) {
+  if (!(model %in% c("mean", "quantile", "ols", "logistic"))) {
 
-    stop(paste("'model' must be one of",
+    stop(paste("'model' must be one of c('mean', 'quantile', 'ols', 'logistic'",
 
-      "c('mean', 'quantile', 'ols', 'logistic', 'multiclass').",
-
-      "See the 'Details' section of the documentation for more information."))
+      ").\nSee the 'Details' for more information."))
   }
 
   #--- D. CHECK FOR VALID METHOD-MODEL COMBINATION
@@ -255,13 +253,13 @@ ipd <- function(formula, method, model, data,
 
     if(!((sum(unique(data[[label_index]]) %in% valid_labeled_df_id) == 1) &
 
-         (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
+      (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
 
       stop(paste(label_index,
 
-                 "must have one valid identifier for labeled and unlabeled data set each.",
+        "must have one valid identifier for labeled and unlabeled data set each.",
 
-                 "See the 'Details' section of the documentation for more information."))
+        "See the 'Details' section of the documentation for more information."))
     }
 
     data_l <- data[data[[label_index]] %in% valid_labeled_df_id, ]
@@ -280,7 +278,14 @@ ipd <- function(formula, method, model, data,
 
   #-- LABELED DATA
 
-  X_l <- model.matrix(formula, data = data_l)
+  if (intercept) {
+
+    X_l <- model.matrix(formula, data = data_l)
+
+  } else {
+
+    X_l <- model.matrix(formula - 1, data = data_l)
+  }
 
   Y_l <- data_l[ , all.vars(formula)[1]] |> matrix(ncol = 1)
 
@@ -288,7 +293,14 @@ ipd <- function(formula, method, model, data,
 
   #-- UNLABELED DATA
 
-  X_u <- model.matrix(formula, data = data_u)
+  if (intercept) {
+
+    X_u <- model.matrix(formula, data = data_u)
+
+  } else {
+
+    X_u <- model.matrix(formula - 1, data = data_u)
+  }
 
   f_u <- data_u[ , all.vars(formula)[2]] |> matrix(ncol = 1)
 

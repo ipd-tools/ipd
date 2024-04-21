@@ -190,5 +190,5 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   #-- Output
 
-  return(list(est = est, se_par = se_p, se_npar = se_n))
+  return(list(est = est, se = se_p, se_npar = se_n))
 }
