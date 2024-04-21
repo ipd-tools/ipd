@@ -34,6 +34,8 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
+#' @param scale_se (boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).
+#'
 #' @returns A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
 #'
@@ -62,7 +64,7 @@
 
 #-- PostPI - ANALYTIC for OLS
 
-postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u) {
+postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u, scale_se = T) {
 
   #- 1. Estimate Relationship Model
 
@@ -80,11 +82,20 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u) {
 
   #- 4. SE of Coefficient Estimator
 
-  se <- sqrt(diag(solve(crossprod(X_u)) *
+  if (scale_se) {
 
-    (sigma(fit_rel)^2 * nrow(X_u) / nrow(X_l) +
+    se <- sqrt(diag(solve(crossprod(X_u)) *
 
-    (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+      (sigma(fit_rel)^2 * nrow(X_u) / nrow(X_l) +
+
+      (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+
+  } else {
+
+    se <- sqrt(diag(solve(crossprod(X_u)) *
+
+      (sigma(fit_rel)^2 + (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+  }
 
   #- Output
 

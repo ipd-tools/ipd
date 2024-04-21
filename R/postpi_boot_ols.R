@@ -38,6 +38,8 @@
 #'
 #' @param rel_func relationship function model form (lm, gam, glm, etc)
 #'
+#' @param scale_se (boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).
+#'
 #' @returns A list of outputs: estimate of inference model parameters and corresponding standard error based on both parametric and non-parametric bootstrap methods.
 #'
 #' @examples
@@ -71,7 +73,7 @@
 
 postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, rel_func = "lm") {
+  nboot = 100, rel_func = "lm", scale_se = T) {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
@@ -114,23 +116,47 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     if (rel_func == "lm") {
 
-      Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
+      if (scale_se) {
 
-        sigma(fit_rel) * sqrt(N / n))
+        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
+
+          sigma(fit_rel) * sqrt(N / n))
+
+
+      } else {
+
+        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
+
+          sigma(fit_rel))
+      }
 
     } else if (rel_func == "rf") {
 
       rel_preds <- predict(fit_rel, data = as.data.frame(X_u_b), type = "se")
 
-      Y_u_b <- rnorm(N, rel_preds$predictions,
+      if (scale_se) {
 
-        rel_preds$se * sqrt(N / n))
+        Y_u_b <- rnorm(N, rel_preds$predictions, rel_preds$se * sqrt(N / n))
+
+      } else {
+
+        Y_u_b <- rnorm(N, rel_preds$predictions, rel_preds$se)
+      }
 
     } else if (rel_func == "gam") {
 
-      Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
+      if (scale_se) {
 
-        sigma(fit_rel) * sqrt(N / n))
+        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
+
+          sigma(fit_rel) * sqrt(N / n))
+
+      } else {
+
+        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
+
+          sigma(fit_rel))
+      }
 
     } else {
 
