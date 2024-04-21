@@ -120,17 +120,23 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     if (rel_func == "lm") {
 
-      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b), sigma(fit_rel))
+      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b),
+
+        sigma(fit_rel) * sqrt(nrow(X_u) / nrow(X_l)))
 
     } else if (rel_func == "rf") {
 
       rel_preds <- predict(fit_rel, data = X_u_b, type = "se")
 
-      Y_u_b <- rnorm(n_u, rel_preds$predictions, rel_preds$se)
+      Y_u_b <- rnorm(n_u, rel_preds$predictions,
+
+        rel_preds$se * sqrt(nrow(X_u) / nrow(X_l)))
 
     } else if (rel_func == "gam") {
 
-      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b), sigma(fit_rel))
+      Y_u_b <- rnorm(n_u, predict(fit_rel, X_u_b),
+
+        sigma(fit_rel) * sqrt(nrow(X_u) / nrow(X_l)))
 
     } else {
 

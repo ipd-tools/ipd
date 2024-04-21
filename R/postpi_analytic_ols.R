@@ -85,13 +85,15 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u) {
 
   est <- solve(crossprod(X_u)) %*% t(X_u) %*%
 
-    (coef(fit_rel)[1] + coef(fit_rel)[2]*X_u %*% coef(fit_inf))
+    (coef(fit_rel)[1] + coef(fit_rel)[2] * X_u %*% coef(fit_inf))
 
   #- 4. SE of Coefficient Estimator
 
-  se <- sqrt(diag(solve(crossprod(X_u))*(sigma(fit_rel)^2 +
+  se <- sqrt(diag(solve(crossprod(X_u)) *
 
-    (coef(fit_rel)[2]^2)*sigma(fit_inf)^2)))
+    (sigma(fit_rel)^2 * nrow(X_u) / nrow(X_l) +
+
+    (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
 
   #- Output
 
