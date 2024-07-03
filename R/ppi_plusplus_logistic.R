@@ -45,7 +45,7 @@
 #'
 #' dat <- simdat_logistic()
 #'
-#' form <- Y - Yhat ~ Xc
+#' form <- Y - f ~ Xc
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
@@ -185,7 +185,7 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' dat <- simdat_logistic()
 #'
-#' form <- Y - Yhat ~ Xc
+#' form <- Y - f ~ Xc
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
@@ -319,7 +319,7 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' dat <- simdat_logistic()
 #'
-#' form <- Y - Yhat ~ Xc
+#' form <- Y - f ~ Xc
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'

@@ -4,12 +4,12 @@
 \alias{compute_cdf_diff}
 \title{Empirical CDF Difference}
 \usage{
-compute_cdf_diff(Y, Yhat, grid, w = NULL)
+compute_cdf_diff(Y, f, grid, w = NULL)
 }
 \arguments{
 \item{Y}{(matrix): n x 1 matrix of observed data.}
 
-\item{Yhat}{(matrix): n x 1 matrix of predictions.}
+\item{f}{(matrix): n x 1 matrix of predictions.}
 
 \item{grid}{(matrix): Grid of values to compute the CDF at.}
 

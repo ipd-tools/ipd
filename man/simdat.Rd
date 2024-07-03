@@ -4,19 +4,23 @@
 \alias{simdat}
 \title{Data generation functions for OLS regression example}
 \usage{
-simdat(n = c(300, 300, 300), beta1 = 1)
+simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
 }
 \arguments{
-\item{n}{vector of size 3 indicating the sample size in the training,
-labeled/test, and unlabeled/validation data sets}
+\item{n}{(int vector) vector of size 3 indicating the sample size in the
+training, labeled, and unlabeled data sets}
 
-\item{beta1}{first regression coefficient (or, regression coefficient of
-variable of interest for inference)}
+\item{effect}{(float) regression coefficient for the first variable of
+interest for inference (defaults to 1)}
+
+\item{sigma_Y}{(float) residual variance for the generated outcome}
 }
 \value{
-A data frame containing 4 columns: labeled outcome, predicted
-outcome and a character variable indicating which data set the observation
-belongs to (training, test/labeled, validation/unlabeled).
+A data.frame containing n rows and seven columns corresponding to
+the labeled outcome (Y), the predicted outcome (f), a character variable
+(set) indicating which data set the observation belongs to (training,
+labeled, or unlabeled), and four independent, normally distributed
+predictors (X1, X2, X3, and X4).
 }
 \description{
 Data generation functions for OLS regression example
@@ -25,6 +29,8 @@ Data generation functions for OLS regression example
 
 # Return a stacked data set with 100 observations for each individual sets
 
-simdat(c(100, 100, 100), 1)
+dat <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1)
+
+head(dat)
 
 }

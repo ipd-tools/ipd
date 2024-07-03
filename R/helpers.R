@@ -164,7 +164,7 @@ wls <- function(X, Y, w = NULL, return_se = F) {
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
@@ -272,7 +272,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
@@ -491,7 +491,7 @@ zconfint_generic <- function(mean, std_mean, alpha, alternative) {
     stop("Invalid alternative")
   }
 
-  return(c(lower, upper))
+  return(cbind(lower, upper))
 }
 
 

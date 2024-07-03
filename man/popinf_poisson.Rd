@@ -46,23 +46,23 @@ Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) \
 }
 \examples{
 
-dat <- simdat()
+# dat <- simdat()
 
-form <- Y - Yhat ~ X1
+# form <- Y - f ~ X1
 
-X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+# X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 
-Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
-Y_l <- round(Y_l - min(Y_l))
+# Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+# Y_l <- round(Y_l - min(Y_l))
 
-f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
-f_l <- round(f_l - min(f_l))
+# f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+# f_l <- round(f_l - min(f_l))
 
-X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+# X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 
-f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
-f_u <- round(f_u - min(f_u))
+# f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+# f_u <- round(f_u - min(f_u))
 
-popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
+# popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
 
 }

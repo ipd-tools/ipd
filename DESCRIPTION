@@ -14,7 +14,8 @@ Imports:
     gam,
     ranger,
     stats,
-    POPInf
+    POPInf,
+    generics
 Suggests: 
     testthat (>= 3.0.0)
 Remotes:

@@ -93,7 +93,9 @@ nboot <- 200
 
 IPD::ipd(formula, 
          
-  method = "postpi_boot", model = "ols", data = dat, label_index = "set")
+  method = "postpi_boot", model = "ols", data = dat, label_index = "set", 
+  
+  nboot = nboot)
 ```
 
 ### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)

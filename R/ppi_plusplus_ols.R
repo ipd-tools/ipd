@@ -41,7 +41,7 @@
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'
@@ -150,7 +150,7 @@ ppi_plusplus_ols_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 #'

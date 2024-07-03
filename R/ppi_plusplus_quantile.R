@@ -48,7 +48,7 @@ compute_cdf <- function(Y, grid, w = NULL) {
 #'
 #' @param Y (matrix): n x 1 matrix of observed data.
 #'
-#' @param Yhat (matrix): n x 1 matrix of predictions.
+#' @param f (matrix): n x 1 matrix of predictions.
 #'
 #' @param grid (matrix): Grid of values to compute the CDF at.
 #'
@@ -62,7 +62,7 @@ compute_cdf <- function(Y, grid, w = NULL) {
 #'
 #' @export
 
-compute_cdf_diff <- function(Y, Yhat, grid, w = NULL) {
+compute_cdf_diff <- function(Y, f, grid, w = NULL) {
 
   n <- length(Y)
 
@@ -72,13 +72,13 @@ compute_cdf_diff <- function(Y, Yhat, grid, w = NULL) {
 
                          ncol = length(grid))
 
-  indicators_Yhat <- matrix((Yhat <= rep(grid, each = length(Yhat))) * w,
+  indicators_f <- matrix((f <= rep(grid, each = length(f))) * w,
 
                             ncol = length(grid))
 
-  diff_mn <- apply(indicators_Y - indicators_Yhat, 2, mean)
+  diff_mn <- apply(indicators_Y - indicators_f, 2, mean)
 
-  diff_sd <- apply(indicators_Y - indicators_Yhat, 2, sd) * sqrt((n - 1) / n)
+  diff_sd <- apply(indicators_Y - indicators_f, 2, sd) * sqrt((n - 1) / n)
 
   return(list(diff_mn, diff_sd))
 }
@@ -194,7 +194,7 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
@@ -273,7 +273,7 @@ ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'

@@ -15,7 +15,7 @@
 #' @param f_l (vector): n-vector of predictions in the labeled data.
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
-#' 
+#'
 #' @param q (float): Quantile to estimate. Must be in the range (0, 1).
 #'
 #' @param weights (array): 1-dimensional array of weights vector for variance reudction. POP-Inf will estimate the weights if not specified.
@@ -32,7 +32,7 @@
 #'
 #' dat <- simdat()
 #'
-#' form <- Y - Yhat ~ X1
+#' form <- Y - f ~ X1
 #'
 #' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'

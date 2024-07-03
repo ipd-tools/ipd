@@ -64,7 +64,7 @@ regression coefficients using the PPI++ algorithm.
 
 dat <- simdat_logistic()
 
-form <- Y - Yhat ~ Xc
+form <- Y - f ~ Xc
 
 X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 

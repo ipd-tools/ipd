@@ -48,7 +48,7 @@ Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) \
 
 dat <- simdat()
 
-form <- Y - Yhat ~ X1
+form <- Y - f ~ X1
 
 X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 

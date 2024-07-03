@@ -1,154 +1,218 @@
 #===============================================================================
-# IPD
-#===============================================================================
-
-
-#  PURPOSE: A complete user-friendly wrapper function with necessary defaults
-#           that calls each individual Inference-on-predicted-data (IPD) methods
-#           (postpi, ppi, ppi++, popinf, etc) with a specified model
-#           argument and returns a summary of outputs.
 #
-#  INPUTS:  1. Formula: Use one formula argument that specifies the "rectifier"
-#           model formula.
+#  FILE:    ipd.R
 #
-#           NOTE: As the PostPI methods are the only ones to deviate from
-#                 the "rectifier" framework, we will create the relationship
-#                 model formula internally for when calling the PostPI-based
-#                 methods. Please see further information in the function
-#                 details found in help tab ("?ipd()").
+#  PURPOSE: Defines main IPD wrapper function
 #
-#           2. Data: The data can be specified in two ways -
+#  UPDATED: 2024.07.05
 #
-#              a) Single data argument with stacked data and a label identifier:
-#                 Take one data argument where both the unlabeled and labeled
-#                 data are "stacked" on top of each other and specify the
-#                 string/logical/factor column that identifies the rows that are
-#                 labeled and unlabeled data respectively.
-#
-#                 NOTE: We will consider labeled data to be defined as
-#                       string  = labeled (US), labelled (UK), TRUE (character)
-#                       logical = TRUE
-#                       factor  = non-reference category (i.e. binary 1)
-#
-#              b) Two data arguments, one for labeled and one for unlabeled.
-#
-#                 NOTE: If the 2nd data argument is provided the function does
-#                       not check for (or ignores the label) identifier.
-#                       Otherwise, if the 2nd data argument is unspecified, the
-#                       function assumes the data provided is stacked.
-#
-#           3. Method: Use a "method" argument to signify which specific
-#              method to use. Note that, going by the author-specified
-#              convention, we denote the methods as following:
-#
-#              a) postpi       = Wang et al. post prediction inference method
-#              b) ppi          = Angelopoulos et al. prediction-powered inference
-#                                method (ppi)
-#              c) ppi_plusplus = Angelopoulos et al. PPI++ method
-#              d) popinf       = Miao et al. Assumption-lean and Data-adaptive
-#                                Post-Prediction Inference
-#
-#           4. Model: Use a model "model" argument to signify what model
-#              (e.g., ols, logistic, cox, etc). The wrapper will concatenate
-#              the Method and Model arguments to identify the required helper
-#              function, all of which have the same naming convention:
-#              "method_model.R".
-#
-#           5. Auxiliary arguments: The wrapper will take method-specific
-#              auxiliary arguments and pass them to the helper function through
-#              the triple dots "..." with specified defaults for simplicity.
-#
-#           6. Other arguments: All other arguments that relate to all the
-#              methods (e.g., alpha, ci.type),
-#              or all other method-specific arguments and will have defaults.
-#
-#           NOTES:
-#              i) Propose all of the other methods take matrix arguments, to
-#                 minimize additional parsing after wrapper function assertions
-#                 and data pre-processing.
-#
-#  Updated: 2024-01-21
+#  NOTES:   1. Add logistic, Poisson, and multiclass models to all methods
 #
 #===============================================================================
 
-#=== MAIN IPD FUNCTION =========================================================
+#=== IPD WRAPPER FUNCTION ======================================================
 
-#' Valid and Efficient Inference on Predicted Data (IPD) using State-of-the-Art
-#' Methods
+#' Valid and Efficient Inference on Predicted Data (IPD)
 #'
-#' @description A complete wrapper function with necessary defaults that calls
-#' on each individual post-prediction inference based methods (postpi, ppi,
-#' ppi++, popinf, etc) along with a specified model argument and
-#' returns a summary of outputs.
+#' @description The main wrapper function to conduct IPD using various methods
+#' and models, and returns a list of fitted model components.
 #'
-#' @details  Note that, going by the author-specified conventions, we denote
-#' the methods as following:
-#' (a) postpi       = Wang et al. (2020) post prediction inference (PostPI) method
-#' (b) ppi          = Angelopoulos et al. (2023) prediction-powered inference
-#'                    (PPI) method
-#' (c) ppi_plusplus = Angelopoulos et al. (2023) PPI++ method
-#' (d) popinf       = Miao et al. (2023) Assumption-lean and Data-adaptive
-#'                    Post-Prediction Inference method
+#' @param formula An object of class \code{formula}: a symbolic description of
+#' the model to be fitted. Must be of the form \code{Y - f ~ X}, where \code{Y}
+#' is the name of the column corresponding to the observed outcome in the
+#' labeled data, \code{f} is the name of the column corresponding to the
+#' predicted outcome in both labeled and unlabeled data, and \code{X}
+#' corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
 #'
-#' Since the PostPI methods (requiring a relationship model) are
-#' the only ones to deviate from the 'rectifier' model framework (used in PPI,
-#' PPI++, and POP-Inf), we will create the relationship model formula internally
-#' when calling the PostPI methods under the assumption that the relationship
-#' model arguments can be recovered from the rectifier model.
+#' @param method The method to be used for fitting the model. Must be one of
+#' \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
+#' \code{"popinf"}, or \code{"ppi_plusplus"}.
 #'
-#' @param formula (formula): an argument of the form Y - Yhat ~ X, where Y is the
-#' name of the column corresponding to the observed outcome in the labeled data,
-#' Yhat is the name of the column corresponding to the predicted outcome in both
-#' labeled and unlabeled data, and X corresponds to the features of interest
-#' (i.e., X = X1 + X2 + ... + Xp).
+#' @param model The type of model to be fitted. Must be one of \code{"mean"},
+#' \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.
 #'
-#' @param method (string): Method to be used. The available methods include
-#' 'postpi' (PostPI), 'ppi' (PPI), 'ppi_plusplus' (PPI++), and 'popinf' (POP-Inf).
+#' @param data A \code{data.frame} containing the variables in the model,
+#' either a stacked data frame with a specific column identifying the labeled
+#' versus unlabeled observations (\code{label}), or only the labeled data
+#' set. Must contain columns for the observed outcomes (\code{Y}), the
+#' predicted outcomes (\code{f}), and the features (\code{X}) needed to specify
+#' the \code{formula}.
 #'
-#' @param model (string): Type of the regression model to be fit or
-#' estimand to be calculated.
-#' This can take on values: 'ols' (for continuous  variable), 'logistic'
-#' (for binary variable), and estimands: 'mean' and 'quantile'.
-#' Note that, not all method-model combinations are currently available. For newer
-#' method-model additions, please use the development version from the github
-#' repo: awanafiaz/IPD.
+#' @param label A \code{string}, \code{int}, or \code{logical} specifying the
+#' column in the data that distinguishes between the labeled and unlabeled
+#' observations. See the \code{Details} section for more information. If NULL,
+#' \code{unlabeled_data} must be specified.
 #'
-#' @param data (data.frame): either a stacked data frame with a specific column identifying the
-#' labeled and unlabeled data sets, or only the labeled data set.
-#' The stacked data frame (or the labeled data set) consists of observed outcomes
-#' for labeled data set (Y), the predicted outcomes (Yhat) for both labeled and
-#' unlabeled data sets, and the features (X).
+#' @param unlabeled_data (optional) A \code{data.frame} of unlabeled data. If
+#' NULL, \code{label} must be specified. Specifying both the \code{label} and
+#' \code{unlabeled_data} arguments will result in an error message. If
+#' specified, must contain columns for the predicted outcomes (\code{f}), and
+#' the features (\code{X}) needed to specify the \code{formula}.
 #'
-#' @param label_index (string/int/logical, optional): The column name for the
-#' indexing variable that identifies the labeled and unlabeled data sets. This
-#' column must have the following pairs of values for labeled and unlabeled data:
-#' string: 'labeled' and 'unlabeled', or integer: 1 (labeled) and 0 (unlabeled), or
-#' logical: TRUE (labeled) and FALSE (unlabeled)).
+#' @param seed (optional) An \code{integer} seed for random number generation.
 #'
-#' @param df_unlabeled (data.frame, optional): a data frame containing only the
-#' unlabeled data set. Specify this argument ONLY if the data provided is not
-#' already stacked. This data frame consists of the predicted outcomes (Yhat)
-#' for the unlabeled data and the features (X). Specifying both 'label_index'
-#' and 'df_unlabeled' arguments will result in an error message.
+#' @param intercept \code{Logical}. Should an intercept be included in the
+#' model? Default is \code{TRUE}.
 #'
-#' @param seed (int, optional): an integer value provided as seed.
+#' @param alpha The significance level for confidence intervals. Default is
+#' \code{0.05}.
 #'
-#' @param intercept (bool): a logical argument specifying whether to include an
-#' intercept in the inference model or not (defaults to TRUE).
+#' @param alternative A string specifying the alternative hypothesis. Must be
+#' one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.
 #'
-#' @param alpha (float, optional): specified level of significance of the the
-#' confidence interval; defaults to 0.05.
-#'
-#' @param alternative (string, optional): Specify the alternative hypothesis,
-#' must be one of "two.sided", "greater" or "less"; defaults to "two.sided".
-#'
-#' @param ... further arguments passed to or from specific methods. See details.
+#' @param ... Additional arguments to be passed to the fitting function. See
+#' the \code{Details} section for more information.
 #'
 #' @returns a summary of model output.
 #'
-#' @examples
-#' # example code
+#' @details
 #'
+#' \strong{1. Formula:}
+#'
+#' The \code{ipd} function uses one formula argument that specifies both the
+#' calibrating model (e.g., PostPI "relationship model", PPI "rectifier" model)
+#' and the inferential model. These separate models will be created internally
+#' based on the specific \code{method} called.
+#'
+#' \strong{2. Data:}
+#'
+#' The data can be specified in two ways:
+#'
+#' \enumerate{
+#'    \item Single data argument (\code{data}) containing a stacked
+#'    \code{data.frame} and a label identifier (\code{label}).
+#'    \item Two data arguments, one for the labeled data (\code{data}) and one
+#'    for the unlabeled data (\code{unlabeled_data}).
+#' }
+#'
+#' For option (1), provide one data argument (\code{data}) which contains a
+#' stacked \code{data.frame} with both the unlabeled and labeled data and a
+#' \code{label} argument that specify the column that identifies the labeled
+#' versus the unlabeled observations in the stacked \code{data.frame}
+#'
+#' NOTE: Labeled data identifiers can be:
+#'
+#' \describe{
+#'    \item{String}{"l", "lab", "label", "labeled", "labelled", "tst", "test",
+#'    "true"}
+#'    \item{Logical}{TRUE}
+#'    \item{Factor}{Non-reference category (i.e., binary 1)}
+#' }
+#'
+#' Unlabeled data identifiers can be:
+#'
+#' \describe{
+#'    \item{String}{"u", "unlab", "unlabeled", "unlabelled", "val",
+#'    "validation", "false"}
+#'    \item{Logical}{FALSE}
+#'    \item{Factor}{Non-reference category (i.e., binary 0)}
+#' }
+#'
+#' For option (2), provide separate data arguments for the labeled data set
+#' (\code{data}) and the unlabeled data set (\code{unlabeled_data}). If the
+#' second argument is provided, the function ignores the label identifier and
+#' assumes the data provided is stacked.
+#'
+#' \strong{3. Method:}
+#'
+#' Use the \code{method} argument to specify the fitting method:
+#'
+#' \describe{
+#'    \item{"postpi"}{Wang et al. (2020) Post-Prediction Inference (PostPI)}
+#'    \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
+#'    (PPI)}
+#'    \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
+#'    \item{"popinf"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
+#'    Post-Prediction Inference (POP-Inf)}
+#' }
+#'
+#' \strong{4. Model:}
+#'
+#' Use the \code{model} argument to specify the type of model:
+#'
+#' \describe{
+#'    \item{"mean"}{Mean value of the outcome}
+#'    \item{"quantile"}{\code{q}th quantile of the outcome}
+#'    \item{"ols"}{Linear regression}
+#'    \item{"logistic"}{Logistic regression}
+#'    \item{"poisson"}{Poisson regression}
+#' }
+#'
+#' The \code{ipd} wrapper function will concatenate the \code{method} and
+#' \code{model} arguments to identify the required helper function, following
+#' the naming convention "method_model".
+#'
+#' \strong{5. Auxiliary Arguments:}
+#'
+#' The wrapper function will take method-specific auxiliary arguments (e.g.,
+#' \code{q} for the quantile estimation models) and pass them to the helper
+#' function through the "..." with specified defaults for simplicity.
+#'
+#' \strong{6. Other Arguments:}
+#'
+#' All other arguments that relate to all methods (e.g., alpha, ci.type), or
+#' other method-specific arguments, will have defaults.
+#'
+#' @return A list containing the fitted model components:
+#'
+#' \describe{
+#'   \item{coefficients}{Estimated coefficients of the model}
+#'   \item{se}{Standard errors of the estimated coefficients}
+#'   \item{ci}{Confidence intervals for the estimated coefficients}
+#'   \item{formula}{The formula used to fit the IPD model.}
+#'   \item{data}{The data frame used for model fitting.}
+#'   \item{method}{The method used for model fitting.}
+#'   \item{model}{The type of model fitted.}
+#'   \item{intercept}{Logical. Indicates if an intercept was included in the
+#'   model.}
+#'   \item{fit}{Fitted model object containing estimated coefficients, standard
+#'   errors, confidence intervals, and additional method-specific output.}
+#'   \item{...}{Additional output specific to the method used.}
+#' }
+#'
+#' @examples
+#'
+#' #-- Generate Example Data
+#'
+#' set.seed(2023)
+#'
+#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
+#'
+#' head(dat)
+#'
+#' formula <- Y - f ~ X1
+#'
+#' #-- PostPI Analytic Correction (Wang et al., 2020)
+#'
+#' ipd(formula, method = "postpi_analytic", model = "ols",
+#'
+#'     data = dat, label = "set")
+#'
+#' #-- PostPI Bootstrap Correction (Wang et al., 2020)
+#'
+#' nboot <- 200
+#'
+#' ipd(formula, method = "postpi_boot", model = "ols",
+#'
+#'     data = dat, label = "set", nboot = nboot)
+#'
+#' #-- PPI (Angelopoulos et al., 2023)
+#'
+#' ipd(formula, method = "ppi", model = "ols",
+#'
+#'     data = dat, label = "set")
+#'
+#' #-- PPI++ (Angelopoulos et al., 2023)
+#'
+#' ipd(formula, method = "ppi_plusplus", model = "ols",
+#'
+#'     data = dat, label = "set")
+#'
+#' #-- POP-Inf (Miao et al., 2023)
+#'
+#' ipd(formula, method = "popinf", model = "ols",
+#'
+#'     data = dat, label = "set")
 #'
 #' @import stats
 #'
@@ -156,47 +220,47 @@
 
 ipd <- function(formula, method, model, data,
 
-  label_index = NULL, df_unlabeled = NULL, seed = NULL,
+  label = NULL, unlabeled_data = NULL, seed = NULL,
 
   intercept = T, alpha = 0.05, alternative = "two-sided", ...) {
 
-  #--- 1. CHECKS & ASSERTIONS --------------------------------------------------
+  #--- CHECKS & ASSERTIONS -----------------------------------------------------
 
-  #-- A1. CHECK FOR DATA
+  #-- CHECK FOR DATA
 
   if (missing(data)) data <- environment(formula)
 
-  #-- A2. CHECK IF BOTH 'label_index' AND 'df_unlabeled' args are UNSPECIFIED
+  #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE UNSPECIFIED
 
-  if(is.null(label_index) & is.null(df_unlabeled)) {
+  if(is.null(label) & is.null(unlabeled_data)) {
 
-    stop(paste("at least one of 'label_index' and 'df_unlabeled' must be",
+    stop(paste("at least one of 'label' and 'unlabeled_data' must be",
 
       "specified.\nSee the help('ipd') documentation for more information."))
   }
 
-  #-- A3. CHECK IF BOTH 'label_index' AND 'df_unlabeled' args are SPECIFIED
+  #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE SPECIFIED
 
-  if(!is.null(label_index) & !is.null(df_unlabeled)) {
+  if(!is.null(label) & !is.null(unlabeled_data)) {
 
-    stop(paste("specify only one of 'label_index' and 'df_unlabeled' argument.",
+    stop(paste("specify only one of 'label' and 'unlabeled_data' argument.",
 
       "\nSee the help('ipd') documentation for more information."))
   }
 
-  #-- A4. CHECK IF SPECIFIED 'label_index' exists in data
+  #-- CHECK IF SPECIFIED 'label' EXISTS IN DATA
 
-  if (!is.null(label_index)) {
+  if (!is.null(label)) {
 
-    if (!exists(label_index, where = data)) {
+    if (!exists(label, where = data)) {
 
-      stop(paste(label_index, "does not exist in the data set.\nSee the",
+      stop(paste(label, "does not exist in the data set.\nSee the",
 
         "help('ipd') documentation for more information."))
     }
   }
 
-  #-- B. CHECK FOR VALID METHOD
+  #-- CHECK FOR VALID METHOD
 
   if (!(method %in% c("postpi_analytic", "postpi_boot", "ppi", "popinf",
 
@@ -209,71 +273,62 @@ ipd <- function(formula, method, model, data,
       "documentation for more information."))
   }
 
-  #-- C. CHECK FOR VALID MODEL
+  #-- CHECK FOR VALID MODEL
 
   if (!(model %in% c("mean", "quantile", "ols", "logistic"))) {
 
-    stop(paste("'model' must be one of c('mean', 'quantile', 'ols', 'logistic'",
+    stop(paste("'model' must be one of c('mean', 'quantile', 'ols',",
 
-      ").\nSee the 'Details' for more information."))
+      "'logistic').\nSee the 'Details' for more information."))
   }
 
-  #--- D. CHECK FOR VALID METHOD-MODEL COMBINATION
-
-  # if (!exists(paste(method, model, sep = "_"), inherits = FALSE))  {
-  #
-  #   stop(paste0("This method/model combination (",
-  #
-  #     paste(method, model, sep = "_"), ") has not yet been implemented. ",
-  #
-  #     "See the 'Details' section of the documentation for more information."))
-  # }
-
-  #--- E. SET SEED
+  #--- SET SEED ----------------------------------------------------------------
 
   if (!is.null(seed)) set.seed(seed)
 
   #--- PREPARE DATA ------------------------------------------------------------
 
-  ##-- IF STACKED DATA IS PROVIDED
+  #-- IF STACKED DATA ARE PROVIDED
 
-  if(!is.null(label_index) & is.null(df_unlabeled)) {
+  if(!is.null(label) & is.null(unlabeled_data)) {
 
-    #---- DEFINE VALID label_index IDENTIFERS
+    #---- DEFINE VALID label IDENTIFERS
 
     ##--- CHECK ONE OF EACH labeled AND unlabeled IDENTIFIERS EXIST
 
-    valid_labeled_df_id <- c(
+    valid_labeled_df_id <- c("l", "lab", "label", "labeled", "labelled",
 
-      "tst", "test", 1, TRUE, "lab", "label", "labeled", "labelled")
+      "tst", "test", "true", 1, TRUE)
 
-    valid_unlabeled_df_id <- c(
+    valid_unlabeled_df_id <- c("u", "unlab", "unlabeled", "unlabelled",
 
-      "val", "validation", 0, FALSE, "unlab", "unlabeled", "unlabelled")
+      "val", "validation", "false", 0, FALSE)
 
-    if(!((sum(unique(data[[label_index]]) %in% valid_labeled_df_id) == 1) &
+    if(!((sum(unique(data[[label]]) %in% valid_labeled_df_id) == 1) &
 
-      (sum(unique(data[[label_index]]) %in% valid_unlabeled_df_id) == 1))) {
+      (sum(unique(data[[label]]) %in% valid_unlabeled_df_id) == 1))) {
 
-      stop(paste(label_index,
+      stop(paste(label,
 
-        "must have one valid identifier for labeled and unlabeled data set each.",
+        "must have one valid identifier for labeled and unlabeled data set",
 
-        "See the 'Details' section of the documentation for more information."))
+        "each. See the 'Details' section of the documentation for more",
+
+        "information."))
     }
 
-    data_l <- data[data[[label_index]] %in% valid_labeled_df_id, ]
+    data_l <- data[data[[label]] %in% valid_labeled_df_id, ]
 
-    data_u <- data[data[[label_index]] %in% valid_unlabeled_df_id, ]
+    data_u <- data[data[[label]] %in% valid_unlabeled_df_id, ]
   }
 
-  if(is.null(label_index) & !is.null(df_unlabeled)) {
+  if(is.null(label) & !is.null(unlabeled_data)) {
 
-    ##-- IF UNSTACKED DATA IS PROVIDED
+    #- IF UNSTACKED DATA ARE PROVIDED
 
     data_l <- data
 
-    data_u <- df_unlabeled
+    data_u <- unlabeled_data
   }
 
   #-- LABELED DATA
@@ -310,15 +365,31 @@ ipd <- function(formula, method, model, data,
 
   fit <- func(X_l, Y_l, f_l, X_u, f_u)
 
+  cat(colnames(X_u))
+
+  names(fit$est) <- colnames(X_u)
+
   ci  <- zconfint_generic(fit$est, fit$se, alpha, alternative)
 
   #--- RETURN ------------------------------------------------------------------
 
-  obj <- list(est = fit$est, se = fit$se, ci = ci, ...)
+  result <- list(
 
-  class(obj) <- c("ipd", fit$class)
+    coefficients = fit$est,
+    se = fit$se,
+    ci = ci,
+    formula = formula,
+    data = data,
+    method = method,
+    model = model,
+    intercept = intercept,
+    fit = fit,
+    ...
+  )
 
-  return(obj)
+  class(result) <- c("ipd")
+
+  return(result)
 }
 
 #=== END =======================================================================
