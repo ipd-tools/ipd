@@ -83,15 +83,17 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   if (rel_func == "lm") {
 
-    fit_rel <- lm(Y_l ~ f_l)
+    fit_rel <- lm(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
 
   } else if (rel_func == "rf") {
 
-    fit_rel <- ranger(Y_l ~ data.frame(f = f_l), keep.inbag = T)
+    fit_rel <- ranger(Y ~ f, data = data.frame(Y = Y_l, f = f_l),
+
+      keep.inbag = T)
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- gam(Y_l ~ f_l)
+    fit_rel <- gam(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
 
   } else {
 
@@ -112,6 +114,8 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     idx_b <- sample(1:N, N, replace = T)
 
+    f_u_b <- f_u[idx_b, ]
+
     X_u_b <- X_u[idx_b, ]
 
     #-  ii. Simulate Values from Relationship Model
@@ -120,21 +124,21 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
 
       } else {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
 
           sigma(fit_rel))
       }
 
     } else if (rel_func == "rf") {
 
-      rel_preds <- predict(fit_rel, data = data.frame(f = f_u), type = "se")
+      rel_preds <- predict(fit_rel, data = data.frame(f = f_u_b), type = "se")
 
       if (scale_se) {
 
@@ -151,13 +155,13 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
       } else {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
 
           sigma(fit_rel))
       }
@@ -169,7 +173,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
+    fit_inf_b <- lm(Y_u_b ~ X_u_b) # -1
 
     #-  iv. Extract Coefficient Estimator
 
