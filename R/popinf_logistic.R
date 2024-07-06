@@ -32,7 +32,7 @@
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "logistic")
 #'
 #' form <- Y - f ~ X1
 #'

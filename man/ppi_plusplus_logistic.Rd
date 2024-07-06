@@ -62,9 +62,9 @@ regression coefficients using the PPI++ algorithm.
 }
 \examples{
 
-dat <- simdat_logistic()
+dat <- simdat(model = "logistic")
 
-form <- Y - f ~ Xc
+form <- Y - f ~ X1
 
 X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 

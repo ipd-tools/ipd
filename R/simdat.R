@@ -1,123 +1,203 @@
 #===============================================================================
-#  DATA GENERATION FUNCTIONS
+#  DATA GENERATION FUNCTION
 #===============================================================================
 
-#--- DATA GENERATION FOR OLS REGRESSION ----------------------------------------
+#--- DATA GENERATION FOR VARIOUS MODELS ----------------------------------------
 
-#' Data generation functions for OLS regression example
+#' Data generation function for various underlying models
 #'
-#' @param n (int vector) vector of size 3 indicating the sample size in the
-#' training, labeled, and unlabeled data sets
+#' @param n Integer vector of size 3 indicating the sample sizes in the
+#' training, labeled, and unlabeled data sets, respectively
 #'
-#' @param effect (float) regression coefficient for the first variable of
-#' interest for inference (defaults to 1)
+#' @param effect Regression coefficient for the first variable of interest for
+#' inference. Defaults is 1.
 #'
-#' @param sigma_Y (float) residual variance for the generated outcome
+#' @param sigma_Y Residual variance for the generated outcome. Defaults is 1.
+#'
+#' @param model The type of model to be generated. Must be one of
+#' \code{"mean"}, \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.
+#' Default is \code{"ols"}.
 #'
 #  @inheritParams gam::gam
 #'
-#' @return A data.frame containing n rows and seven columns corresponding to
+#' @return A data.frame containing n rows and columns corresponding to
 #' the labeled outcome (Y), the predicted outcome (f), a character variable
 #' (set) indicating which data set the observation belongs to (training,
 #' labeled, or unlabeled), and four independent, normally distributed
-#' predictors (X1, X2, X3, and X4).
+#' predictors (X1, X2, X3, and X4), where applicable.
 #'
 #' @examples
 #'
-#' # Return a stacked data set with 100 observations for each individual sets
+#' #-- Mean
 #'
-#' dat <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1)
+#' dat_mean <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
 #'
-#' head(dat)
+#'   model = "mean")
 #'
-#' @import stats gam
+#' head(dat_mean)
+#'
+#' #-- Quantile
+#'
+#' dat_quantile <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+#'
+#'   model = "quantile")
+#'
+#' head(dat_quantile)
+#'
+#' #-- Linear Regression
+#'
+#' dat_ols <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+#'
+#'   model = "ols")
+#'
+#' head(dat_ols)
+#'
+#' #-- Logistic Regression
+#'
+#' dat_logistic <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+#'
+#'   model = "logistic")
+#'
+#' head(dat_logistic)
+#'
+#' #-- Poisson Regression
+#'
+#' dat_poisson <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+#'
+#'   model = "poisson")
+#'
+#' head(dat_poisson)
+#'
+#' @import stats gam caret
 #'
 #' @export
 
-simdat <- function(n = c(300, 300, 300), effect = 1, sigma_Y = 1) {
+simdat <- function(n = c(300, 300, 300),
+
+  effect = 1, sigma_Y = 1, model = "ols") {
+
+  #-- CHECK FOR VALID MODEL
+
+  if (!(model %in% c("mean", "quantile", "ols", "logistic", "poisson"))) {
+
+    stop(paste("'model' must be one of c('mean', 'quantile', 'ols',",
+
+      "'logistic', 'poisson')."))
+  }
+
+  #-- GENERATE SYSTEMATIC COMPONENT
+
+  if (model %in% c("mean", "quantile")) {
+
+    X <- 1
+
+    mu <- effect * 1
+
+  } else if (model %in% c("ols", "logistic", "poisson")) {
+
+    X <- matrix(rnorm(sum(n) * 4), ncol = 4, nrow = sum(n))
+
+    mu <- effect * X[,1] + (1/2) * X[,2]^2 + 3 * X[,3]^3 + 4 * X[,4]^2
+  }
+
+  #-- GENERATE ERROR COMPONENT
 
   eps <- rnorm(sum(n), 0, sigma_Y)
 
-  X <- matrix(rnorm(sum(n) * 4), ncol = 4, nrow = sum(n))
+  #-- GENERATE OUTCOMES
 
-  Y <- effect * X[,1] + (1/2) * X[,2]^2 + 3 * X[,3]^3 + 4 * X[,4]^2 + eps
+  if (model %in% c("mean", "quantile", "ols")) {
 
-  set <- rep(c("training", "labeled", "unlabeled"), n)
+    Y <- mu + eps
 
-  dat <- data.frame(X, Y, f = NA, set)
+  } else if (model == "logistic") {
 
-  fit_gam <- gam::gam(Y ~ gam::s(X1) + gam::s(X2) + gam::s(X3) + gam::s(X4),
+    p_Y <- plogis(mu + eps)
 
-    data = dat[set == "training",])
+    Y <- rbinom(sum(n), 1, p_Y)
 
-  dat[set == "labeled", "f"] <- predict(
+  } else if (model == "poisson") {
 
-    fit_gam, newdat = dat[set == "labeled",])
+    lam_Y <- exp(mu + eps)
 
-  dat[set == "unlabeled", "f"] <- predict(
+    Y <- rpois(sum(n), lam_Y)
+  }
 
-    fit_gam, newdat = dat[set == "unlabeled",])
-
-  return(dat)
-}
-
-#' Data generation for logistic regression examples
-#'
-#' @param n vector of size 3 indicating the sample size in the training,
-#' labeled/test, and unlabeled/validation data sets
-#'
-#' @param betac first regression coefficient (or, regression coefficient of
-#' variable of interest for inference)
-#'
-#' @return A data frame containing 4 columns: labeled outcome, predicted
-#' outcome and a character variable indicating which data set the observation
-#' belongs to (training, test/labeled, validation/unlabeled).
-#'
-#' @examples
-#'
-#' # Return a stacked data set with 100 observations for each individual sets
-#'
-#' simdat(c(100, 100, 100), 1)
-#'
-#' @import stats caret
-#'
-#' @export
-
-simdat_logistic <- function(n = c(300, 300, 300), betac = 1) {
-
-  X1 <- rnorm(sum(n), 1)
-  X2 <- rnorm(sum(n), 2)
-  Xc <- sample(0:2, sum(n), replace = T)
-
-  p_Y <- plogis(c(betac*as.numeric(Xc == 2) +
-
-    1*as.numeric(Xc == 1) + 1*smooth(X1) - 2*smooth(X2) + rnorm(sum(n))))
-
-  Y <- rbinom(sum(n), 1, p_Y)
+  #-- CREATE DATA.FRAME
 
   set <- rep(c("training", "labeled", "unlabeled"), n)
 
-  dat <- data.frame(X1, X2, Xc, Y, f = NA, set)
+  if (model %in% c("mean", "quantile")) {
 
-  knn_tune <- caret::train(
+    dat <- data.frame(Y, f = NA, set)
 
-    factor(Y) ~ X1 + X2 + Xc, data = dat[set == "training",],
+  } else if (model %in% c("ols", "logistic", "poisson")) {
 
-    method = "knn", trControl = trainControl(method = "cv"),
+    dat <- data.frame(X, Y, f = NA, set)
+  }
 
-    tuneGrid = data.frame(k = c(1:10)))
+  #-- GENERATE PREDICTIONS
 
-  fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + Xc,
+  if (model %in% c("mean", "quantile")) {
 
-    data = dat[set == "training",], k = knn_tune$bestTune$k)
+    dat[set == "labeled", "f"] <- mean(dat[set == "training", "Y"]) +
 
-  dat[set == "labeled", "f"] <- predict(
+      rnorm(n[2], 0, sigma_Y)
 
-    fit_knn, dat[set == "labeled",], type = "class")
+    dat[set == "unlabeled", "f"] <- mean(dat[set == "training", "Y"]) +
 
-  dat[set == "unlabeled", "f"] <- predict(
+      rnorm(n[3], 0, sigma_Y)
 
-    fit_knn, dat[set == "unlabeled",], type = "class")
+  } else if (model == "ols") {
+
+    fit_gam <- gam::gam(Y ~ gam::s(X1) + gam::s(X2) + gam::s(X3) + gam::s(X4),
+
+      data = dat[set == "training",])
+
+    dat[set == "labeled", "f"] <- predict(
+
+      fit_gam, newdat = dat[set == "labeled",])
+
+    dat[set == "unlabeled", "f"] <- predict(
+
+      fit_gam, newdat = dat[set == "unlabeled",])
+
+  } else if (model == "logistic") {
+
+    knn_tune <- caret::train(
+
+      factor(Y) ~ X1 + X2 + X3 + X4, data = dat[set == "training",],
+
+      method = "knn", trControl = trainControl(method = "cv"),
+
+      tuneGrid = data.frame(k = c(1:10)))
+
+    fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + X3 + X4,
+
+      data = dat[set == "training",], k = knn_tune$bestTune$k)
+
+    dat[set == "labeled", "f"] <- predict(
+
+      fit_knn, dat[set == "labeled",], type = "class")
+
+    dat[set == "unlabeled", "f"] <- predict(
+
+      fit_knn, dat[set == "unlabeled",], type = "class")
+
+  } else if (model == "poisson") {
+
+    fit_poisson <- glm(Y ~ X1 + X2 + X3 + X4, family = poisson,
+
+      data = dat[set == "training",])
+
+    dat[set == "labeled", "f"] <- predict(fit_poisson,
+
+      newdata = dat[set == "labeled",], type = "response")
+
+    dat[set == "unlabeled", "f"] <- predict(fit_poisson,
+
+      newdata = dat[set == "unlabeled",], type = "response")
+  }
 
   return(dat)
 }

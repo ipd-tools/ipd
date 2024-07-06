@@ -275,11 +275,11 @@ ipd <- function(formula, method, model, data,
 
   #-- CHECK FOR VALID MODEL
 
-  if (!(model %in% c("mean", "quantile", "ols", "logistic"))) {
+  if (!(model %in% c("mean", "quantile", "ols", "logistic", "poisson"))) {
 
     stop(paste("'model' must be one of c('mean', 'quantile', 'ols',",
 
-      "'logistic').\nSee the 'Details' for more information."))
+      "'logistic', 'poisson').\nSee the 'Details' for more information."))
   }
 
   #--- SET SEED ----------------------------------------------------------------

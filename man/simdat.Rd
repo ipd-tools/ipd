@@ -2,35 +2,73 @@
 % Please edit documentation in R/simdat.R
 \name{simdat}
 \alias{simdat}
-\title{Data generation functions for OLS regression example}
+\title{Data generation function for various underlying models}
 \usage{
-simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
+simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1, model = "ols")
 }
 \arguments{
-\item{n}{(int vector) vector of size 3 indicating the sample size in the
-training, labeled, and unlabeled data sets}
+\item{n}{Integer vector of size 3 indicating the sample sizes in the
+training, labeled, and unlabeled data sets, respectively}
 
-\item{effect}{(float) regression coefficient for the first variable of
-interest for inference (defaults to 1)}
+\item{effect}{Regression coefficient for the first variable of interest for
+inference. Defaults is 1.}
 
-\item{sigma_Y}{(float) residual variance for the generated outcome}
+\item{sigma_Y}{Residual variance for the generated outcome. Defaults is 1.}
+
+\item{model}{The type of model to be generated. Must be one of
+\code{"mean"}, \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.
+Default is \code{"ols"}.}
 }
 \value{
-A data.frame containing n rows and seven columns corresponding to
+A data.frame containing n rows and columns corresponding to
 the labeled outcome (Y), the predicted outcome (f), a character variable
 (set) indicating which data set the observation belongs to (training,
 labeled, or unlabeled), and four independent, normally distributed
-predictors (X1, X2, X3, and X4).
+predictors (X1, X2, X3, and X4), where applicable.
 }
 \description{
-Data generation functions for OLS regression example
+Data generation function for various underlying models
 }
 \examples{
 
-# Return a stacked data set with 100 observations for each individual sets
+#-- Mean
 
-dat <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1)
+dat_mean <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
 
-head(dat)
+  model = "mean")
+
+head(dat_mean)
+
+#-- Quantile
+
+dat_quantile <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+
+  model = "quantile")
+
+head(dat_quantile)
+
+#-- Linear Regression
+
+dat_ols <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+
+  model = "ols")
+
+head(dat_ols)
+
+#-- Logistic Regression
+
+dat_logistic <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+
+  model = "logistic")
+
+head(dat_logistic)
+
+#-- Poisson Regression
+
+dat_poisson <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
+
+  model = "poisson")
+
+head(dat_poisson)
 
 }

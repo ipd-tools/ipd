@@ -46,7 +46,7 @@ Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) \
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "logistic")
 
 form <- Y - f ~ X1
 
