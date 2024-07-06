@@ -12,7 +12,8 @@ postpi_boot_ols(
   f_u,
   nboot = 100,
   rel_func = "lm",
-  scale_se = T
+  scale_se = T,
+  n_t = Inf
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ postpi_boot_ols(
 \item{rel_func}{relationship function model form (lm, gam, glm, etc)}
 
 \item{scale_se}{(boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).}
+
+\item{n_t}{(integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).}
 }
 \value{
 A list of outputs: estimate of inference model parameters and corresponding standard error based on both parametric and non-parametric bootstrap methods.

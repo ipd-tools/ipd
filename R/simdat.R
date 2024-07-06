@@ -97,7 +97,7 @@ simdat <- function(n = c(300, 300, 300),
 
     X <- matrix(rnorm(sum(n) * 4), ncol = 4, nrow = sum(n))
 
-    mu <- effect * X[,1] + (1/2) * X[,2]^2 + 3 * X[,3]^3 + 4 * X[,4]^2
+    mu <- effect * X[,1] + (1/2) * X[,2]^2 + (1/3) * X[,3]^3 + (1/4) * X[,4]^2
   }
 
   #-- GENERATE ERROR COMPONENT

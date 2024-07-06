@@ -40,6 +40,8 @@
 #'
 #' @param scale_se (boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).
 #'
+#' @param n_t (integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).
+#'
 #' @returns A list of outputs: estimate of inference model parameters and corresponding standard error based on both parametric and non-parametric bootstrap methods.
 #'
 #' @examples
@@ -73,7 +75,7 @@
 
 postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, rel_func = "lm", scale_se = T) {
+  nboot = 100, rel_func = "lm", scale_se = T, n_t = Inf) {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
@@ -120,7 +122,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
         Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
 
-          sigma(fit_rel) * sqrt(N / n))
+          sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
 
       } else {
@@ -136,7 +138,9 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, rel_preds$predictions, rel_preds$se * sqrt(N / n))
+        Y_u_b <- rnorm(N, rel_preds$predictions,
+
+          rel_preds$se * sqrt(N / min(n, n_t)))
 
       } else {
 
@@ -149,7 +153,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
         Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(X_u_b)),
 
-          sigma(fit_rel) * sqrt(N / n))
+          sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
       } else {
 
@@ -165,7 +169,8 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
+    # fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)                                         ## Check this
+    fit_inf_b <- lm(Y_u_b ~ X_u_b)
 
     #-  iv. Extract Coefficient Estimator
 

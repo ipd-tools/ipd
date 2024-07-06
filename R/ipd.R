@@ -174,7 +174,7 @@
 #'
 #' #-- Generate Example Data
 #'
-#' set.seed(2023)
+#' set.seed(12345)
 #'
 #' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
 #'
@@ -364,8 +364,6 @@ ipd <- function(formula, method, model, data,
   func <- get(paste(method, model, sep = "_"))
 
   fit <- func(X_l, Y_l, f_l, X_u, f_u)
-
-  cat(colnames(X_u))
 
   names(fit$est) <- colnames(X_u)
 

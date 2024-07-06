@@ -18,114 +18,197 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 
 ## <img src="man/figures/IPD_LOGO.png" align="right" height="200" style="float:right; height:200px;">
 
-With the rapid advancement of artificial intelligence and machine learning (AI/ML), researchers from a wide range of disciplines increasingly use predictions from pre-trained algorithms as outcome variables in statistical analyses. However, reifying algorithmically-derived values as measured outcomes may lead to biased estimates and anti-conservative inference ([Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117)). The statistical challenges encountered when drawing inference on predicted data (IPD) include: 
+With the rapid advancement of artificial intelligence and machine learning (AI/ML), researchers from a wide range of disciplines increasingly use predictions from pre-trained algorithms as outcome variables in statistical analyses. However, reifying algorithmically-derived values as measured outcomes may lead to biased estimates and anti-conservative inference ([Hoffman et al., 2023](https://arxiv.org/abs/2401.08702)). The statistical challenges encountered when drawing inference on predicted data (IPD) include: 
 
-1. Understanding the relationship between predicted outcomes and their true unobserved counterparts
+1. Understanding the relationship between predicted outcomes and their true, unobserved counterparts
 2. Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
 3. Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
 
-Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and assumption-lean and data-adaptive post-prediction inference (POP-Inf) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `IPD`, a open-source `R` package that implements methods under the umbrella of IPD.
+Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and assumption-lean and data-adaptive post-prediction inference (POP-Inf) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `IPD`, a open-source `R` package that implements these methods under the umbrella of IPD.
+
+This README provides an overview of the package, including installation instructions, basic usage examples, and links to further documentation. The examples show how to generate data, fit models, and use custom methods provided by the package.
 
 ## Installation
 
-You can install the development version of `IPD` from [GitHub](https://github.com/) with:
+To install the development version of `IPD` from [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools` package:
 
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
 
-# install.packages("devtools")   
+install.packages("devtools")   
 
-#-- Install the IPD package
+#-- Install the IPD package from GitHub
 
 devtools::install_github("awanafiaz/IPD")
 ```
 
 ## Usage
 
-We provide a simple example to demonstrate the basic use of the functions included in `IPD`.
+We provide a simple example to demonstrate the basic use of the functions included in the `IPD` package.
 
 ### Example Setup
 
-1. Assume we have access to an algorithm \(f(X)\) that can predict our outcome of interest \(Y\).
-2. Consider we have two datasets: a labeled dataset, \((Y_L, X_L, f(X))\), and an unlabeled dataset, \((X_u, f(X_U))\). The labeled set is typically smaller in size compared to the unlabeled set.
-3. Our interest is in performing inference on \( H_0: \beta_1^* = 0 \) vs \( H_1: \beta_1^* \ne 0 \). Our inference model is:
-   
-$$Y_{val} = \beta_0^* + \beta_1^* X_{val} + \epsilon^*,$$
+1. We have two datasets: a labeled dataset, \(\mathcal{L} = \left\{Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right\}\), and an unlabeled dataset, \(\left\{X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right\}\). The labeled set is typically smaller in size compared to the unlabeled set. 
+2. We have access to an algorithm \(f(X)\) that can predict our outcome of interest \(Y\).
+3. Our interest is in performing inference on a quantity such as the outcome mean or quantile, or to recover a downstream inferential (mean) model:
 
-where \( \epsilon^* \) is normally distributed with mean 0 and variance 1. We do not observe \( Y_U \), but only the predicted \( \hat{Y}_U = f(X_U) \).
+$$\mathbb{E}\left[Y^{\mathcal{U}} \mid \boldsymbol{X}^{\mathcal{U}}\right] = g^{-1}\left(\boldsymbol{X}^{\mathcal{U}'}\beta\right),$$
 
-### Data Generation and Loading
+where \(\beta\) is a vector of regression coefficients and \(g(\cdot)\) is a given link function, such as the identity link for linear regression, the logistic link for logistic regression, or the log link for Poisson regression. However, we do not observe \(Y^\mathcal{U}\), only the predicted \(f(X^\mathcal{U})\). We can use methods for IPD to obtain corrected estimates and standard errors when we replace these unobserved \(Y^\mathcal{U}\) by \(f(X^\mathcal{U})\).
+
+### Data Generation
+
+You can generate synthetic datasets for different types of regression models using the provided `simdat` function. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models.
 
 ```{r example}
 #-- Load the IPD Library
 
 library(IPD)
 
-#-- Generate Example Data
+#-- Generate Example Data for Linear Regression
 
-set.seed(2023)
+set.seed(12345)
 
-dat <- simdat(n = c(300, 300, 300), beta1 = 1)
+dat <- simdat(c(10000, 500, 1000), effect = 1, sigma_Y = 1, model = "ols")
 
-head(dat)
+head(dat[dat$set == "training",])
+
+head(dat[dat$set == "labeled",])
+
+head(dat[dat$set == "unlabeled",])
+
 ```
 
-### 1.1) PostPI Analytic Correction (Wang et al., 2020)
 
-```{r postpi_analytic_ols}
-#-- Specify the Formula
 
-formula <- Y - Yhat ~ X1
+```{r plot}
 
-#-- Fit the PostPI Analytic Correction
+library(tidyverse)
 
-IPD::ipd(formula, 
-         
-  method = "postpi_analytic", model = "ols", data = dat, label_index = "set")
+library(patchwork)
+
+dat_labeled <- dat[dat$set == "labeled",]
+
+p1 <- dat_labeled |> ggplot(aes(x = X1, y = Y)) + geom_point()
+
+p2 <- dat_labeled |> ggplot(aes(x = X1, y = f)) + geom_point()
+
+p3 <- dat_labeled |> ggplot(aes(x = f, y = Y)) + geom_point()
+
+p1 + p2 + p3
+
 ```
 
-### 1.2) PostPI Bootstrap Correction (Wang et al., 2020)
+
+
+
+### Model Fitting
+
+You can fit the various IPD methods to your data and obtain summaries using the provided wrapper function, `ipd()`:
+
+#### 1.1) PostPI Bootstrap Correction (Wang et al., 2020)
 
 ```{r postpi_boot_ols}
+#-- Specify the Formula
+
+formula <- Y - f ~ X1
+
 #-- Fit the PostPI Bootstrap Correction
 
 nboot <- 200
 
 IPD::ipd(formula, 
          
-  method = "postpi_boot", model = "ols", data = dat, label_index = "set", 
+  method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
   nboot = nboot)
 ```
 
-### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+
+#### 1.2) PostPI Analytic Correction (Wang et al., 2020)
+
+```{r postpi_analytic_ols}
+#-- Fit the PostPI Analytic Correction
+
+IPD::ipd(formula, 
+         
+  method = "postpi_analytic", model = "ols", data = dat, label = "set")
+```
+
+
+#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ```{r ppi_ols}
 #-- Fit the PPI Correction
 
 IPD::ipd(formula, 
          
-  method = "ppi", model = "ols", data = dat, label_index = "set")
+  method = "ppi", model = "ols", data = dat, label = "set")
 ```
 
-### 3. PPI++ (Angelopoulos et al., 2023)
+#### 3. PPI++ (Angelopoulos et al., 2023)
 
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
 
 IPD::ipd(formula, 
          
-  method = "ppi_plusplus", model = "ols", data = dat, label_index = "set")
+  method = "ppi_plusplus", model = "ols", data = dat, label = "set")
 ```
 
-### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
+#### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
 
 ```{r popinf}
 #-- Fit the POP-Inf Correction
 
 IPD::ipd(formula, 
          
-  method = "popinf", model = "ols", data = dat, label_index = "set")
+  method = "popinf", model = "ols", data = dat, label = "set")
+```
+
+### Printing and Tidying
+
+The package also provides custom print, summary, tidy, glance, and augment methods to facilitate easy model inspection:
+
+```{r methods}
+
+#-- Fit the PostPI Bootstrap Correction
+
+nboot <- 200
+
+fit_postpi <- IPD::ipd(formula, 
+         
+  method = "postpi_boot", model = "ols", data = dat, label = "set", 
+  
+  nboot = nboot)
+  
+#-- Print the Model
+
+print(fit_postpi)
+
+#-- Summarize the Model
+
+summ_fit_postpi <- summary(fit_postpi)
+  
+#-- Print the Model Summary
+
+print(summ_fit_postpi)
+
+#-- Tidy the Model Output
+
+tidy(fit_postpi)
+
+#-- Get a One-Row Summary of the Model
+
+glance(fit_postpi)
+
+#-- Augment the Original Data with Fitted Values and Residuals
+
+df <- dat[which(dat$set != "training"),]
+
+augmented_df <- augment(fit_postpi, data = df)
+
+head(augmented_df)
 ```
 
 ## Vignette 
@@ -133,10 +216,18 @@ IPD::ipd(formula,
 For additional details, we provide more use cases and examples in the package vignette:
 
 ```{r, eval = FALSE}
-vignette("IPD")
+vignette("ipd")
 ```
 
 
 ## Feedback
 
-For questions, comments, or any other feedback, please contact the developers.
+For questions, comments, or any other feedback, please contact the developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on GitHub.
+
+## License
+
+This package is licensed under the MIT License.

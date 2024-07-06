@@ -180,7 +180,7 @@ other method-specific arguments, will have defaults.
 
 #-- Generate Example Data
 
-set.seed(2023)
+set.seed(12345)
 
 dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
 
