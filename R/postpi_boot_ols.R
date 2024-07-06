@@ -87,7 +87,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   } else if (rel_func == "rf") {
 
-    fit_rel <- ranger(Y_l ~ f_l, keep.inbag = T)
+    fit_rel <- ranger(Y_l ~ data.frame(f = f_l), keep.inbag = T)
 
   } else if (rel_func == "gam") {
 
@@ -120,21 +120,21 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
 
       } else {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
 
           sigma(fit_rel))
       }
 
     } else if (rel_func == "rf") {
 
-      rel_preds <- predict(fit_rel, data = data.frame(f_l = f_u), type = "se")
+      rel_preds <- predict(fit_rel, data = data.frame(f = f_u), type = "se")
 
       if (scale_se) {
 
@@ -151,13 +151,13 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
       } else {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u)),
 
           sigma(fit_rel))
       }
