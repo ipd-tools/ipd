@@ -120,21 +120,21 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
 
       } else {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
 
           sigma(fit_rel))
       }
 
     } else if (rel_func == "rf") {
 
-      rel_preds <- predict(fit_rel, data = as.data.frame(f_u), type = "se")
+      rel_preds <- predict(fit_rel, data = data.frame(f_l = f_u), type = "se")
 
       if (scale_se) {
 
@@ -151,13 +151,13 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
       if (scale_se) {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
 
       } else {
 
-        Y_u_b <- rnorm(N, predict(fit_rel, as.data.frame(f_u)),
+        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f_l = f_u)),
 
           sigma(fit_rel))
       }
@@ -169,8 +169,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    # fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)                                         ## Check this
-    fit_inf_b <- lm(Y_u_b ~ X_u_b)
+    fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
 
     #-  iv. Extract Coefficient Estimator
 
