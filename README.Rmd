@@ -124,7 +124,6 @@ IPD::ipd(formula,
   nboot = nboot)
 ```
 
-
 #### 1.2) PostPI Analytic Correction (Wang et al., 2020)
 
 ```{r postpi_analytic_ols}
