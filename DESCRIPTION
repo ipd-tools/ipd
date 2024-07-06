@@ -1,10 +1,10 @@
 Package: IPD
-Title: Perform Statistically Valid and Efficient Inference on Predicted Data (IPD) using State-of-the-art Methods
+Title: Inference on Predicted Data
 Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: A comprehensive r-package for peforming valid statistical inference on predicted data utilizing all extant state-of-the-art methods. The package offers an all-encompassing wrapper function with specified defaults for ease of use and provides the output in summary format. 
+Description: Peforms valid statistical inference on predicted data utilizing state-of-the-art methods. The package offers an all-encompassing wrapper function with specified defaults for ease of use and provides methods for tidying and summarizing results. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -17,9 +17,14 @@ Imports:
     POPInf,
     generics
 Suggests: 
+    knitr,
+    rmarkdown,
+    tidyverse,
+    patchwork,
     testthat (>= 3.0.0)
 Remotes:
     qlu-lab/POPInf
 Config/testthat/edition: 3
 URL: https://github.com/awanafiaz/IPD
 BugReports: https://github.com/awanafiaz/IPD/issues
+VignetteBuilder: knitr

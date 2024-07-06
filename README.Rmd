@@ -58,7 +58,7 @@ where \(\beta\) is a vector of regression coefficients and \(g(\cdot)\) is a giv
 
 ### Data Generation
 
-You can generate synthetic datasets for different types of regression models using the provided `simdat` function. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models.
+You can generate synthetic datasets for different types of regression models using the provided `simdat` function by specifying the sizes of the datasets, the effect size, residual variance, and the type of model. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models. 
 
 ```{r example}
 #-- Load the IPD Library
@@ -71,6 +71,10 @@ set.seed(12345)
 
 dat <- simdat(c(10000, 500, 1000), effect = 1, sigma_Y = 1, model = "ols")
 
+#-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
+
+options(digits=2)
+
 head(dat[dat$set == "training",])
 
 head(dat[dat$set == "labeled",])
@@ -79,9 +83,9 @@ head(dat[dat$set == "unlabeled",])
 
 ```
 
+The `simdat` function provides observed and unobserved outcomes for both the labeled and unlabeled datasets, though in practice the observed outcomes are not in the unlabeled set. We can visualize the relationships between these variables:
 
-
-```{r plot}
+```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.height=2}
 
 library(tidyverse)
 
@@ -89,20 +93,127 @@ library(patchwork)
 
 dat_labeled <- dat[dat$set == "labeled",]
 
-p1 <- dat_labeled |> ggplot(aes(x = X1, y = Y)) + geom_point()
+p1_fit <- lm(Y ~ X1, data = dat_labeled)
 
-p2 <- dat_labeled |> ggplot(aes(x = X1, y = f)) + geom_point()
+p1 <- dat_labeled |> ggplot(aes(x = X1, y = Y)) + 
+  
+  theme_bw() + coord_fixed(1/3) +
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm") +
+  
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  
+  annotate("text", x = -5, y = 10, 
+           
+    label = paste(
+      
+      "Estimated Intercept:", round(coef(p1_fit)[1], 2),
+      
+      "\nEstimated Slope:",   round(coef(p1_fit)[2], 2), 
+      
+      "\nResidual Variance:", round(sigma(p1_fit)^2, 2)),
+    
+    hjust = 0, vjust = 1, size = 5, color = "black") +
+  
+  labs(x = expression(X[1]), y = "Y")
 
-p3 <- dat_labeled |> ggplot(aes(x = f, y = Y)) + geom_point()
+p2_fit <- lm(f ~ X1, data = dat_labeled)
+  
+p2 <- dat_labeled |> ggplot(aes(x = X1, y = f)) + 
+  
+  theme_bw() + coord_fixed(1/3) +
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm") +
+  
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  
+  annotate("text", x = -5, y = 10, 
+           
+    label = paste(
+      
+      "Estimated Intercept:", round(coef(p2_fit)[1], 2),
+      
+      "\nEstimated Slope:",   round(coef(p2_fit)[2], 2), 
+      
+      "\nResidual Variance:", round(sigma(p2_fit)^2, 2)),
+    
+    hjust = 0, vjust = 1, size = 5, color = "black") +
+  
+  labs(x = expression(X[1]), y = "f(X)")
 
-p1 + p2 + p3
+p3_fit <- lm(Y ~ f, data = dat_labeled)
+
+p3 <- dat_labeled |> ggplot(aes(x = f, y = Y)) + 
+  
+  theme_bw() + coord_fixed(1/3) +
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm") +
+  
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  
+  annotate("text", x = -5, y = 10, 
+           
+    label = paste(
+      
+      "Estimated Intercept:", round(coef(p3_fit)[1], 2),
+      
+      "\nEstimated Slope:",   round(coef(p3_fit)[2], 2), 
+      
+      "\nResidual Variance:", round(sigma(p3_fit)^2, 2)),
+    
+    hjust = 0, vjust = 1, size = 5, color = "black") +
+  
+  labs(x = "f(X)", y = "Y")
+
+(p1 + theme(plot.margin = unit(c(0,20,0, 0), "pt"))) +
+(p2 + theme(plot.margin = unit(c(0,20,0,20), "pt"))) +
+(p3 + theme(plot.margin = unit(c(0, 0,0,20), "pt"))) +
+  
+  plot_annotation(tag_levels = "A")
 
 ```
 
+We can see that:
 
-
+- The relationship between the true outcome and the covariate (plot A) is less variable than the relationship between the predicted outcome and the covariate (plot B)
+- There is uncertainty in predicting the outcomes that needs to be accounted for (plot C)
 
 ### Model Fitting
+
+We compare two non-`IPD` approaches to analyzin the data to methods included in the `IPD` package.
+
+#### 0.1) 'Naive' Regression Using the Predicted Outcomes
+
+```{r naive}
+#--- Fit the Naive Regression
+
+lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |> 
+  
+  summary()
+```
+
+
+#### 0.2) 'Classic' Regression Using only the Labeled Data
+
+```{r classic}
+#--- Fit the Classic Regression
+
+lm(Y ~ X1, data = dat[dat$set == "labeled",]) |> 
+  
+  summary()
+```
 
 You can fit the various IPD methods to your data and obtain summaries using the provided wrapper function, `ipd()`:
 
@@ -121,7 +232,9 @@ IPD::ipd(formula,
          
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
-  nboot = nboot)
+  nboot = nboot) |> 
+  
+  summary()
 ```
 
 #### 1.2) PostPI Analytic Correction (Wang et al., 2020)
@@ -131,7 +244,9 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "postpi_analytic", model = "ols", data = dat, label = "set")
+  method = "postpi_analytic", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 ```
 
 
@@ -142,7 +257,9 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "ppi", model = "ols", data = dat, label = "set")
+  method = "ppi", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 ```
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
@@ -152,7 +269,9 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set")
+  method = "ppi_plusplus", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 ```
 
 #### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
@@ -162,7 +281,9 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "popinf", model = "ols", data = dat, label = "set")
+  method = "popinf", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 ```
 
 ### Printing and Tidying

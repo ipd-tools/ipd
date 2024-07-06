@@ -178,11 +178,11 @@ simdat <- function(n = c(300, 300, 300),
 
     dat[set == "labeled", "f"] <- predict(
 
-      fit_knn, dat[set == "labeled",], type = "class")
+      fit_knn, dat[set == "labeled",], type = "class") |> as.numeric() - 1
 
     dat[set == "unlabeled", "f"] <- predict(
 
-      fit_knn, dat[set == "unlabeled",], type = "class")
+      fit_knn, dat[set == "unlabeled",], type = "class") |> as.numeric() - 1
 
   } else if (model == "poisson") {
 

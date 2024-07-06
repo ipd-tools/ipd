@@ -91,8 +91,10 @@ $Y^\mathcal{U}$ by $f(X^\mathcal{U})$.
 ### Data Generation
 
 You can generate synthetic datasets for different types of regression
-models using the provided `simdat` function. The function currently
-supports “mean”, “quantile”, “ols”, “logistic”, and “poisson” models.
+models using the provided `simdat` function by specifying the sizes of
+the datasets, the effect size, residual variance, and the type of model.
+The function currently supports “mean”, “quantile”, “ols”, “logistic”,
+and “poisson” models.
 
 ``` r
 #-- Load the IPD Library
@@ -105,80 +107,113 @@ set.seed(12345)
 
 dat <- simdat(c(10000, 500, 1000), effect = 1, sigma_Y = 1, model = "ols")
 
+#-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
+
+options(digits=2)
+
 head(dat[dat$set == "training",])
-#>           X1         X2          X3         X4         Y  f      set
-#> 1  0.5855288  0.7487320 -1.08153963  1.7380841  2.129752 NA training
-#> 2  0.7094660  0.8386136  0.04123505 -0.1996555  1.529630 NA training
-#> 3 -0.1093033 -1.8377414  0.49054926  1.1245687  2.106469 NA training
-#> 4 -0.4534972  0.2044950 -1.33044649  0.5389589 -2.373296 NA training
-#> 5  0.6058875  0.8086635 -0.39129058 -2.4365934  2.214769 NA training
-#> 6 -1.8179560 -0.3886214  1.16798808  0.2939337 -1.809534 NA training
+#>      X1    X2     X3    X4    Y  f      set
+#> 1  0.59  0.75 -1.082  1.74  2.1 NA training
+#> 2  0.71  0.84  0.041 -0.20  1.5 NA training
+#> 3 -0.11 -1.84  0.491  1.12  2.1 NA training
+#> 4 -0.45  0.20 -1.330  0.54 -2.4 NA training
+#> 5  0.61  0.81 -0.391 -2.44  2.2 NA training
+#> 6 -1.82 -0.39  1.168  0.29 -1.8 NA training
 
 head(dat[dat$set == "labeled",])
-#>               X1         X2         X3         X4           Y         f     set
-#> 10001  0.1612775 -1.3730215  0.8816500  0.3013700  0.91108316 1.6995559 labeled
-#> 10002  0.5319214 -0.4466659 -1.0221340  0.7586302 -0.76949000 0.2770002 labeled
-#> 10003 -1.2979034 -0.8122093  1.2188757 -0.1630360 -0.72035346 0.5697554 labeled
-#> 10004  1.2455783 -0.1915237 -1.4300525  1.2729837  1.57813524 0.6146402 labeled
-#> 10005 -0.9916905  1.8768000  1.1086366 -0.2568603  0.93081211 0.8493186 labeled
-#> 10006 -0.3181931 -0.9006203  0.6209725  0.5786088 -0.01175558 0.9844006 labeled
+#>          X1    X2    X3    X4      Y    f     set
+#> 10001  0.16 -1.37  0.88  0.30  0.911 1.70 labeled
+#> 10002  0.53 -0.45 -1.02  0.76 -0.769 0.28 labeled
+#> 10003 -1.30 -0.81  1.22 -0.16 -0.720 0.57 labeled
+#> 10004  1.25 -0.19 -1.43  1.27  1.578 0.61 labeled
+#> 10005 -0.99  1.88  1.11 -0.26  0.931 0.85 labeled
+#> 10006 -0.32 -0.90  0.62  0.58 -0.012 0.98 labeled
 
 head(dat[dat$set == "unlabeled",])
-#>               X1         X2          X3         X4           Y          f
-#> 10501  1.5058747 -1.4321016  0.72924860  1.5121492  3.26618720  2.9131682
-#> 10502 -0.9105015  1.5949058 -1.25467772  0.3954227 -0.60565575 -1.3382382
-#> 10503  0.4059670 -1.6423932  0.41524420 -0.9161881  1.33663281  1.4787372
-#> 10504 -0.8801105 -1.5265113  0.03174338 -0.5398788  0.82656413 -0.1737679
-#> 10505  0.1844883  0.2574885  0.37794643 -0.8719697 -0.11662568  1.2765319
-#> 10506  0.3271606 -0.5748017 -0.12104284  0.6207108 -0.03258024  0.9306709
-#>             set
-#> 10501 unlabeled
-#> 10502 unlabeled
-#> 10503 unlabeled
-#> 10504 unlabeled
-#> 10505 unlabeled
-#> 10506 unlabeled
+#>          X1    X2     X3    X4      Y     f       set
+#> 10501  1.51 -1.43  0.729  1.51  3.266  2.91 unlabeled
+#> 10502 -0.91  1.59 -1.255  0.40 -0.606 -1.34 unlabeled
+#> 10503  0.41 -1.64  0.415 -0.92  1.337  1.48 unlabeled
+#> 10504 -0.88 -1.53  0.032 -0.54  0.827 -0.17 unlabeled
+#> 10505  0.18  0.26  0.378 -0.87 -0.117  1.28 unlabeled
+#> 10506  0.33 -0.57 -0.121  0.62 -0.033  0.93 unlabeled
 ```
 
-``` r
-
-library(tidyverse)
-#> Warning: package 'ggplot2' was built under R version 4.2.3
-#> Warning: package 'tibble' was built under R version 4.2.3
-#> Warning: package 'tidyr' was built under R version 4.2.3
-#> Warning: package 'readr' was built under R version 4.2.3
-#> Warning: package 'purrr' was built under R version 4.2.3
-#> Warning: package 'dplyr' was built under R version 4.2.3
-#> Warning: package 'stringr' was built under R version 4.2.3
-#> Warning: package 'lubridate' was built under R version 4.2.3
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-#> ✔ purrr     1.0.2     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-library(patchwork)
-#> Warning: package 'patchwork' was built under R version 4.2.3
-
-dat_labeled <- dat[dat$set == "labeled",]
-
-p1 <- dat_labeled |> ggplot(aes(x = X1, y = Y)) + geom_point()
-
-p2 <- dat_labeled |> ggplot(aes(x = X1, y = f)) + geom_point()
-
-p3 <- dat_labeled |> ggplot(aes(x = f, y = Y)) + geom_point()
-
-p1 + p2 + p3
-```
+The `simdat` function provides observed and unobserved outcomes for both
+the labeled and unlabeled datasets, though in practice the observed
+outcomes are not in the unlabeled set. We can visualize the
+relationships between these variables:
 
 <img src="man/figures/README-plot-1.png" width="100%" />
 
+We can see that:
+
+- The relationship between the true outcome and the covariate (plot A)
+  is less variable than the relationship between the predicted outcome
+  and the covariate (plot B)
+- There is uncertainty in predicting the outcomes that needs to be
+  accounted for (plot C)
+
 ### Model Fitting
+
+We compare two non-`IPD` approaches to analyzin the data to methods
+included in the `IPD` package.
+
+#### 0.1) ‘Naive’ Regression Using the Predicted Outcomes
+
+``` r
+#--- Fit the Naive Regression
+
+lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |> 
+  
+  summary()
+#> 
+#> Call:
+#> lm(formula = f ~ X1, data = dat[dat$set == "unlabeled", ])
+#> 
+#> Residuals:
+#>     Min      1Q  Median      3Q     Max 
+#> -2.9426 -0.6501 -0.0101  0.6543  3.0193 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)   0.7418     0.0303    24.5   <2e-16 ***
+#> X1            0.9805     0.0314    31.2   <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 0.96 on 998 degrees of freedom
+#> Multiple R-squared:  0.494,  Adjusted R-squared:  0.493 
+#> F-statistic:  972 on 1 and 998 DF,  p-value: <2e-16
+```
+
+#### 0.2) ‘Classic’ Regression Using only the Labeled Data
+
+``` r
+#--- Fit the Classic Regression
+
+lm(Y ~ X1, data = dat[dat$set == "labeled",]) |> 
+  
+  summary()
+#> 
+#> Call:
+#> lm(formula = Y ~ X1, data = dat[dat$set == "labeled", ])
+#> 
+#> Residuals:
+#>     Min      1Q  Median      3Q     Max 
+#> -23.491  -0.885  -0.120   0.831  12.736 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)   0.7658     0.0916    8.36  6.5e-16 ***
+#> X1            1.0405     0.0936   11.12  < 2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 2 on 498 degrees of freedom
+#> Multiple R-squared:  0.199,  Adjusted R-squared:  0.197 
+#> F-statistic:  124 on 1 and 498 DF,  p-value: <2e-16
+```
 
 You can fit the various IPD methods to your data and obtain summaries
 using the provided wrapper function, `ipd()`:
@@ -198,213 +233,21 @@ IPD::ipd(formula,
          
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
-  nboot = nboot)
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
+  nboot = nboot) |> 
+  
+  summary()
 #> 
 #> Call:
 #>  Y - f ~ X1 
 #> 
+#> Method: postpi_boot 
+#> Model: ols 
+#> Intercept: Yes 
+#> 
 #> Coefficients:
-#> (Intercept)          X1 
-#> 0.748755012 0.002572974
+#>             Estimate Std.Error Lower.CI Upper.CI
+#> (Intercept)   0.8215    0.0859   0.6532     0.99
+#> X1            1.1019    0.0893   0.9269     1.28
 ```
 
 #### 1.2) PostPI Analytic Correction (Wang et al., 2020)
@@ -414,14 +257,21 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "postpi_analytic", model = "ols", data = dat, label = "set")
+  method = "postpi_analytic", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 #> 
 #> Call:
 #>  Y - f ~ X1 
 #> 
+#> Method: postpi_analytic 
+#> Model: ols 
+#> Intercept: Yes 
+#> 
 #> Coefficients:
-#> (Intercept)          X1 
-#>   0.8145576   1.0993107
+#>             Estimate Std.Error Lower.CI Upper.CI
+#> (Intercept)   0.8146    0.0858   0.6464     0.98
+#> X1            1.0993    0.0890   0.9249     1.27
 ```
 
 #### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
@@ -431,14 +281,21 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "ppi", model = "ols", data = dat, label = "set")
+  method = "ppi", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 #> 
 #> Call:
 #>  Y - f ~ X1 
 #> 
+#> Method: ppi 
+#> Model: ols 
+#> Intercept: Yes 
+#> 
 #> Coefficients:
-#> (Intercept)          X1 
-#>   0.8083629   1.0511556
+#>             Estimate Std.Error Lower.CI Upper.CI
+#> (Intercept)    0.808     0.084    0.644     0.97
+#> X1             1.051     0.101    0.854     1.25
 ```
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
@@ -448,14 +305,21 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set")
+  method = "ppi_plusplus", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 #> 
 #> Call:
 #>  Y - f ~ X1 
 #> 
+#> Method: ppi_plusplus 
+#> Model: ols 
+#> Intercept: Yes 
+#> 
 #> Coefficients:
-#> (Intercept)          X1 
-#>   0.8005687   1.0492023
+#>             Estimate Std.Error Lower.CI Upper.CI
+#> (Intercept)   0.8006    0.0833   0.6373     0.96
+#> X1            1.0492    0.1024   0.8485     1.25
 ```
 
 #### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
@@ -465,14 +329,21 @@ IPD::ipd(formula,
 
 IPD::ipd(formula, 
          
-  method = "popinf", model = "ols", data = dat, label = "set")
+  method = "popinf", model = "ols", data = dat, label = "set") |> 
+  
+  summary()
 #> 
 #> Call:
 #>  Y - f ~ X1 
 #> 
+#> Method: popinf 
+#> Model: ols 
+#> Intercept: Yes 
+#> 
 #> Coefficients:
-#> (Intercept)          X1 
-#>   0.7970723   1.0506707
+#>             Estimate Std.Error Lower.CI Upper.CI
+#> (Intercept)   0.7971    0.0831   0.6342     0.96
+#> X1            1.0507    0.1002   0.8543     1.25
 ```
 
 ### Printing and Tidying
@@ -491,205 +362,6 @@ fit_postpi <- IPD::ipd(formula,
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
   nboot = nboot)
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
-
-#> Warning: 'newdata' had 1000 rows but variables found have 500 rows
   
 #-- Print the Model
 
@@ -700,7 +372,7 @@ print(fit_postpi)
 #> 
 #> Coefficients:
 #> (Intercept)          X1 
-#> 0.748755012 0.002572974
+#>        0.82        1.10
 
 #-- Summarize the Model
 
@@ -718,16 +390,16 @@ print(summ_fit_postpi)
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>              Estimate Std.Error  Lower.CI Upper.CI
-#> (Intercept)  0.748755  0.091099  0.570205   0.9273
-#> X1           0.002573  0.095224 -0.184062   0.1892
+#>             Estimate Std.Error Lower.CI Upper.CI
+#> (Intercept)   0.8215    0.0859   0.6532     0.99
+#> X1            1.1019    0.0893   0.9269     1.28
 
 #-- Tidy the Model Output
 
 tidy(fit_postpi)
-#>                    term    estimate  std.error   conf.low conf.high
-#> (Intercept) (Intercept) 0.748755012 0.09109885  0.5702045 0.9273055
-#> X1                   X1 0.002572974 0.09522360 -0.1840619 0.1892078
+#>                    term estimate std.error conf.low conf.high
+#> (Intercept) (Intercept)     0.82     0.086     0.65      0.99
+#> X1                   X1     1.10     0.089     0.93      1.28
 
 #-- Get a One-Row Summary of the Model
 
@@ -742,20 +414,13 @@ df <- dat[which(dat$set != "training"),]
 augmented_df <- augment(fit_postpi, data = df)
 
 head(augmented_df)
-#>               X1         X2         X3         X4           Y         f     set
-#> 10001  0.1612775 -1.3730215  0.8816500  0.3013700  0.91108316 1.6995559 labeled
-#> 10002  0.5319214 -0.4466659 -1.0221340  0.7586302 -0.76949000 0.2770002 labeled
-#> 10003 -1.2979034 -0.8122093  1.2188757 -0.1630360 -0.72035346 0.5697554 labeled
-#> 10004  1.2455783 -0.1915237 -1.4300525  1.2729837  1.57813524 0.6146402 labeled
-#> 10005 -0.9916905  1.8768000  1.1086366 -0.2568603  0.93081211 0.8493186 labeled
-#> 10006 -0.3181931 -0.9006203  0.6209725  0.5786088 -0.01175558 0.9844006 labeled
-#>         .fitted     .resid
-#> 10001 0.7491700  0.1619132
-#> 10002 0.7501236 -1.5196136
-#> 10003 0.7454155 -1.4657690
-#> 10004 0.7519599  0.8261754
-#> 10005 0.7462034  0.1846087
-#> 10006 0.7479363 -0.7596919
+#>          X1    X2    X3    X4      Y    f     set .fitted .resid
+#> 10001  0.16 -1.37  0.88  0.30  0.911 1.70 labeled    1.00 -0.088
+#> 10002  0.53 -0.45 -1.02  0.76 -0.769 0.28 labeled    1.41 -2.177
+#> 10003 -1.30 -0.81  1.22 -0.16 -0.720 0.57 labeled   -0.61 -0.112
+#> 10004  1.25 -0.19 -1.43  1.27  1.578 0.61 labeled    2.19 -0.616
+#> 10005 -0.99  1.88  1.11 -0.26  0.931 0.85 labeled   -0.27  1.202
+#> 10006 -0.32 -0.90  0.62  0.58 -0.012 0.98 labeled    0.47 -0.483
 ```
 
 ## Vignette
