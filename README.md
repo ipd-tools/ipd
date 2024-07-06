@@ -132,15 +132,20 @@ nboot <- 200
 
 IPD::ipd(formula, 
          
-  method = "postpi_boot", model = "ols", data = dat, label_index = "set")
+  method = "postpi_boot", model = "ols", data = dat, label_index = "set", 
+  
+  nboot = nboot)
 #> $est
 #> [1] 12.70224908 -0.03039477
 #> 
 #> $se
-#> NULL
+#> [1] 0.2502446 0.1781699
 #> 
 #> $ci
-#> numeric(0)
+#> [1] 12.2117787 -0.3796013 13.1927195  0.3188118
+#> 
+#> $nboot
+#> [1] 200
 #> 
 #> attr(,"class")
 #> [1] "ipd"
