@@ -156,10 +156,10 @@ We can see that:
 
 ### Model Fitting
 
-We compare two non-`IPD` approaches to analyzin the data to methods
+We compare two non-`IPD` approaches to analyzing the data to methods
 included in the `IPD` package.
 
-#### 0.1) ‘Naive’ Regression Using the Predicted Outcomes
+#### 0.1 ‘Naive’ Regression Using the Predicted Outcomes
 
 ``` r
 #--- Fit the Naive Regression
@@ -187,7 +187,7 @@ lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |>
 #> F-statistic:  972 on 1 and 998 DF,  p-value: <2e-16
 ```
 
-#### 0.2) ‘Classic’ Regression Using only the Labeled Data
+#### 0.2 ‘Classic’ Regression Using only the Labeled Data
 
 ``` r
 #--- Fit the Classic Regression
@@ -218,7 +218,7 @@ lm(Y ~ X1, data = dat[dat$set == "labeled",]) |>
 You can fit the various IPD methods to your data and obtain summaries
 using the provided wrapper function, `ipd()`:
 
-#### 1.1) PostPI Bootstrap Correction (Wang et al., 2020)
+#### 1.1 PostPI Bootstrap Correction (Wang et al., 2020)
 
 ``` r
 #-- Specify the Formula
@@ -250,7 +250,7 @@ IPD::ipd(formula,
 #> X1            1.1019    0.0893   0.9269     1.28
 ```
 
-#### 1.2) PostPI Analytic Correction (Wang et al., 2020)
+#### 1.2 PostPI Analytic Correction (Wang et al., 2020)
 
 ``` r
 #-- Fit the PostPI Analytic Correction
@@ -348,11 +348,10 @@ IPD::ipd(formula,
 
 ### Printing and Tidying
 
-The package also provides custom print, summary, tidy, glance, and
-augment methods to facilitate easy model inspection:
+The package also provides custom `print`, `summary`, `tidy`, `glance`,
+and `augment` methods to facilitate easy model inspection:
 
 ``` r
-
 #-- Fit the PostPI Bootstrap Correction
 
 nboot <- 200
@@ -440,7 +439,7 @@ developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request
-on GitHub.
+on [GitHub](https://github.com/awanafiaz/IPD).
 
 ## License
 

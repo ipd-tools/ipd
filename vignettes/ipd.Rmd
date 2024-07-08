@@ -1,0 +1,546 @@
+---
+title: "Getting Started with the IPD Package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with the IPD Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{tidyverse}
+  %\VignetteDepends{patchwork}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  error = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+## Background
+
+With the rapid advancement of artificial intelligence and machine learning (AI/ML), researchers from a wide range of disciplines increasingly use predictions from pre-trained algorithms as outcome variables in statistical analyses. However, reifying algorithmically-derived values as measured outcomes may lead to biased estimates and anti-conservative inference ([Hoffman et al., 2023](https://arxiv.org/abs/2401.08702)). The statistical challenges encountered when drawing inference on predicted data (IPD) include: 
+
+1. Understanding the relationship between predicted outcomes and their true, unobserved counterparts
+2. Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
+3. Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
+
+Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and assumption-lean and data-adaptive post-prediction inference (POP-Inf) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `IPD`, a open-source `R` package that implements these methods under the umbrella of IPD.
+
+This vignette provides a guide to using the `IPD` package, including installation instructions, examples of data generation, model fitting, and usage of custom methods. The examples demonstrate the package's functionality.
+
+## Notation
+
+Following the notation of [Miao et al., 2023](https://arxiv.org/abs/2311.14220), we assume we have the following data structure:
+
+1. We have two datasets: a labeled dataset, \(\mathcal{L} = \left\{Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right\}\), and an unlabeled dataset, \(\left\{X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right\}\). The labeled set is typically smaller in size compared to the unlabeled set. 
+2. We have access to an algorithm \(f(X)\) that can predict our outcome of interest \(Y\).
+3. Our interest is in performing inference on a quantity such as the outcome mean or quantile, or to recover a downstream inferential (mean) model:
+
+$$\mathbb{E}\left[Y^{\mathcal{U}} \mid \boldsymbol{X}^{\mathcal{U}}\right] = g^{-1}\left(\boldsymbol{X}^{\mathcal{U}'}\beta\right),$$
+
+where \(\beta\) is a vector of regression coefficients and \(g(\cdot)\) is a given link function, such as the identity link for linear regression, the logistic link for logistic regression, or the log link for Poisson regression. However, we do not observe \(Y^\mathcal{U}\), only the predicted \(f(X^\mathcal{U})\). We can use methods for IPD to obtain corrected estimates and standard errors when we replace these unobserved \(Y^\mathcal{U}\) by \(f(X^\mathcal{U})\).
+
+## Installation
+
+To install the development version of `IPD` from [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools` package:
+
+```{r, eval = F}
+#-- Install devtools if it is not already installed
+
+install.packages("devtools")   
+
+#-- Install the IPD package from GitHub
+
+devtools::install_github("awanafiaz/IPD")
+```
+
+# Usage
+
+We provide a simple example to demonstrate the basic use of the functions included in the `IPD` package.
+
+```{r setup}
+#-- Load IPD Package
+
+library(IPD)
+```
+
+## Data Generation
+
+The `IPD` packages provides a unified function, `simdat`, for generating synthetic datasets for various models. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models. 
+
+### Function Arguments
+
+- `n`: A vector of size 3 indicating the sample size in the training, labeled, and unlabeled data sets.
+- `effect`: A float specifying the regression coefficient for the first variable of interest (defaults to 1).
+- `sigma_Y`: A float specifying the residual variance for the generated outcome.
+- `model`: The type of model to be generated. Must be one of `"mean"`, `"quantile"`, `"ols"`, `"logistic"`, or `"poisson"`.
+
+### Generating Data for Linear Regression
+
+We can generate a continuous outcome and relevant predictors for linear regression as follows:
+
+```{r simols}
+#-- Generate a Dataset for Linear Regression
+
+set.seed(12345)
+
+n <- c(10000, 500, 1000)
+
+dat_ols <- simdat(n = n, effect = 1, sigma_Y = 1, model = "ols")
+
+#-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
+
+options(digits=2)
+
+head(dat_ols[dat_ols$set == "training",])
+
+head(dat_ols[dat_ols$set == "labeled",])
+
+head(dat_ols[dat_ols$set == "unlabeled",])
+```
+
+The `simdat` function provides observed and unobserved outcomes for both the labeled and unlabeled datasets, though in practice the observed outcomes are not in the unlabeled set. We can visualize the relationships between these variables in the labeled data subset:
+
+```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.width=7}
+
+library(tidyverse)
+
+library(patchwork)
+
+dat_ols_labeled <- dat_ols[dat_ols$set == "labeled",]
+
+p1_fit <- lm(Y ~ X1, data = dat_ols_labeled)
+
+p1 <- dat_ols_labeled |> ggplot(aes(x = X1, y = Y)) + 
+  
+  theme_bw() + coord_fixed(1/3) +
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm", color = "#00C1D5") +
+  
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  
+  annotate("text", x = -2, y = -4, 
+           
+    label = paste(
+      
+      "Estimated Intercept:", round(coef(p1_fit)[1], 2),
+      
+      "\nEstimated Slope:",   round(coef(p1_fit)[2], 2), 
+      
+      "\nResidual Variance:", round(sigma(p1_fit)^2, 2)),
+    
+    hjust = 0, vjust = 1, size = 2, color = "black") +
+  
+  labs(x = expression(X[1]), y = "Y", title = "Y ~ X")
+
+p2_fit <- lm(f ~ X1, data = dat_ols_labeled)
+  
+p2 <- dat_ols_labeled |> ggplot(aes(x = X1, y = f)) + 
+  
+  theme_bw() + coord_fixed(1/3) +
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm", color = "#00C1D5") +
+  
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  
+  annotate("text", x = -2, y = -4, 
+           
+    label = paste(
+      
+      "Estimated Intercept:", round(coef(p2_fit)[1], 2),
+      
+      "\nEstimated Slope:",   round(coef(p2_fit)[2], 2), 
+      
+      "\nResidual Variance:", round(sigma(p2_fit)^2, 2)),
+    
+    hjust = 0, vjust = 1, size = 2, color = "black") +
+  
+  labs(x = expression(X[1]), y = "f(X)", title = "f(X) ~ X")
+
+p3_fit <- lm(Y ~ f, data = dat_ols_labeled)
+
+p3 <- dat_ols_labeled |> ggplot(aes(x = f, y = Y)) + 
+  
+  theme_bw() + coord_fixed(1/3) +
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm", color = "#00C1D5") +
+  
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  
+  annotate("text", x = -2, y = -4, 
+           
+    label = paste(
+      
+      "Estimated Intercept:", round(coef(p3_fit)[1], 2),
+      
+      "\nEstimated Slope:",   round(coef(p3_fit)[2], 2), 
+      
+      "\nResidual Variance:", round(sigma(p3_fit)^2, 2)),
+    
+    hjust = 0, vjust = 1, size = 2, color = "black") +
+  
+  labs(x = "f(X)", y = "Y", title = "Y ~ f(X)")
+
+(p1 + theme(plot.margin = unit(c(0,20,0, 0), "pt"))) +
+(p2 + theme(plot.margin = unit(c(0,20,0,20), "pt"))) +
+(p3 + theme(plot.margin = unit(c(0, 0,0,20), "pt"))) +
+  
+  plot_annotation(tag_levels = "A")
+
+```
+
+We can see that:
+
+- The relationship between the true outcome and the covariate (plot A) is less variable than the relationship between the predicted outcome and the covariate (plot B)
+- There is uncertainty in predicting the outcomes that needs to be accounted for (plot C)
+
+### Generating Data for Logistic Regression
+
+As another example, we can generate a binary outcome and relevant predictors for logistic regression as follows:
+
+```{r simlogistic}
+#-- Generate a Dataset for Logistic Regression
+
+dat_logistic <- simdat(n = n, effect = 1, sigma_Y = 1, model = "logistic")
+
+#-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
+
+head(dat_logistic[dat_logistic$set == "training",])
+
+head(dat_logistic[dat_logistic$set == "labeled",])
+
+head(dat_logistic[dat_logistic$set == "unlabeled",])
+```
+
+```{r logsum, echo = F}
+
+dat_logistic_labeled <- dat_logistic[dat_logistic$set == "labeled",]
+
+dat_logistic_labeled_summ <- dat_logistic_labeled |>
+  
+  group_by(Y, f) |> count() |> ungroup() |>
+  
+  mutate(Y = factor(Y), f = factor(f), 
+         
+    pct = n / sum(n) * 100,
+    
+    fill = if_else(Y == f, 1, 0))
+
+```
+
+We can again visualize the relationships between the true and predicted outcome variables in the labeled data subset and see that `r paste0(sprintf("%2.1f", sum(dat_logistic_labeled_summ[dat_logistic_labeled_summ$fill == 1, "pct"])), "%")` observations are correctly predicted:
+
+```{r plot2, echo = F, fig.width=7}
+
+dat_logistic_labeled_summ |>
+  
+  ggplot(aes(x = f, y = Y, fill = fill)) + 
+  
+    geom_tile() + coord_equal() +
+  
+    geom_text(
+      
+      aes(label = paste0(n, " (", sprintf("%2.1f", pct), "%)")), vjust = 1) +
+  
+    scale_x_discrete(expand = c(0,0), limits = rev) +
+  
+    scale_y_discrete(expand = c(0,0)) +
+  
+    scale_fill_gradient(high = "#00C1D5", low = "#FFB500") + 
+  
+    theme(legend.position = "none")
+```
+
+## Model Fitting
+
+### Linear Regression
+
+We compare two non-`IPD` approaches to analyzing the data to methods included in the `IPD` package.
+
+#### 0.1 'Naive' Regression Using the Predicted Outcomes
+
+```{r naive}
+#--- Fit the Naive Regression
+
+lm(f ~ X1, data = dat_ols[dat_ols$set == "unlabeled",]) |> 
+  
+  summary()
+```
+
+#### 0.2 'Classic' Regression Using only the Labeled Data
+
+```{r classic}
+#--- Fit the Classic Regression
+
+lm(Y ~ X1, data = dat_ols[dat_ols$set == "labeled",]) |> 
+  
+  summary()
+```
+
+You can fit the various IPD methods to your data and obtain summaries using the provided wrapper function, `ipd()`:
+
+#### 1.1 PostPI Bootstrap Correction (Wang et al., 2020)
+
+```{r postpi_boot_ols}
+#-- Specify the Formula
+
+formula <- Y - f ~ X1
+
+#-- Fit the PostPI Bootstrap Correction
+
+nboot <- 200
+
+IPD::ipd(formula, 
+         
+  method = "postpi_boot", model = "ols", data = dat_ols, label = "set", 
+  
+  nboot = nboot) |> 
+  
+  summary()
+```
+
+#### 1.2 PostPI Analytic Correction (Wang et al., 2020)
+
+```{r postpi_analytic_ols}
+#-- Fit the PostPI Analytic Correction
+
+IPD::ipd(formula, 
+         
+  method = "postpi_analytic", model = "ols", data = dat_ols, label = "set") |> 
+  
+  summary()
+```
+
+#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+
+```{r ppi_ols}
+#-- Fit the PPI Correction
+
+IPD::ipd(formula, 
+         
+  method = "ppi", model = "ols", data = dat_ols, label = "set") |> 
+  
+  summary()
+```
+
+#### 3. PPI++ (Angelopoulos et al., 2023)
+
+```{r ppi_plusplus}
+#-- Fit the PPI++ Correction
+
+IPD::ipd(formula, 
+         
+  method = "ppi_plusplus", model = "ols", data = dat_ols, label = "set") |> 
+  
+  summary()
+```
+
+#### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
+
+```{r popinf}
+#-- Fit the POP-Inf Correction
+
+IPD::ipd(formula, 
+         
+  method = "popinf", model = "ols", data = dat_ols, label = "set") |> 
+  
+  summary()
+```
+
+### Logistic Regression
+
+We also show how these methods compare for logistic regression.
+
+#### 0.1 'Naive' Regression Using the Predicted Outcomes
+
+```{r naive2}
+#--- Fit the Naive Regression
+
+glm(f ~ X1, family = binomial, 
+    
+  data = dat_logistic[dat_logistic$set == "unlabeled",]) |> 
+  
+  summary()
+```
+
+#### 0.2 'Classic' Regression Using only the Labeled Data
+
+```{r classic2}
+#--- Fit the Classic Regression
+
+lm(Y ~ X1, family = binomial,
+   
+  data = dat_logistic[dat_logistic$set == "labeled",]) |> 
+  
+  summary()
+```
+
+You can again fit the various IPD methods to your data and obtain summaries using the provided wrapper function, `ipd()`:
+
+#### 1. PostPI Bootstrap Correction (Wang et al., 2020)
+
+```{r postpi_boot2, eval = F}
+#-- Specify the Formula
+
+formula <- Y - f ~ X1
+
+#-- Fit the PostPI Bootstrap Correction
+
+nboot <- 200
+
+IPD::ipd(formula, method = "postpi_boot", model = "logistic", 
+         
+  data = dat_logistic, label = "set", nboot = nboot) |> 
+  
+  summary()
+```
+
+#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+
+```{r ppi2, eval=FALSE}
+#-- Fit the PPI Correction
+
+IPD::ipd(formula, method = "ppi", model = "logistic", 
+         
+  data = dat_logistic, label = "set") |> 
+  
+  summary()
+```
+
+#### 3. PPI++ (Angelopoulos et al., 2023)
+
+```{r ppi_plusplus2}
+#-- Fit the PPI++ Correction
+
+IPD::ipd(formula, method = "ppi_plusplus", model = "logistic", 
+         
+  data = dat_logistic, label = "set") |> 
+  
+  summary()
+```
+
+#### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
+
+```{r popinf2}
+#-- Fit the POP-Inf Correction
+
+IPD::ipd(formula, method = "popinf", model = "logistic", 
+         
+  data = dat_logistic, label = "set") |> 
+  
+  summary()
+```
+
+## Printing, Summarizing, and Tidying
+
+The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augment` methods to facilitate easy model inspection:
+
+```{r methods}
+#-- Fit the PostPI Bootstrap Correction
+
+nboot <- 200
+
+fit_postpi <- IPD::ipd(formula, 
+         
+  method = "postpi_boot", model = "ols", data = dat_ols, label = "set", 
+  
+  nboot = nboot)
+
+```
+
+### Print Method
+
+The `print` method gives an abbreviated summary of the output from the `ipd` function:
+
+```{r print}
+#-- Print the Model
+
+print(fit_postpi)
+
+```
+
+### Summary Method
+
+The `summary` method gives more detailed information about the estimated coefficients, standard errrors, and confidence limits:
+
+```{r summary}
+#-- Summarize the Model
+
+summ_fit_postpi <- summary(fit_postpi)
+  
+#-- Print the Model Summary
+
+print(summ_fit_postpi)
+```
+
+### Tidy Method
+
+The `tidy` method organizes the model coefficients into a [tidy](https://broom.tidymodels.org/) format.
+
+```{r tidy}
+#-- Tidy the Model Output
+
+tidy(fit_postpi)
+```
+
+### Glance Method
+
+The `glance` method returns a one-row summary of the model fit.
+
+```{r glance}
+#-- Get a One-Row Summary of the Model
+
+glance(fit_postpi)
+```
+
+### Augment Method
+
+The `augment` method adds model predictions and residuals to the original dataset.
+
+```{r augment}
+#-- Augment the Original Data with Fitted Values and Residuals
+
+df <- dat_ols[which(dat_ols$set != "training"),]
+
+augmented_df <- augment(fit_postpi, data = df)
+
+head(augmented_df)
+```
+
+# Conclusions
+
+The `IPD` package offers a suite of functions for conducting inference on predicted data. With custom methods for printing, summarizing, tidying, glancing, and augmenting model outputs, `IPD` streamlines the process of IPD-based inference in `R`. We will continue to develop this package to include more targets of inference and IPD methods as they are developed, as well as additional functionality for analyzing such data. For further information and detailed documentation, please refer to the function help pages within the package, e.g.,
+
+```{r help, eval=F}
+?ipd
+```
+
+## Feedback
+
+For questions, comments, or any other feedback, please contact the developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD).
+
+## License
+
+This package is licensed under the MIT License.
+

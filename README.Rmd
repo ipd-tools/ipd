@@ -192,9 +192,9 @@ We can see that:
 
 ### Model Fitting
 
-We compare two non-`IPD` approaches to analyzin the data to methods included in the `IPD` package.
+We compare two non-`IPD` approaches to analyzing the data to methods included in the `IPD` package.
 
-#### 0.1) 'Naive' Regression Using the Predicted Outcomes
+#### 0.1 'Naive' Regression Using the Predicted Outcomes
 
 ```{r naive}
 #--- Fit the Naive Regression
@@ -204,8 +204,7 @@ lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |>
   summary()
 ```
 
-
-#### 0.2) 'Classic' Regression Using only the Labeled Data
+#### 0.2 'Classic' Regression Using only the Labeled Data
 
 ```{r classic}
 #--- Fit the Classic Regression
@@ -217,7 +216,7 @@ lm(Y ~ X1, data = dat[dat$set == "labeled",]) |>
 
 You can fit the various IPD methods to your data and obtain summaries using the provided wrapper function, `ipd()`:
 
-#### 1.1) PostPI Bootstrap Correction (Wang et al., 2020)
+#### 1.1 PostPI Bootstrap Correction (Wang et al., 2020)
 
 ```{r postpi_boot_ols}
 #-- Specify the Formula
@@ -237,7 +236,7 @@ IPD::ipd(formula,
   summary()
 ```
 
-#### 1.2) PostPI Analytic Correction (Wang et al., 2020)
+#### 1.2 PostPI Analytic Correction (Wang et al., 2020)
 
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
@@ -248,7 +247,6 @@ IPD::ipd(formula,
   
   summary()
 ```
-
 
 #### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
@@ -288,10 +286,9 @@ IPD::ipd(formula,
 
 ### Printing and Tidying
 
-The package also provides custom print, summary, tidy, glance, and augment methods to facilitate easy model inspection:
+The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augment` methods to facilitate easy model inspection:
 
 ```{r methods}
-
 #-- Fit the PostPI Bootstrap Correction
 
 nboot <- 200
@@ -346,7 +343,7 @@ For questions, comments, or any other feedback, please contact the developers at
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on GitHub.
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD).
 
 ## License
 
