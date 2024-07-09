@@ -18,6 +18,12 @@
 #' \code{"mean"}, \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.
 #' Default is \code{"ols"}.
 #'
+#' @param shift Scalar shift of the predictions for continuous outcomes
+#' (i.e., "mean", "quantile", and "ols"). Defaults to 0.
+#'
+#' @param scale Scaling factor for the predictions for continuous outcomes
+#' (i.e., "mean", "quantile", and "ols"). Defaults to 1.
+#'
 #  @inheritParams gam::gam
 #'
 #' @return A data.frame containing n rows and columns corresponding to
@@ -72,9 +78,9 @@
 #'
 #' @export
 
-simdat <- function(n = c(300, 300, 300),
+simdat <- function(n = c(300, 300, 300), effect = 1, sigma_Y = 1,
 
-  effect = 1, sigma_Y = 1, model = "ols") {
+  model = "ols", shift = 0, scale = 1) {
 
   #-- CHECK FOR VALID MODEL
 
@@ -140,13 +146,13 @@ simdat <- function(n = c(300, 300, 300),
 
   if (model %in% c("mean", "quantile")) {
 
-    dat[set == "labeled", "f"] <- mean(dat[set == "training", "Y"]) +
+    dat[set == "labeled", "f"] <- (mean(dat[set == "training", "Y"]) +
 
-      rnorm(n[2], 0, sigma_Y)
+      rnorm(n[2], 0, sigma_Y) - shift) / scale
 
-    dat[set == "unlabeled", "f"] <- mean(dat[set == "training", "Y"]) +
+    dat[set == "unlabeled", "f"] <- (mean(dat[set == "training", "Y"]) +
 
-      rnorm(n[3], 0, sigma_Y)
+      rnorm(n[3], 0, sigma_Y) - shift) / scale
 
   } else if (model == "ols") {
 
@@ -154,13 +160,13 @@ simdat <- function(n = c(300, 300, 300),
 
       data = dat[set == "training",])
 
-    dat[set == "labeled", "f"] <- predict(
+    dat[set == "labeled", "f"] <- (predict(
 
-      fit_gam, newdat = dat[set == "labeled",])
+      fit_gam, newdat = dat[set == "labeled",]) - shift) / scale
 
-    dat[set == "unlabeled", "f"] <- predict(
+    dat[set == "unlabeled", "f"] <- (predict(
 
-      fit_gam, newdat = dat[set == "unlabeled",])
+      fit_gam, newdat = dat[set == "unlabeled",]) - shift) / scale
 
   } else if (model == "logistic") {
 
