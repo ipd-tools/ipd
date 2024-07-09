@@ -1,18 +1,10 @@
 #===============================================================================
-#
-#  FILE:    ipd.R
-#
-#  PURPOSE: Defines main IPD wrapper function
-#
-#  UPDATED: 2024.07.05
-#
-#  NOTES:   1. Add logistic, Poisson, and multiclass models to all methods
-#
+# IPD WRAPPER FUNCTION
 #===============================================================================
 
-#=== IPD WRAPPER FUNCTION ======================================================
+#--- MAIN IPD WRAPPER FUNCTION -------------------------------------------------
 
-#' Valid and Efficient Inference on Predicted Data (IPD)
+#' Inference on Predicted Data (IPD)
 #'
 #' @description The main wrapper function to conduct IPD using various methods
 #' and models, and returns a list of fitted model components.

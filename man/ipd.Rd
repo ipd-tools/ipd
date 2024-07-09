@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipd.R
 \name{ipd}
 \alias{ipd}
-\title{Valid and Efficient Inference on Predicted Data (IPD)}
+\title{Inference on Predicted Data (IPD)}
 \usage{
 ipd(
   formula,

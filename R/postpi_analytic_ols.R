@@ -36,6 +36,8 @@
 #'
 #' @param scale_se (boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).
 #'
+#' @param n_t (integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).
+#'
 #' @returns A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
 #'
@@ -64,7 +66,9 @@
 
 #-- PostPI - ANALYTIC for OLS
 
-postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u, scale_se = T) {
+postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
+
+  scale_se = T, n_t = Inf) {
 
   #- 1. Estimate Relationship Model
 
@@ -86,7 +90,7 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u, scale_se = T) {
 
     se <- sqrt(diag(solve(crossprod(X_u)) *
 
-      (sigma(fit_rel)^2 * nrow(X_u) / nrow(X_l) +
+      (sigma(fit_rel)^2 * nrow(X_u) / min(nrow(X_l), n_t) +
 
       (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/popinf_ols.R
 \name{popinf_ols}
 \alias{popinf_ols}
-\title{POP-Inf OLS Point Estimate (helper function)}
+\title{POP-Inf OLS Estimation}
 \usage{
 popinf_ols(
   X_l,
@@ -27,26 +27,30 @@ popinf_ols(
 
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{weights}{(array): p-dimensional array of weights vector for variance reudction. POP-Inf will estimate the weights if not specified.}
+\item{weights}{(array): p-dimensional array of weights vector for variance
+reduction. POP-Inf will estimate the weights if not specified.}
 
-\item{alpha}{(scalar): type I error rate for hypothesis testing - values in (0, 1); defaults to 0.05}
+\item{alpha}{(scalar): type I error rate for hypothesis testing - values in
+(0, 1); defaults to 0.05}
 
 \item{delta}{(scalar):tolerance for assessing convergence; defaults to 0.05}
 
 \item{K}{(integer): maximum number of iterations; defaults to 100}
 }
 \value{
-A list of outputs: estimate of inference model parameters and corresponding standard error.
+A list of outputs: estimate of inference model parameters and
+corresponding standard error.
 }
 \description{
-POP-Inf OLS for linear regression
+Helper function for POP-Inf OLS for linear regression
 }
 \details{
-Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
+Assumption-lean and data-adaptive post-prediction inference
+(Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 

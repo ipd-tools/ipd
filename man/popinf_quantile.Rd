@@ -2,7 +2,7 @@
 % Please edit documentation in R/popinf_quantile.R
 \name{popinf_quantile}
 \alias{popinf_quantile}
-\title{POP-Inf quantile-estimation (helper function)}
+\title{POP-Inf Quantile Estimation}
 \usage{
 popinf_quantile(
   Y_l,
@@ -24,32 +24,36 @@ popinf_quantile(
 
 \item{q}{(float): Quantile to estimate. Must be in the range (0, 1).}
 
-\item{weights}{(array): 1-dimensional array of weights vector for variance reudction. POP-Inf will estimate the weights if not specified.}
+\item{weights}{(array): 1-dimensional array of weights vector for variance
+reduction. POP-Inf will estimate the weights if not specified.}
 
-\item{alpha}{(scalar): type I error rate for hypothesis testing - values in (0, 1); defaults to 0.05}
+\item{alpha}{(scalar): type I error rate for hypothesis testing - values in
+(0, 1); defaults to 0.05}
 
 \item{delta}{(scalar):tolerance for assessing convergence; defaults to 0.05}
 
 \item{K}{(integer): maximum number of iterations; defaults to 100}
 }
 \value{
-A list of outputs: estimate of inference model parameters and corresponding standard error.
+A list of outputs: estimate of inference model parameters and
+corresponding standard error.
 }
 \description{
-POP-Inf quantile-estimation
+Helper function for POP-Inf quantile estimation
 }
 \details{
-Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
+Assumption-lean and data-adaptive post-prediction inference
+(Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "quantile")
 
-form <- Y - f ~ X1
+form <- Y - f ~ 1
 
-Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- dat[dat$set == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
 
-f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- dat[dat$set == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 

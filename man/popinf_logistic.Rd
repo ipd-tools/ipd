@@ -2,7 +2,7 @@
 % Please edit documentation in R/popinf_logistic.R
 \name{popinf_logistic}
 \alias{popinf_logistic}
-\title{POP-Inf Logistic regression (helper function)}
+\title{POP-Inf Logistic Regression}
 \usage{
 popinf_logistic(
   X_l,
@@ -27,22 +27,26 @@ popinf_logistic(
 
 \item{f_u}{(vector): N-vector of binary predictions in the unlabeled data.}
 
-\item{weights}{(array): p-dimensional array of weights vector for variance reudction. POP-Inf will estimate the weights if not specified.}
+\item{weights}{(array): p-dimensional array of weights vector for variance
+reduction. POP-Inf will estimate the weights if not specified.}
 
-\item{alpha}{(scalar): type I error rate for hypothesis testing - values in (0, 1); defaults to 0.05}
+\item{alpha}{(scalar): type I error rate for hypothesis testing - values in
+(0, 1); defaults to 0.05}
 
 \item{delta}{(scalar):tolerance for assessing convergence; defaults to 0.05}
 
 \item{K}{(integer): maximum number of iterations; defaults to 100}
 }
 \value{
-A list of outputs: estimate of inference model parameters and corresponding standard error.
+A list of outputs: estimate of inference model parameters and
+corresponding standard error.
 }
 \description{
-POP-Inf Logistic regression
+Helper function for POP-Inf logistic regression
 }
 \details{
-Assumption-lean and data-adaptive post-prediction inference (Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
+Assumption-lean and data-adaptive post-prediction inference
+(Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
 }
 \examples{
 
@@ -53,15 +57,12 @@ form <- Y - f ~ X1
 X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
 
 Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
-Y_l <- ifelse(Y_l > quantile(Y_l, 0.75), 1, 0)
 
 f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
-f_l <- ifelse(f_l > quantile(f_l, 0.75), 1, 0)
 
 X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
-f_u <- ifelse(f_u > quantile(f_u, 0.75), 1, 0)
 
 popinf_logistic(X_l, Y_l, f_l, X_u, f_u)
 

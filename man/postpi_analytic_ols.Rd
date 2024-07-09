@@ -4,7 +4,7 @@
 \alias{postpi_analytic_ols}
 \title{PostPI Linear Regression using Wang et al. (2020) Analytic Correction}
 \usage{
-postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = T)
+postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = T, n_t = Inf)
 }
 \arguments{
 \item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
@@ -18,6 +18,8 @@ postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = T)
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
 \item{scale_se}{(boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).}
+
+\item{n_t}{(integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).}
 }
 \value{
 A list of outputs: estimate of the inference model parameters and

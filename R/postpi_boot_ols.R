@@ -1,26 +1,8 @@
 #===============================================================================
-#
-#  PROGRAM: postpi_boot_ols.R
-#
-#  AUTHORS: Stephen Salerno (ssalerno@fredhutch.org)
-#           Kentaro Hoffman (khoffm3@uw.edu)
-#           Awan Afiaz (aafiaz@uw.edu)
-#
-#
-#  PURPOSE: Implementation of bootstrap correction algorithm from Wang et al.(2020)
-#
-#           Methods for correcting inference based on outcomes predicted by
-#           machine learning
-#
-#  INPUTS:  rel_form, inf_form, dat, nboot
-#
-#  OUTPUTS:  Post-prediction inference functions for various target estimands:
-#
-#  Updated: 2024-07-06
-#
+#  POSTPI BOOTSTRAP ORDINARY LEAST SQUARES
 #===============================================================================
 
-#=== BOOTSTRAP CORRECTION =======================================================
+#=== BOOTSTRAP CORRECTION ======================================================
 
 #' IPD Linear Regression using Wang et al. (2020) Bootstrap Correction
 #'
