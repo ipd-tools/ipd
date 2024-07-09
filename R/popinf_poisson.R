@@ -64,7 +64,7 @@ popinf_poisson <- function(X_l, Y_l, f_l, X_u, f_u,
 
     Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
 
-    intercept = F, max_iterations = K, convergence_threshold = delta,
+    intercept = T, max_iterations = K, convergence_threshold = delta,
 
     weights = weights, alpha = alpha, method = "poisson")
 

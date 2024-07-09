@@ -56,7 +56,7 @@ popinf_quantile <- function(Y_l, f_l, f_u, q,
 
   fit <- POPInf::pop_M(Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
 
-    quant = q, intercept = F, max_iterations = K,
+    quant = q, intercept = T, max_iterations = K,
 
     convergence_threshold = delta, weights = weights,
 
