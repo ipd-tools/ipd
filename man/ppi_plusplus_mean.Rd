@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppi_plusplus_mean.R
 \name{ppi_plusplus_mean}
 \alias{ppi_plusplus_mean}
-\title{...Need title...}
+\title{PPI++ Mean Estimation}
 \usage{
 ppi_plusplus_mean(
   Y_l,
@@ -17,48 +17,57 @@ ppi_plusplus_mean(
 )
 }
 \arguments{
-\item{Y_l}{(ndarray): Gold-standard labels.}
+\item{Y_l}{(vector): n-vector of labeled outcomes.}
 
-\item{f_l}{(ndarray): Predictions corresponding to the gold-standard
-labels.}
+\item{f_l}{(vector): n-vector of predictions in the labeled data.}
 
-\item{f_u}{(ndarray): Predictions corresponding to the unlabeled
-data.}
+\item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{alpha}{(float, optional): Error level; the confidence interval will target a coverage of 1 - alpha. Must be in (0, 1).}
+\item{alpha}{(scalar): type I error rate for hypothesis testing - values in
+(0, 1); defaults to 0.05.}
 
-\item{alternative}{(str, optional): Alternative hypothesis, either 'two-sided', 'larger' or 'smaller'.}
+\item{alternative}{(string): Alternative hypothesis. Must be one of
+\code{"two-sided"}, \code{"less"}, or \code{"greater"}.}
 
 \item{lhat}{(float, optional): Power-tuning parameter (see
-\verb{[ADZ23] <https://arxiv.org/abs/2311.01453>}__). The default value \code{None}
-will estimate the optimal value from data. Setting \code{lhat=1} recovers PPI
-with no power tuning, and setting \code{lhat=0} recovers the classical point
-estimate.}
+\url{https://arxiv.org/abs/2311.01453}). The default value, \code{NULL},
+will estimate the optimal value from the data. Setting \code{lhat = 1}
+recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+the classical point estimate.}
 
-\item{coord}{(int, optional): Coordinate for which to optimize \code{lhat}. If
-\code{None}, it optimizes the total variance over all coordinates. Must be in
-{1, ..., d} where d is the dimension of the estimand.}
+\item{coord}{(int, optional): Coordinate for which to optimize
+\code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.}
 
 \item{w_l}{(ndarray, optional): Sample weights for the labeled data set.
-Defaults to all ones vector.}
+Defaults to a vector of ones.}
 
 \item{w_u}{(ndarray, optional): Sample weights for the unlabeled
-data set. Defaults to all ones vector.}
+data set. Defaults to a vector of ones.}
 }
 \value{
 tuple: Lower and upper bounds of the prediction-powered confidence
 interval for the mean.
 }
 \description{
-Computes the prediction-powered confidence interval for a d-dimensional mean.
+Helper function for PPI++ mean estimation
 }
 \details{
-\verb{[ADZ23] <https://arxiv.org/abs/2311.01453>}__ A. N. Angelopoulos, J. C.
-Duchi, and T. Zrnic. PPI++: Efficient Prediction Powered Inference.
-arxiv:2311.01453, 2023.
+PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+\url{https://arxiv.org/abs/2311.01453}`
 }
 \examples{
 
-#need examples
+dat <- simdat(model = "mean")
+
+form <- Y - f ~ 1
+
+Y_l <- dat[dat$set == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+
+f_l <- dat[dat$set == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+
+f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+
+ppi_plusplus_mean(Y_l, f_l, f_u)
 
 }

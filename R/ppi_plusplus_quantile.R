@@ -2,199 +2,42 @@
 # PPI++ QUANTILE ESTIMATION
 #===============================================================================
 
-#=== EMPIRICAL CDF =============================================================
+#--- PPI++ QUANTILE ESTIMATION - POINT ESTIMATE --------------------------------
 
-#' Empirical CDF of the Data
+#' PPI++ Quantile Estimation (Point Estimate)
 #'
-#' Computes the empirical CDF of the data.
+#' @description
+#' Helper function for PPI++ quantile estimation (point estimate)
 #'
-#' @param Y (matrix): n x 1 matrix of observed data.
+#' @details
+#' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://arxiv.org/abs/2311.01453>`
 #'
-#' @param grid (matrix): Grid of values to compute the CDF at.
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param w (vector, optional): n-vector of sample weights.
+#' @param f_l (vector): n-vector of predictions in the labeled data.
 #'
-#' @returns (list): Empirical CDF and its standard deviation at the specified
-#' grid points.
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @examples
-#' # Need example code
-#'
-#' @export
-
-compute_cdf <- function(Y, grid, w = NULL) {
-
-  n <- length(Y)
-
-  if (is.null(w)) w <- rep(1, n) else w <- w / sum(w) * n
-
-  indicators <- matrix((Y <= rep(grid, each = n)) * w,
-
-                       ncol = length(grid))
-
-  cdf_mn <- apply(indicators, 2, mean)
-
-  cdf_sd <- apply(indicators, 2, sd) * sqrt((n - 1) / n)
-
-  return(list(cdf_mn, cdf_sd))
-}
-
-#=== DIFFERENCE IN EMPIRICAL CDFS ==============================================
-
-#' Empirical CDF Difference
-#'
-#' Computes the difference between the empirical CDFs of the data and the
-#' predictions.
-#'
-#' @param Y (matrix): n x 1 matrix of observed data.
-#'
-#' @param f (matrix): n x 1 matrix of predictions.
-#'
-#' @param grid (matrix): Grid of values to compute the CDF at.
-#'
-#' @param w (vector, optional): n-vector of sample weights.
-#'
-#' @returns (list): Difference between the empirical CDFs of the data and the
-#' predictions and its standard deviation at the specified grid points.
-#'
-#' @examples
-#' # Need example code
-#'
-#' @export
-
-compute_cdf_diff <- function(Y, f, grid, w = NULL) {
-
-  n <- length(Y)
-
-  if (is.null(w)) w <- rep(1, n) else w <- w / sum(w) * n
-
-  indicators_Y <- matrix((Y <= rep(grid, each = n)) * w,
-
-                         ncol = length(grid))
-
-  indicators_f <- matrix((f <= rep(grid, each = length(f))) * w,
-
-                            ncol = length(grid))
-
-  diff_mn <- apply(indicators_Y - indicators_f, 2, mean)
-
-  diff_sd <- apply(indicators_Y - indicators_f, 2, sd) * sqrt((n - 1) / n)
-
-  return(list(diff_mn, diff_sd))
-}
-
-#=== RECTIFIED CDF =============================================================
-
-#' Rectified CDF
-#'
-#' Computes the rectified CDF of the data.
-#'
-#' @param Y_l (vector): Gold-standard labels.
-#'
-#' @param f_l (vector): Predictions corresponding to the gold-standard labels.
-#'
-#' @param f_u (vector): Predictions corresponding to the unlabeled data.
-#'
-#' @param grid (vector): Grid of values to compute the CDF at.
-#'
-#' @param w_l (vector, optional): Sample weights for the labeled data set.
-#'
-#' @param w_u (vector, optional): Sample weights for the unlabeled data set.
-#'
-#' @returns (vector): Rectified CDF of the data at the specified grid points.
-#'
-#' @examples
-#' # Need example code
-#'
-#' @export
-
-rectified_cdf <- function(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL) {
-
-  n <- length(Y_l)
-
-  N <- length(f_u)
-
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
-
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
-
-  cdf_f_u <- compute_cdf(f_u, grid, w = w_u)[[1]]
-
-  cdf_rectifier <- compute_cdf_diff(Y_l, f_l, grid, w = w_l)[[1]]
-
-  return(cdf_f_u + cdf_rectifier)
-}
-
-#=== RECTIFIED P-VALUE =========================================================
-
-#' Rectified P-Value
-#'
-#' Computes a rectified p-value.
-#'
-#' @param rectifier (float or vector): Rectifier value.
-#'
-#' @param rectifier_std (float or vector): Rectifier standard deviation.
-#'
-#' @param imputed_mean (float or vector): Imputed mean.
-#'
-#' @param imputed_std (float or vector): Imputed standard deviation.
-#'
-#' @param null (float, optional): Value of the null hypothesis to be tested.
-#' Defaults to `0`.
-#'
-#' @param alternative (str, optional): Alternative hypothesis, either
-#' 'two-sided', 'larger' or 'smaller'.
-#'
-#' @examples
-#' # Need example code
-#'
-#'
-#' @returns (float or vector): P-value.
-
-rectified_p_value <- function(rectifier, rectifier_std,
-
-                              imputed_mean, imputed_std, null = 0, alternative = "two-sided") {
-
-  rectified_point_estimate <- imputed_mean + rectifier
-
-  rectified_std <- pmax(sqrt(imputed_std^2 + rectifier_std^2), 1e-16)
-
-  p_value <- zstat_generic(rectified_point_estimate, 0, rectified_std,
-
-                           alternative, null)[[2]]
-
-  return(p_value)
-}
-
-#=== PPI++ QUANTILE ESTIMATION POINT ESTIMATE ==================================
-
-#' PPI++ Quantile Estimation Point Estimate
-#'
-#' Computes the prediction-powered point estimate of the quantile.
-#'
-#' @param Y_l (vector): Gold-standard labels.
-#'
-#' @param f_l (vector): Predictions corresponding to the gold-standard labels.
-#'
-#' @param f_u (vector): Predictions corresponding to the unlabeled data.
-#'
-#' @param q (float): Quantile to estimate.
+#' @param q (float): Quantile to estimate. Must be in the range (0, 1).
 #'
 #' @param exact_grid (bool, optional): Whether to compute the exact solution
 #' (TRUE) or an approximate solution based on a linearly spaced grid of 5000
 #' values (FALSE).
 #'
-#' @param w_l (vector, optional): Sample weights for the labeled data set.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param w_u (vector, optional): Sample weights for the unlabeled data set.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
 #' @returns (float): Prediction-powered point estimate of the quantile.
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "quantile")
 #'
-#' form <- Y - f ~ X1
+#' form <- Y - f ~ 1
 #'
 #' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
@@ -206,9 +49,9 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #'
 #' @export
 
-ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
+ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q,
 
-                                  w_l = NULL, w_u = NULL) {
+  exact_grid = FALSE, w_l = NULL, w_u = NULL) {
 
   Y_l <- c(Y_l)
 
@@ -242,36 +85,41 @@ ppi_plusplus_quantile_est <- function(Y_l, f_l, f_u, q, exact_grid = FALSE,
   return(grid[minimizer])
 }
 
-#=== PPI++ QUANTILE ESTIMATION =================================================
+#--- PPI++ QUANTILE ESTIMATION - INFERENCE -------------------------------------
 
 #' PPI++ Quantile Estimation
 #'
-#' Computes the prediction-powered confidence interval for the quantile.
+#' @description
+#' Helper function for PPI++ quantile estimation
 #'
-#' @param Y_l (vector): Gold-standard labels.
+#' @details
+#' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://arxiv.org/abs/2311.01453>
 #'
-#' @param f_l (vector): Predictions corresponding to the gold-standard labels.
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param f_u (vector): Predictions corresponding to the unlabeled data.
+#' @param f_l (vector): n-vector of predictions in the labeled data.
+#'
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
 #' @param q (float): Quantile to estimate. Must be in the range (0, 1).
 #'
-#' @param alpha (float, optional): Error level; the confidence interval will
-#' target a coverage of 1 - alpha. Must be in the range (0, 1).
+#' @param alpha (scalar): type I error rate for hypothesis testing - values in
+#' (0, 1); defaults to 0.05.
 #'
-#' @param exact_grid (bool, optional): Whether to use the exact grid of values
-#' (TRUE) or a linearly spaced grid of 5000 values (FALSE).
+#' @param exact_grid (bool, optional): Whether to compute the exact solution
+#' (TRUE) or an approximate solution based on a linearly spaced grid of 5000
+#' values (FALSE).
 #'
-#' @param w_l (vector, optional): Sample weights for the labeled data set.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param w_u (vector, optional): Sample weights for the unlabeled data set.
-#'
-#' @returns (list): Lower and upper bounds of the prediction-powered confidence  # Fix this to be estimate and sd
-#' interval for the quantile.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "quantile")
 #'
 #' form <- Y - f ~ X1
 #'

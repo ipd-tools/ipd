@@ -16,34 +16,37 @@ ppi_plusplus_quantile(
 )
 }
 \arguments{
-\item{Y_l}{(vector): Gold-standard labels.}
+\item{Y_l}{(vector): n-vector of labeled outcomes.}
 
-\item{f_l}{(vector): Predictions corresponding to the gold-standard labels.}
+\item{f_l}{(vector): n-vector of predictions in the labeled data.}
 
-\item{f_u}{(vector): Predictions corresponding to the unlabeled data.}
+\item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
 \item{q}{(float): Quantile to estimate. Must be in the range (0, 1).}
 
-\item{alpha}{(float, optional): Error level; the confidence interval will
-target a coverage of 1 - alpha. Must be in the range (0, 1).}
+\item{alpha}{(scalar): type I error rate for hypothesis testing - values in
+(0, 1); defaults to 0.05.}
 
-\item{exact_grid}{(bool, optional): Whether to use the exact grid of values
-(TRUE) or a linearly spaced grid of 5000 values (FALSE).}
+\item{exact_grid}{(bool, optional): Whether to compute the exact solution
+(TRUE) or an approximate solution based on a linearly spaced grid of 5000
+values (FALSE).}
 
-\item{w_l}{(vector, optional): Sample weights for the labeled data set.}
+\item{w_l}{(ndarray, optional): Sample weights for the labeled data set.
+Defaults to a vector of ones.}
 
-\item{w_u}{(vector, optional): Sample weights for the unlabeled data set.}
-}
-\value{
-(list): Lower and upper bounds of the prediction-powered confidence  # Fix this to be estimate and sd
-interval for the quantile.
+\item{w_u}{(ndarray, optional): Sample weights for the unlabeled
+data set. Defaults to a vector of ones.}
 }
 \description{
-Computes the prediction-powered confidence interval for the quantile.
+Helper function for PPI++ quantile estimation
+}
+\details{
+PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+\url{https://arxiv.org/abs/2311.01453}
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "quantile")
 
 form <- Y - f ~ X1
 

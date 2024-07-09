@@ -2,13 +2,16 @@
 # PPI++ LOGISTIC REGRESSION
 #===============================================================================
 
-#=== PPI++ LOGISTIC REGRESSION POINT ESTIMATE ==================================
+#--- PPI++ LOGISTIC REGRESSION - POINT ESTIMATE --------------------------------
 
-#' PPI++ Logistic Regression Point Estimate
+#' PPI++ Logistic Regression (Point Estimate)
 #'
 #' @description
-#' Computes the prediction-powered point estimate of the logistic regression
-#' coefficients.
+#' Helper function for PPI++ logistic regression (point estimate)
+#'
+#' @details
+#' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://arxiv.org/abs/2311.01453>`
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
@@ -20,25 +23,26 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param lhat (float, optional): Power-tuning parameter.
-#' The default value `NULL` will estimate the optimal value from data.
-#' Setting `lhat = 1` recovers PPI with no power tuning.
-#' Setting `lhat = 0` recovers the classical point estimate.
+#' @param lhat (float, optional): Power-tuning parameter (see
+#' <https://arxiv.org/abs/2311.01453>). The default value, \code{NULL},
+#' will estimate the optimal value from the data. Setting \code{lhat = 1}
+#' recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+#' the classical point estimate.
 #'
-#' @param coord (int, optional): Coordinate for which to optimize `lhat`.
-#' If `None`, it optimizes the total variance over all coordinates.
-#' Must be in {1, ..., p} where p is the shape of the estimand.
+#' @param coord (int, optional): Coordinate for which to optimize
+#' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
 #'
 #' @param opts (list, optional): Options to pass to the optimizer.
 #' See ?optim for details.
 #'
-#' @param w_l (vector, optional): n-vector of sample weights for the
-#' labeled data.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param w_u (vector, optional): N-vector of sample weights for the
-#' unlabeled data.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
-#' @returns (vector): p-vector of prediction-powered point estimates of the
+#' @returns (vector): vector of prediction-powered point estimates of the
 #' logistic regression coefficients.
 #'
 #' @examples
@@ -140,143 +144,16 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
   }
 }
 
-#=== PPI++ LOGISTIC GRADIENT AND HESSIAN =======================================
+#--- PPI++ LOGISTIC REGRESSION - INFERENCE -------------------------------------
 
-#' Logistic Regression Gradient and Hessian
+#' PPI++ Logistic Regression
 #'
 #' @description
-#' Computes the statistics needed for the logstic regression-based
-#' prediction-powered inference.
+#' Helper function for PPI++ logistic regression
 #'
-#' @param est (vector): Point estimates of the coefficients.
-#'
-#' @param X_l (matrix): Covariates for the labeled data set.
-#'
-#' @param Y_l (vector): Labels for the labeled data set.
-#'
-#' @param f_l (vector): Predictions for the labeled data set.
-#'
-#' @param X_u (matrix): Covariates for the unlabeled data set.
-#'
-#' @param f_u (vector): Predictions for the unlabeled data set.
-#'
-#' @param w_l (vector, optional): Sample weights for the labeled data set.
-#'
-#' @param w_u (vector, optional): Sample weights for the unlabeled data set.
-#'
-#' @param use_u (bool, optional): Whether to use the unlabeled data set.
-#'
-#' @returns (list): A list containing the following:
-#'
-#' \describe{
-#'    \item{grads}{(matrix): n x p matrix gradient of the loss function with
-#'    respect to the coefficients.}
-#'    \item{grads_hat}{(matrix): n x p matrix gradient of the loss function
-#'    with respect to the coefficients, evaluated using the labeled
-#'    predictions.}
-#'    \item{grads_hat_unlabeled}{(matrix): N x p matrix gradient of the loss
-#'    function with respect to the coefficients, evaluated using the unlabeled
-#'    predictions.}
-#'    \item{inv_hessian}{(matrix): p x p matrix inverse Hessian of the loss
-#'    function with respect to the coefficients.}
-#' }
-#'
-#' @examples
-#'
-#' dat <- simdat(model = "logistic")
-#'
-#' form <- Y - f ~ X1
-#'
-#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
-#'
-#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
-#'
-#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
-#'
-#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
-#'
-#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
-#'
-#' est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u)
-#'
-#' stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
-#'
-#' @export
-
-logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
-
-  w_l = NULL, w_u = NULL, use_u = TRUE) {
-
-  n <- nrow(f_l)
-
-  N <- nrow(f_u)
-
-  p <- ncol(X_u)
-
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
-
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
-
-  mu_l <- plogis(X_l %*% est)
-
-  mu_u <- plogis(X_u %*% est)
-
-  hessian <- matrix(0, nrow = p, ncol = p)
-
-  grads_hat_unlabeled <- matrix(0, nrow = N, ncol = p)
-
-  if (use_u) {
-
-    for (i in 1:N) {
-
-      hessian <- hessian + w_u[i] / (N + n) * mu_u[i] * (1 - mu_u[i]) *
-
-        tcrossprod(X_u[i, ])
-
-      grads_hat_unlabeled[i, ] <- w_u[i] * X_u[i, ] * (mu_u[i] - f_u[i])
-    }
-  }
-
-  grads <- matrix(0, nrow = n, ncol = p)
-
-  grads_hat <- matrix(0, nrow = n, ncol = p)
-
-  for (i in 1:n) {
-
-    if (use_u) {
-
-      hessian <- hessian + w_l[i] / (N + n) * mu_l[i] * (1 - mu_l[i]) *
-
-        tcrossprod(X_l[i, ])
-
-    } else {
-
-      hessian <- hessian + w_l[i] / n * mu_l[i] * (1 - mu_l[i]) *
-
-        tcrossprod(X_l[i, ])
-    }
-
-    grads[i, ] <- w_l[i] * X_l[i, ] * (mu_l[i] - Y_l[i])
-
-    grads_hat[i, ] <- w_l[i] * X_l[i, ] * (mu_l[i] - f_l[i])
-  }
-
-  inv_hessian <- solve(hessian)
-
-  return(
-
-    list(grads = grads, grads_hat = grads_hat,
-
-      grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
-}
-
-#=== PPI++ LOGISTIC REGRESSION =================================================
-
-#' PPI++ Logistic Regression Estimator and Inference
-#'
-#' @description
-#' Computes the prediction-powered confidence interval for the logistic
-#' regression coefficients using the PPI++ algorithm.
+#' @details
+#' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://arxiv.org/abs/2311.01453>
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
@@ -288,30 +165,31 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param lhat (float, optional): Power-tuning parameter.
-#' The default value `NULL` will estimate the optimal value from data.
-#' Setting `lhat = 1` recovers PPI with no power tuning.
-#' Setting `lhat = 0` recovers the classical point estimate.
+#' @param lhat (float, optional): Power-tuning parameter (see
+#' <https://arxiv.org/abs/2311.01453>). The default value, \code{NULL},
+#' will estimate the optimal value from the data. Setting \code{lhat = 1}
+#' recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+#' the classical point estimate.
 #'
-#' @param coord (int, optional): Coordinate for which to optimize `lhat`.
-#' If `None`, it optimizes the total variance over all coordinates.
-#' Must be in {1, ..., p} where p is the shape of the estimand.
+#' @param coord (int, optional): Coordinate for which to optimize
+#' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
 #'
 #' @param opts (list, optional): Options to pass to the optimizer.
 #' See ?optim for details.
 #'
-#' @param w_l (vector, optional): n-vector of sample weights for the
-#' labeled data.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param w_u (vector, optional): N-vector of sample weights for the
-#' unlabeled data.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
 #' @returns (list): A list containing the following:
 #'
 #' \describe{
-#'    \item{est}{(vector): p-vector of PPI++ logistic regression coefficient
+#'    \item{est}{(vector): vector of PPI++ logistic regression coefficient
 #'    estimates.}
-#'    \item{se}{(vector): p-vector of standard errors of the coefficients.}
+#'    \item{se}{(vector): vector of standard errors of the coefficients.}
 #'    \item{lambda}{(float): estimated power-tuning parameter.}
 #' }
 #'

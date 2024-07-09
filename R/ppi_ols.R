@@ -1,30 +1,33 @@
-#=== ORDINARY LEAST SQUARES ====================================================
+#===============================================================================
+# PPI ORDINARY LEAST SQUARES
+#===============================================================================
 
-#' PPI Linear Regression using Angelopoulos et al. (2023) Analytic Form
+#--- PPI OLS -------------------------------------------------------------------
+
+#' PPI OLS
 #'
 #' @description
-#' Computes the prediction-powered point estimate of the OLS coefficients.
+#' Helper function for prediction-powered inference for OLS estimation
 #'
 #' @details
-#' Additional details...
+#' Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://www.science.org/doi/10.1126/science.adi6000>
 #'
-#' @param X_l (ndarray): Covariates corresponding to the gold-standard labels.
+#' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
-#' @param Y_l (ndarray): Gold-standard labels.
+#' @param Y_l (vector): n-vector of labeled outcomes.
 #'
-#' @param f_l (ndarray): Predictions corresponding to the gold-standard labels.
+#' @param f_l (vector): n-vector of predictions in the labeled data.
 #'
-#' @param X_u (ndarray): Covariates corresponding to the unlabeled data.
+#' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
-#' @param f_u (ndarray): Predictions corresponding to the unlabeled data.
+#' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param lhat (float, optional): Power-tuning parameter (see `[ADZ23] <https://arxiv.org/abs/2311.01453>`__). The default value `None` will estimate the optimal value from data. Setting `lhat=1` recovers PPI with no power tuning, and setting `lhat=0` recovers the classical point estimate.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param coord (int, optional): Coordinate for which to optimize `lhat`. If `None`, it optimizes the total variance over all coordinates. Must be in {1, ..., d} where d is the shape of the estimand.
-#'
-#' @param w (ndarray, optional): Sample weights for the labeled data set.
-#'
-#' @param w_unlabeled (ndarray, optional): Sample weights for the unlabeled data set.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
 #' @returns A list of outputs: estimate of inference model parameters and corresponding standard errors
 #'
@@ -50,9 +53,7 @@
 #'
 #' @export
 
-ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u,
-
-  lhat = NULL, coord = NULL, w = NULL, w_unlabeled = NULL) {
+ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
 
   n <- NROW(X_l)
 

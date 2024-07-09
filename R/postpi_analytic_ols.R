@@ -1,23 +1,5 @@
 #===============================================================================
-#
-#  PROGRAM: postpi_analytic_ols.R
-#
-#  AUTHORS: Stephen Salerno (ssalerno@fredhutch.org)
-#           Kentaro Hoffman (khoffm3@uw.edu)
-#           Awan Afiaz (aafiaz@uw.edu)
-#
-#
-#  PURPOSE: Implementation of analytic correction algorithm from Wang et al.(2020)
-#
-#           Methods for correcting inference based on outcomes predicted by
-#           machine learning
-#
-#  INPUTS:  rel_form, inf_form, dat
-#
-#  OUTPUTS:  Post-prediction inference functions for various target estimands:
-#
-#  Updated: 2024-01-20
-#
+# POSTPI ANALYTIC ORDINARY LEAST SQUARES
 #===============================================================================
 
 #=== ANALYTIC CORRECTION =======================================================

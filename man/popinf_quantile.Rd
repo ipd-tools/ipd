@@ -28,11 +28,11 @@ popinf_quantile(
 reduction. POP-Inf will estimate the weights if not specified.}
 
 \item{alpha}{(scalar): type I error rate for hypothesis testing - values in
-(0, 1); defaults to 0.05}
+(0, 1); defaults to 0.05.}
 
-\item{delta}{(scalar):tolerance for assessing convergence; defaults to 0.05}
+\item{delta}{(scalar):tolerance for assessing convergence; defaults to 0.05.}
 
-\item{K}{(integer): maximum number of iterations; defaults to 100}
+\item{K}{(integer): maximum number of iterations; defaults to 100.}
 }
 \value{
 A list of outputs: estimate of inference model parameters and

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppi_plusplus_logistic.R
 \name{ppi_plusplus_logistic}
 \alias{ppi_plusplus_logistic}
-\title{PPI++ Logistic Regression Estimator and Inference}
+\title{PPI++ Logistic Regression}
 \usage{
 ppi_plusplus_logistic(
   X_l,
@@ -28,37 +28,41 @@ ppi_plusplus_logistic(
 
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{lhat}{(float, optional): Power-tuning parameter.
-The default value \code{NULL} will estimate the optimal value from data.
-Setting \code{lhat = 1} recovers PPI with no power tuning.
-Setting \code{lhat = 0} recovers the classical point estimate.}
+\item{lhat}{(float, optional): Power-tuning parameter (see
+\url{https://arxiv.org/abs/2311.01453}). The default value, \code{NULL},
+will estimate the optimal value from the data. Setting \code{lhat = 1}
+recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+the classical point estimate.}
 
-\item{coord}{(int, optional): Coordinate for which to optimize \code{lhat}.
-If \code{None}, it optimizes the total variance over all coordinates.
-Must be in {1, ..., p} where p is the shape of the estimand.}
+\item{coord}{(int, optional): Coordinate for which to optimize
+\code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.}
 
 \item{opts}{(list, optional): Options to pass to the optimizer.
 See ?optim for details.}
 
-\item{w_l}{(vector, optional): n-vector of sample weights for the
-labeled data.}
+\item{w_l}{(ndarray, optional): Sample weights for the labeled data set.
+Defaults to a vector of ones.}
 
-\item{w_u}{(vector, optional): N-vector of sample weights for the
-unlabeled data.}
+\item{w_u}{(ndarray, optional): Sample weights for the unlabeled
+data set. Defaults to a vector of ones.}
 }
 \value{
 (list): A list containing the following:
 
 \describe{
-\item{est}{(vector): p-vector of PPI++ logistic regression coefficient
+\item{est}{(vector): vector of PPI++ logistic regression coefficient
 estimates.}
-\item{se}{(vector): p-vector of standard errors of the coefficients.}
+\item{se}{(vector): vector of standard errors of the coefficients.}
 \item{lambda}{(float): estimated power-tuning parameter.}
 }
 }
 \description{
-Computes the prediction-powered confidence interval for the logistic
-regression coefficients using the PPI++ algorithm.
+Helper function for PPI++ logistic regression
+}
+\details{
+PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+\url{https://arxiv.org/abs/2311.01453}
 }
 \examples{
 

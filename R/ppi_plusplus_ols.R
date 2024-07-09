@@ -2,12 +2,16 @@
 # PPI++ ORDINARY LEAST SQUARES
 #===============================================================================
 
-#=== PPI++ OLS POINT ESTIMATE ==================================================
+#--- PPI++ OLS - POINT ESTIMATE ------------------------------------------------
 
-#' PPI++ OLS Point Estimate (helper function)
+#' PPI++ OLS (Point Estimate)
 #'
 #' @description
-#' Computes the prediction-powered point estimate of the OLS coefficients.
+#' Helper function for PPI++ OLS estimation (point estimate)
+#'
+#' @details
+#' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://arxiv.org/abs/2311.01453>
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
@@ -19,27 +23,28 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param lhat (float, optional): Power-tuning parameter.
-#' The default value `NULL` will estimate the optimal value from data.
-#' Setting `lhat = 1` recovers PPI with no power tuning.
-#' Setting `lhat = 0` recovers the classical point estimate.
+#' @param lhat (float, optional): Power-tuning parameter (see
+#' <https://arxiv.org/abs/2311.01453>). The default value, \code{NULL},
+#' will estimate the optimal value from the data. Setting \code{lhat = 1}
+#' recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+#' the classical point estimate.
 #'
-#' @param coord (int, optional): Coordinate for which to optimize `lhat`.
-#' If `None`, it optimizes the total variance over all coordinates.
-#' Must be in {1, ..., p} where p is the shape of the estimand.
+#' @param coord (int, optional): Coordinate for which to optimize
+#' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
 #'
-#' @param w_l (vector, optional): n-vector of sample weights for the
-#' labeled data.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param w_u (vector, optional): N-vector of sample weights for the
-#' unlabeled data.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
-#' @returns (vector): p-vector of prediction-powered point estimates of the
-#' OLS coefficients.
+#' @returns (vector): vector of prediction-powered point estimates of the OLS
+#' coefficients.
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "ols")
 #'
 #' form <- Y - f ~ X1
 #'
@@ -105,13 +110,16 @@ ppi_plusplus_ols_est <- function(X_l, Y_l, f_l, X_u, f_u,
   }
 }
 
-#=== PPI++ OLS =================================================================
+#--- PPI++ OLS - INFERENCE -----------------------------------------------------
 
-#' PPI++ OLS Estimator and Inference
+#' PPI++ OLS
 #'
 #' @description
-#' Computes the prediction-powered estimator and confidence interval for the
-#' OLS coefficients using the PPI++ algorithm.
+#' Helper function for PPI++ OLS estimation
+#'
+#' @details
+#' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+#' <https://arxiv.org/abs/2311.01453>`
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
@@ -123,32 +131,33 @@ ppi_plusplus_ols_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param lhat (float, optional): Power-tuning parameter.
-#' The default value `NULL` will estimate the optimal value from data.
-#' Setting `lhat = 1` recovers PPI with no power tuning.
-#' Setting `lhat = 0` recovers the classical point estimate.
+#' @param lhat (float, optional): Power-tuning parameter (see
+#' <https://arxiv.org/abs/2311.01453>). The default value, \code{NULL},
+#' will estimate the optimal value from the data. Setting \code{lhat = 1}
+#' recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+#' the classical point estimate.
 #'
-#' @param coord (int, optional): Coordinate for which to optimize `lhat`.
-#' If `None`, it optimizes the total variance over all coordinates.
-#' Must be in {1, ..., p} where p is the shape of the estimand.
+#' @param coord (int, optional): Coordinate for which to optimize
+#' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
 #'
-#' @param w_l (vector, optional): n-vector of sample weights for the
-#' labeled data.
+#' @param w_l (ndarray, optional): Sample weights for the labeled data set.
+#' Defaults to a vector of ones.
 #'
-#' @param w_u (vector, optional): N-vector of sample weights for the
-#' unlabeled data.
+#' @param w_u (ndarray, optional): Sample weights for the unlabeled
+#' data set. Defaults to a vector of ones.
 #'
 #' @returns (list): A list containing the following:
 #'
 #' \describe{
-#'    \item{est}{(vector): p-vector of PPI++ OLS coefficient estimates.}
-#'    \item{se}{(vector): p-vector of standard errors of the coefficients.}
+#'    \item{est}{(vector): vector of PPI++ OLS coefficient estimates.}
+#'    \item{se}{(vector): vector of standard errors of the coefficients.}
 #'    \item{lambda}{(float): estimated power-tuning parameter.}
 #' }
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "ols")
 #'
 #' form <- Y - f ~ X1
 #'

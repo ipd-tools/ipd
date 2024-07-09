@@ -2,7 +2,173 @@
 # HELPERS
 #===============================================================================
 
-#=== PPI++ =====================================================================
+#=== PPI++ QUANTILE ESTIMATION =================================================
+
+#--- EMPIRICAL CDF -------------------------------------------------------------
+
+#' Empirical CDF of the Data
+#'
+#' Computes the empirical CDF of the data.
+#'
+#' @param Y (matrix): n x 1 matrix of observed data.
+#'
+#' @param grid (matrix): Grid of values to compute the CDF at.
+#'
+#' @param w (vector, optional): n-vector of sample weights.
+#'
+#' @returns (list): Empirical CDF and its standard deviation at the specified
+#' grid points.
+#'
+#' @examples
+#' # Need example code
+#'
+#' @export
+
+compute_cdf <- function(Y, grid, w = NULL) {
+
+  n <- length(Y)
+
+  if (is.null(w)) w <- rep(1, n) else w <- w / sum(w) * n
+
+  indicators <- matrix((Y <= rep(grid, each = n)) * w,
+
+                       ncol = length(grid))
+
+  cdf_mn <- apply(indicators, 2, mean)
+
+  cdf_sd <- apply(indicators, 2, sd) * sqrt((n - 1) / n)
+
+  return(list(cdf_mn, cdf_sd))
+}
+
+#--- DIFFERENCE IN EMPIRICAL CDFS ----------------------------------------------
+
+#' Empirical CDF Difference
+#'
+#' Computes the difference between the empirical CDFs of the data and the
+#' predictions.
+#'
+#' @param Y (matrix): n x 1 matrix of observed data.
+#'
+#' @param f (matrix): n x 1 matrix of predictions.
+#'
+#' @param grid (matrix): Grid of values to compute the CDF at.
+#'
+#' @param w (vector, optional): n-vector of sample weights.
+#'
+#' @returns (list): Difference between the empirical CDFs of the data and the
+#' predictions and its standard deviation at the specified grid points.
+#'
+#' @examples
+#' # Need example code
+#'
+#' @export
+
+compute_cdf_diff <- function(Y, f, grid, w = NULL) {
+
+  n <- length(Y)
+
+  if (is.null(w)) w <- rep(1, n) else w <- w / sum(w) * n
+
+  indicators_Y <- matrix((Y <= rep(grid, each = n)) * w,
+
+                         ncol = length(grid))
+
+  indicators_f <- matrix((f <= rep(grid, each = length(f))) * w,
+
+                         ncol = length(grid))
+
+  diff_mn <- apply(indicators_Y - indicators_f, 2, mean)
+
+  diff_sd <- apply(indicators_Y - indicators_f, 2, sd) * sqrt((n - 1) / n)
+
+  return(list(diff_mn, diff_sd))
+}
+
+#--- RECTIFIED CDF -------------------------------------------------------------
+
+#' Rectified CDF
+#'
+#' Computes the rectified CDF of the data.
+#'
+#' @param Y_l (vector): Gold-standard labels.
+#'
+#' @param f_l (vector): Predictions corresponding to the gold-standard labels.
+#'
+#' @param f_u (vector): Predictions corresponding to the unlabeled data.
+#'
+#' @param grid (vector): Grid of values to compute the CDF at.
+#'
+#' @param w_l (vector, optional): Sample weights for the labeled data set.
+#'
+#' @param w_u (vector, optional): Sample weights for the unlabeled data set.
+#'
+#' @returns (vector): Rectified CDF of the data at the specified grid points.
+#'
+#' @examples
+#' # Need example code
+#'
+#' @export
+
+rectified_cdf <- function(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL) {
+
+  n <- length(Y_l)
+
+  N <- length(f_u)
+
+  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+
+  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+
+  cdf_f_u <- compute_cdf(f_u, grid, w = w_u)[[1]]
+
+  cdf_rectifier <- compute_cdf_diff(Y_l, f_l, grid, w = w_l)[[1]]
+
+  return(cdf_f_u + cdf_rectifier)
+}
+
+#--- RECTIFIED P-VALUE ---------------------------------------------------------
+
+#' Rectified P-Value
+#'
+#' Computes a rectified p-value.
+#'
+#' @param rectifier (float or vector): Rectifier value.
+#'
+#' @param rectifier_std (float or vector): Rectifier standard deviation.
+#'
+#' @param imputed_mean (float or vector): Imputed mean.
+#'
+#' @param imputed_std (float or vector): Imputed standard deviation.
+#'
+#' @param null (float, optional): Value of the null hypothesis to be tested.
+#' Defaults to `0`.
+#'
+#' @param alternative (str, optional): Alternative hypothesis, either
+#' 'two-sided', 'larger' or 'smaller'.
+#'
+#' @examples
+#' # Need example code
+#'
+#'
+#' @returns (float or vector): P-value.
+
+rectified_p_value <- function(rectifier, rectifier_std,
+
+                              imputed_mean, imputed_std, null = 0, alternative = "two-sided") {
+
+  rectified_point_estimate <- imputed_mean + rectifier
+
+  rectified_std <- pmax(sqrt(imputed_std^2 + rectifier_std^2), 1e-16)
+
+  p_value <- zstat_generic(rectified_point_estimate, 0, rectified_std,
+
+                           alternative, null)[[2]]
+
+  return(p_value)
+}
+
+#=== PPI++ OLS =================================================================
 
 #--- ORDINARY LEAST SQUARES ----------------------------------------------------
 
@@ -508,6 +674,138 @@ log1pexp <- function(x) {
   out[!idxs] <- log1p(exp(x[!idxs]))
 
   return(out)
+}
+
+#=== PPI++ LOGISTIC REGRESSION =================================================
+
+#=== PPI++ LOGISTIC GRADIENT AND HESSIAN =======================================
+
+#' Logistic Regression Gradient and Hessian
+#'
+#' @description
+#' Computes the statistics needed for the logstic regression-based
+#' prediction-powered inference.
+#'
+#' @param est (vector): Point estimates of the coefficients.
+#'
+#' @param X_l (matrix): Covariates for the labeled data set.
+#'
+#' @param Y_l (vector): Labels for the labeled data set.
+#'
+#' @param f_l (vector): Predictions for the labeled data set.
+#'
+#' @param X_u (matrix): Covariates for the unlabeled data set.
+#'
+#' @param f_u (vector): Predictions for the unlabeled data set.
+#'
+#' @param w_l (vector, optional): Sample weights for the labeled data set.
+#'
+#' @param w_u (vector, optional): Sample weights for the unlabeled data set.
+#'
+#' @param use_u (bool, optional): Whether to use the unlabeled data set.
+#'
+#' @returns (list): A list containing the following:
+#'
+#' \describe{
+#'    \item{grads}{(matrix): n x p matrix gradient of the loss function with
+#'    respect to the coefficients.}
+#'    \item{grads_hat}{(matrix): n x p matrix gradient of the loss function
+#'    with respect to the coefficients, evaluated using the labeled
+#'    predictions.}
+#'    \item{grads_hat_unlabeled}{(matrix): N x p matrix gradient of the loss
+#'    function with respect to the coefficients, evaluated using the unlabeled
+#'    predictions.}
+#'    \item{inv_hessian}{(matrix): p x p matrix inverse Hessian of the loss
+#'    function with respect to the coefficients.}
+#' }
+#'
+#' @examples
+#'
+#' dat <- simdat(model = "logistic")
+#'
+#' form <- Y - f ~ X1
+#'
+#' X_l <- model.matrix(form, data = dat[dat$set == "labeled",])
+#'
+#' Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
+#'
+#' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'
+#' est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u)
+#'
+#' stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
+#'
+#' @export
+
+logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
+
+                               w_l = NULL, w_u = NULL, use_u = TRUE) {
+
+  n <- nrow(f_l)
+
+  N <- nrow(f_u)
+
+  p <- ncol(X_u)
+
+  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+
+  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+
+  mu_l <- plogis(X_l %*% est)
+
+  mu_u <- plogis(X_u %*% est)
+
+  hessian <- matrix(0, nrow = p, ncol = p)
+
+  grads_hat_unlabeled <- matrix(0, nrow = N, ncol = p)
+
+  if (use_u) {
+
+    for (i in 1:N) {
+
+      hessian <- hessian + w_u[i] / (N + n) * mu_u[i] * (1 - mu_u[i]) *
+
+        tcrossprod(X_u[i, ])
+
+      grads_hat_unlabeled[i, ] <- w_u[i] * X_u[i, ] * (mu_u[i] - f_u[i])
+    }
+  }
+
+  grads <- matrix(0, nrow = n, ncol = p)
+
+  grads_hat <- matrix(0, nrow = n, ncol = p)
+
+  for (i in 1:n) {
+
+    if (use_u) {
+
+      hessian <- hessian + w_l[i] / (N + n) * mu_l[i] * (1 - mu_l[i]) *
+
+        tcrossprod(X_l[i, ])
+
+    } else {
+
+      hessian <- hessian + w_l[i] / n * mu_l[i] * (1 - mu_l[i]) *
+
+        tcrossprod(X_l[i, ])
+    }
+
+    grads[i, ] <- w_l[i] * X_l[i, ] * (mu_l[i] - Y_l[i])
+
+    grads_hat[i, ] <- w_l[i] * X_l[i, ] * (mu_l[i] - f_l[i])
+  }
+
+  inv_hessian <- solve(hessian)
+
+  return(
+
+    list(grads = grads, grads_hat = grads_hat,
+
+         grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
 }
 
 #=== END =======================================================================

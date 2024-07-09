@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppi_plusplus_quantile.R
 \name{ppi_plusplus_quantile_est}
 \alias{ppi_plusplus_quantile_est}
-\title{PPI++ Quantile Estimation Point Estimate}
+\title{PPI++ Quantile Estimation (Point Estimate)}
 \usage{
 ppi_plusplus_quantile_est(
   Y_l,
@@ -15,33 +15,39 @@ ppi_plusplus_quantile_est(
 )
 }
 \arguments{
-\item{Y_l}{(vector): Gold-standard labels.}
+\item{Y_l}{(vector): n-vector of labeled outcomes.}
 
-\item{f_l}{(vector): Predictions corresponding to the gold-standard labels.}
+\item{f_l}{(vector): n-vector of predictions in the labeled data.}
 
-\item{f_u}{(vector): Predictions corresponding to the unlabeled data.}
+\item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{q}{(float): Quantile to estimate.}
+\item{q}{(float): Quantile to estimate. Must be in the range (0, 1).}
 
 \item{exact_grid}{(bool, optional): Whether to compute the exact solution
 (TRUE) or an approximate solution based on a linearly spaced grid of 5000
 values (FALSE).}
 
-\item{w_l}{(vector, optional): Sample weights for the labeled data set.}
+\item{w_l}{(ndarray, optional): Sample weights for the labeled data set.
+Defaults to a vector of ones.}
 
-\item{w_u}{(vector, optional): Sample weights for the unlabeled data set.}
+\item{w_u}{(ndarray, optional): Sample weights for the unlabeled
+data set. Defaults to a vector of ones.}
 }
 \value{
 (float): Prediction-powered point estimate of the quantile.
 }
 \description{
-Computes the prediction-powered point estimate of the quantile.
+Helper function for PPI++ quantile estimation (point estimate)
+}
+\details{
+PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+\url{https://arxiv.org/abs/2311.01453}`
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "quantile")
 
-form <- Y - f ~ X1
+form <- Y - f ~ 1
 
 Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 

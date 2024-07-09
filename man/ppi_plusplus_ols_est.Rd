@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppi_plusplus_ols.R
 \name{ppi_plusplus_ols_est}
 \alias{ppi_plusplus_ols_est}
-\title{PPI++ OLS Point Estimate (helper function)}
+\title{PPI++ OLS (Point Estimate)}
 \usage{
 ppi_plusplus_ols_est(
   X_l,
@@ -27,31 +27,36 @@ ppi_plusplus_ols_est(
 
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{lhat}{(float, optional): Power-tuning parameter.
-The default value \code{NULL} will estimate the optimal value from data.
-Setting \code{lhat = 1} recovers PPI with no power tuning.
-Setting \code{lhat = 0} recovers the classical point estimate.}
+\item{lhat}{(float, optional): Power-tuning parameter (see
+\url{https://arxiv.org/abs/2311.01453}). The default value, \code{NULL},
+will estimate the optimal value from the data. Setting \code{lhat = 1}
+recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
+the classical point estimate.}
 
-\item{coord}{(int, optional): Coordinate for which to optimize \code{lhat}.
-If \code{None}, it optimizes the total variance over all coordinates.
-Must be in {1, ..., p} where p is the shape of the estimand.}
+\item{coord}{(int, optional): Coordinate for which to optimize
+\code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
+coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.}
 
-\item{w_l}{(vector, optional): n-vector of sample weights for the
-labeled data.}
+\item{w_l}{(ndarray, optional): Sample weights for the labeled data set.
+Defaults to a vector of ones.}
 
-\item{w_u}{(vector, optional): N-vector of sample weights for the
-unlabeled data.}
+\item{w_u}{(ndarray, optional): Sample weights for the unlabeled
+data set. Defaults to a vector of ones.}
 }
 \value{
-(vector): p-vector of prediction-powered point estimates of the
-OLS coefficients.
+(vector): vector of prediction-powered point estimates of the OLS
+coefficients.
 }
 \description{
-Computes the prediction-powered point estimate of the OLS coefficients.
+Helper function for PPI++ OLS estimation (point estimate)
+}
+\details{
+PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
+\url{https://arxiv.org/abs/2311.01453}
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 

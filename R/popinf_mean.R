@@ -21,11 +21,11 @@
 #' reduction. POP-Inf will estimate the weights if not specified.
 #'
 #' @param alpha (scalar): type I error rate for hypothesis testing - values in
-#' (0, 1); defaults to 0.05
+#' (0, 1); defaults to 0.05.
 #'
-#' @param delta (scalar):tolerance for assessing convergence; defaults to 0.05
+#' @param delta (scalar):tolerance for assessing convergence; defaults to 0.05.
 #'
-#' @param K (integer): maximum number of iterations; defaults to 100
+#' @param K (integer): maximum number of iterations; defaults to 100.
 #'
 #' @returns A list of outputs: estimate of inference model parameters and
 #' corresponding standard error.
