@@ -48,7 +48,7 @@ We provide a simple example to demonstrate the basic use of the functions includ
 
 ### Example Setup
 
-1. We have two datasets: a labeled dataset, \(\mathcal{L} = \left\{Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right\}\), and an unlabeled dataset, \(\left\{X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right\}\). The labeled set is typically smaller in size compared to the unlabeled set. 
+1. We have two datasets: a labeled dataset, \(\mathcal{L} = \left[Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right]\), and an unlabeled dataset, \(\left[X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right]\). The labeled set is typically smaller in size compared to the unlabeled set. 
 2. We have access to an algorithm \(f(X)\) that can predict our outcome of interest \(Y\).
 3. Our interest is in performing inference on a quantity such as the outcome mean or quantile, or to recover a downstream inferential (mean) model:
 

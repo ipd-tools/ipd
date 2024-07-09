@@ -67,9 +67,9 @@ functions included in the `IPD` package.
 ### Example Setup
 
 1.  We have two datasets: a labeled dataset,
-    $\mathcal{L} = \left\{Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right\}$,
+    $\mathcal{L} = \left[Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right]$,
     and an unlabeled dataset,
-    $\left\{X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right\}$. The
+    $\left[X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right]$. The
     labeled set is typically smaller in size compared to the unlabeled
     set.
 2.  We have access to an algorithm $f(X)$ that can predict our outcome
