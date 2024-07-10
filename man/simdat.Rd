@@ -4,7 +4,14 @@
 \alias{simdat}
 \title{Data generation function for various underlying models}
 \usage{
-simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1, model = "ols")
+simdat(
+  n = c(300, 300, 300),
+  effect = 1,
+  sigma_Y = 1,
+  model = "ols",
+  shift = 0,
+  scale = 1
+)
 }
 \arguments{
 \item{n}{Integer vector of size 3 indicating the sample sizes in the
@@ -18,6 +25,12 @@ inference. Defaults is 1.}
 \item{model}{The type of model to be generated. Must be one of
 \code{"mean"}, \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.
 Default is \code{"ols"}.}
+
+\item{shift}{Scalar shift of the predictions for continuous outcomes
+(i.e., "mean", "quantile", and "ols"). Defaults to 0.}
+
+\item{scale}{Scaling factor for the predictions for continuous outcomes
+(i.e., "mean", "quantile", and "ols"). Defaults to 1.}
 }
 \value{
 A data.frame containing n rows and columns corresponding to
