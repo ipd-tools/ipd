@@ -29,7 +29,8 @@
 #' @param w_u (ndarray, optional): Sample weights for the unlabeled
 #' data set. Defaults to a vector of ones.
 #'
-#' @returns A list of outputs: estimate of inference model parameters and corresponding standard errors
+#' @returns A list of outputs: estimate of inference model parameters and
+#' corresponding standard errors
 #'
 #' @examples
 #'

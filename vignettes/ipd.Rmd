@@ -385,7 +385,7 @@ glm(f ~ X1, family = binomial,
 ```{r classic2}
 #--- Fit the Classic Regression
 
-lm(Y ~ X1, family = binomial,
+glm(Y ~ X1, family = binomial,
    
   data = dat_logistic[dat_logistic$set == "labeled",]) |> 
   
@@ -396,7 +396,7 @@ You can again fit the various IPD methods to your data and obtain summaries usin
 
 #### 1. PostPI Bootstrap Correction (Wang et al., 2020)
 
-```{r postpi_boot2, eval = F}
+```{r postpi_boot2}
 #-- Specify the Formula
 
 formula <- Y - f ~ X1
@@ -414,7 +414,7 @@ IPD::ipd(formula, method = "postpi_boot", model = "logistic",
 
 #### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
-```{r ppi2, eval=FALSE}
+```{r ppi2}
 #-- Fit the PPI Correction
 
 IPD::ipd(formula, method = "ppi", model = "logistic", 
