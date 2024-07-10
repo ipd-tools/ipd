@@ -2,9 +2,17 @@
 #  POSTPI BOOTSTRAP ORDINARY LEAST SQUARES
 #===============================================================================
 
-#=== BOOTSTRAP CORRECTION ======================================================
+#--- POSTPI BOOTSTRAP OLS ------------------------------------------------------
 
-#' IPD Linear Regression using Wang et al. (2020) Bootstrap Correction
+#' PostPI OLS (Bootstrap Correction)
+#'
+#' @description
+#' Helper function for PostPI OLS estimation (bootstrap correction)
+#'
+#' @details
+#' Methods for correcting inference based on outcomes predicted by machine
+#' learning (Wang et al., 2020)
+#' <https://www.pnas.org/doi/abs/10.1073/pnas.2001238117>
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
@@ -16,19 +24,30 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param nboot number of bootstraps
+#' @param nboot (integer): Number of bootstrap samples. Defaults to 100.
 #'
-#' @param rel_func relationship function model form (lm, gam, glm, etc)
+#' @param se_type (string): Which method to calculate the standard errors.
+#' Options include "par" (parametric) or "npar" (nonparametric).
+#' Defaults to "par".
 #'
-#' @param scale_se (boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).
+#' @param rel_func (string): Method for fitting the relationship model.
+#' Options include "lm" (linear model), "rf" (random forest), and "gam"
+#' (generalized additive model). Defaults to "lm".
 #'
-#' @param n_t (integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).
+#' @param scale_se (boolean): Logical argument to scale relationship model
+#' error variance. Defaults to TRUE; FALSE option is retained for posterity.
 #'
-#' @returns A list of outputs: estimate of inference model parameters and corresponding standard error based on both parametric and non-parametric bootstrap methods.
+#' @param n_t (integer, optiona) Size of the dataset used to train the
+#' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
+#' Defaults to \code{Inf}.
+#'
+#' @returns A list of outputs: estimate of inference model parameters and
+#' corresponding standard error based on both parametric and non-parametric
+#' bootstrap methods.
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "ols")
 #'
 #' form <- Y - f ~ X1
 #'
@@ -42,22 +61,19 @@
 #'
 #' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' nboot <- 100
-#'
-#' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u)
-#'
-#' @export
+#' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 #'
 #' @import stats
+#'
 #' @importFrom ranger ranger
+#'
 #' @importFrom gam gam
-
-
-#-- PostPI - BOOTSTRAP
+#'
+#' @export
 
 postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, rel_func = "lm", scale_se = T, n_t = Inf) {
+  nboot = 100, se_type = "par", rel_func = "lm", scale_se = T, n_t = Inf) {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
@@ -170,15 +186,24 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   #-- 5. Estimate Inference Model SE
 
-  #- a. Parametric Bootstrap
+  if (se_type == "par") {
 
-  se_p <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, median)
+    #- a. Parametric Bootstrap
 
-  #- b. Nonparametric Bootstrap
+    se <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, median)
 
-  se_n <- apply(ests_b[1:(nrow(ests_b)/2),], 1, sd)
+  } else if (se_type == "npar") {
+
+    #- b. Nonparametric Bootstrap
+
+    se <- apply(ests_b[1:(nrow(ests_b)/2),], 1, sd)
+
+  } else {
+
+    stop("se_type must be one of 'par' or 'npar'")
+  }
 
   #-- Output
 
-  return(list(est = est, se = se_p, se_npar = se_n))
+  return(list(est = est, se = se))
 }

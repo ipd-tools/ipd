@@ -2,7 +2,7 @@
 % Please edit documentation in R/postpi_boot_ols.R
 \name{postpi_boot_ols}
 \alias{postpi_boot_ols}
-\title{IPD Linear Regression using Wang et al. (2020) Bootstrap Correction}
+\title{PostPI OLS (Bootstrap Correction)}
 \usage{
 postpi_boot_ols(
   X_l,
@@ -11,6 +11,7 @@ postpi_boot_ols(
   X_u,
   f_u,
   nboot = 100,
+  se_type = "par",
   rel_func = "lm",
   scale_se = T,
   n_t = Inf
@@ -27,23 +28,39 @@ postpi_boot_ols(
 
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{nboot}{number of bootstraps}
+\item{nboot}{(integer): Number of bootstrap samples. Defaults to 100.}
 
-\item{rel_func}{relationship function model form (lm, gam, glm, etc)}
+\item{se_type}{(string): Which method to calculate the standard errors.
+Options include "par" (parametric) or "npar" (nonparametric).
+Defaults to "par".}
 
-\item{scale_se}{(boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).}
+\item{rel_func}{(string): Method for fitting the relationship model.
+Options include "lm" (linear model), "rf" (random forest), and "gam"
+(generalized additive model). Defaults to "lm".}
 
-\item{n_t}{(integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).}
+\item{scale_se}{(boolean): Logical argument to scale relationship model
+error variance. Defaults to TRUE; FALSE option is retained for posterity.}
+
+\item{n_t}{(integer, optiona) Size of the dataset used to train the
+prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
+Defaults to \code{Inf}.}
 }
 \value{
-A list of outputs: estimate of inference model parameters and corresponding standard error based on both parametric and non-parametric bootstrap methods.
+A list of outputs: estimate of inference model parameters and
+corresponding standard error based on both parametric and non-parametric
+bootstrap methods.
 }
 \description{
-IPD Linear Regression using Wang et al. (2020) Bootstrap Correction
+Helper function for PostPI OLS estimation (bootstrap correction)
+}
+\details{
+Methods for correcting inference based on outcomes predicted by machine
+learning (Wang et al., 2020)
+\url{https://www.pnas.org/doi/abs/10.1073/pnas.2001238117}
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 
@@ -57,8 +74,6 @@ X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-nboot <- 100
-
-postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u)
+postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 
 }

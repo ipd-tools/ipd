@@ -2,9 +2,17 @@
 # POSTPI ANALYTIC ORDINARY LEAST SQUARES
 #===============================================================================
 
-#=== ANALYTIC CORRECTION =======================================================
+#--- POSTPI ANALYTIC OLS -------------------------------------------------------
 
-#' PostPI Linear Regression using Wang et al. (2020) Analytic Correction
+#' PostPI OLS (Analytic Correction)
+#'
+#' @description
+#' Helper function for PostPI OLS estimation (analytic correction)
+#'
+#' @details
+#' Methods for correcting inference based on outcomes predicted by machine
+#' learning (Wang et al., 2020)
+#' <https://www.pnas.org/doi/abs/10.1073/pnas.2001238117>
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'
@@ -16,16 +24,19 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param scale_se (boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).
+#' @param scale_se (boolean): Logical argument to scale relationship model
+#' error variance. Defaults to TRUE; FALSE option is retained for posterity.
 #'
-#' @param n_t (integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).
+#' @param n_t (integer, optiona) Size of the dataset used to train the
+#' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
+#' Defaults to \code{Inf}.
 #'
 #' @returns A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "ols")
 #'
 #' form <- Y - f ~ X1
 #'
@@ -41,12 +52,9 @@
 #'
 #' postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
-#' @export
-#'
 #' @import stats
 #'
-
-#-- PostPI - ANALYTIC for OLS
+#' @export
 
 postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
@@ -88,3 +96,4 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
   return(list(est = as.vector(est), se = as.vector(se)))
 }
 
+#=== END =======================================================================

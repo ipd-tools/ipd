@@ -2,7 +2,7 @@
 % Please edit documentation in R/postpi_analytic_ols.R
 \name{postpi_analytic_ols}
 \alias{postpi_analytic_ols}
-\title{PostPI Linear Regression using Wang et al. (2020) Analytic Correction}
+\title{PostPI OLS (Analytic Correction)}
 \usage{
 postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = T, n_t = Inf)
 }
@@ -17,20 +17,28 @@ postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = T, n_t = Inf)
 
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{scale_se}{(boolean): Logical argument to scale relationship model error variance (defaults to TRUE; retained for posterity).}
+\item{scale_se}{(boolean): Logical argument to scale relationship model
+error variance. Defaults to TRUE; FALSE option is retained for posterity.}
 
-\item{n_t}{(integer, optiona) Size of the dataset used to train the prediction function (necessary if \code{n_t} < \code{nrow(X_l)}; defaults to \code{Inf}).}
+\item{n_t}{(integer, optiona) Size of the dataset used to train the
+prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
+Defaults to \code{Inf}.}
 }
 \value{
 A list of outputs: estimate of the inference model parameters and
 corresponding standard error estimate.
 }
 \description{
-PostPI Linear Regression using Wang et al. (2020) Analytic Correction
+Helper function for PostPI OLS estimation (analytic correction)
+}
+\details{
+Methods for correcting inference based on outcomes predicted by machine
+learning (Wang et al., 2020)
+\url{https://www.pnas.org/doi/abs/10.1073/pnas.2001238117}
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 
