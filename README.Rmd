@@ -67,9 +67,13 @@ library(IPD)
 
 #-- Generate Example Data for Linear Regression
 
-set.seed(12345)
+set.seed(123)
 
-dat <- simdat(c(10000, 500, 1000), effect = 1, sigma_Y = 1, model = "ols")
+n <- c(10000, 500, 1000)
+
+dat <- simdat(n = n, effect = 3, sigma_Y = 1,
+
+  model = "ols", shift = 1, scale = 2)
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
@@ -336,14 +340,29 @@ For additional details, we provide more use cases and examples in the package vi
 vignette("ipd")
 ```
 
-
 ## Feedback
 
 For questions, comments, or any other feedback, please contact the developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD).
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD). The following method/model combinations are currently implemented:
+
+| Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression | Multiclass Regression |
+|-----------------------------------------------------------------|--------------------|---------------------|--------------------|---------------------|--------------------|-----------------------|
+| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
+| [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
+| [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
+| [POP-Inf](https://arxiv.org/abs/2311.14220)                     | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
+| [PSPS](https://arxiv.org/abs/2405.20039)                        | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+| [PDC](https://arxiv.org/abs/2312.06478)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+| [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121)   | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+| [PPBoot](https://arxiv.org/abs/2405.18379)                      | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+| [DSL](https://arxiv.org/abs/2306.04746)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+
+
+
+
 
 ## License
 

@@ -87,11 +87,13 @@ We can generate a continuous outcome and relevant predictors for linear regressi
 ```{r simols}
 #-- Generate a Dataset for Linear Regression
 
-set.seed(12345)
+set.seed(123)
 
 n <- c(10000, 500, 1000)
 
-dat_ols <- simdat(n = n, effect = 1, sigma_Y = 1, model = "ols")
+dat_ols <- simdat(n = n, effect = 3, sigma_Y = 1,
+
+  model = "ols", shift = 1, scale = 2)
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
@@ -218,7 +220,11 @@ As another example, we can generate a binary outcome and relevant predictors for
 ```{r simlogistic}
 #-- Generate a Dataset for Logistic Regression
 
-dat_logistic <- simdat(n = n, effect = 1, sigma_Y = 1, model = "logistic")
+set.seed(123)
+
+dat_logistic <- simdat(n = n, effect = 3, sigma_Y = 1, 
+                       
+  model = "logistic")
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
