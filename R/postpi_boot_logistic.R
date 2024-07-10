@@ -1,13 +1,13 @@
 #===============================================================================
-#  POSTPI BOOTSTRAP ORDINARY LEAST SQUARES
+#  POSTPI BOOTSTRAP LOGISTIC REGRESSION
 #===============================================================================
 
-#--- POSTPI BOOTSTRAP OLS ------------------------------------------------------
+#--- POSTPI BOOTSTRAP LOGISTIC REGRESSION --------------------------------------
 
-#' PostPI OLS (Bootstrap Correction)
+#' PostPI Logistic Regression (Bootstrap Correction)
 #'
 #' @description
-#' Helper function for PostPI OLS estimation (bootstrap correction)
+#' Helper function for PostPI logistic regression (bootstrap correction)
 #'
 #' @details
 #' Methods for correcting inference based on outcomes predicted by machine
@@ -30,24 +30,13 @@
 #' Options include "par" (parametric) or "npar" (nonparametric).
 #' Defaults to "par".
 #'
-#' @param rel_func (string): Method for fitting the relationship model.
-#' Options include "lm" (linear model), "rf" (random forest), and "gam"
-#' (generalized additive model). Defaults to "lm".
-#'
-#' @param scale_se (boolean): Logical argument to scale relationship model
-#' error variance. Defaults to TRUE; FALSE option is retained for posterity.
-#'
-#' @param n_t (integer, optional) Size of the dataset used to train the
-#' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
-#' Defaults to \code{Inf}.
-#'
 #' @returns A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
 #' bootstrap methods.
 #'
 #' @examples
 #'
-#' dat <- simdat(model = "ols")
+#' dat <- simdat(model = "logistic")
 #'
 #' form <- Y - f ~ X1
 #'
@@ -61,42 +50,27 @@
 #'
 #' f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
+#' postpi_boot_logistic(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 #'
 #' @import stats
 #'
-#' @importFrom ranger ranger
-#'
-#' @importFrom gam gam
+#' @import caret
 #'
 #' @export
 
-postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
+postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, se_type = "par", rel_func = "lm", scale_se = T, n_t = Inf) {
+  nboot = 100, se_type = "par") {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
   #-- 2. Estimate Relationship Model
 
-  if (rel_func == "lm") {
+  fit_rel <- caret::train(
 
-    fit_rel <- lm(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
+    factor(Y) ~ factor(f), data = data.frame(Y = Y_l, f = f_l),
 
-  } else if (rel_func == "rf") {
-
-    fit_rel <- ranger(Y ~ f, data = data.frame(Y = Y_l, f = f_l),
-
-      keep.inbag = T)
-
-  } else if (rel_func == "gam") {
-
-    fit_rel <- gam(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
-
-  } else {
-
-    stop("Currently only 'lm', 'rf', and 'gam' are supported")
-  }
+    method = "knn")
 
   #-- 3. Bootstrap
 
@@ -118,60 +92,13 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #-  ii. Simulate Values from Relationship Model
 
-    if (rel_func == "lm") {
+    prob_b <- predict(fit_rel, data.frame(f = f_u_b), type = "prob")[,2]
 
-      if (scale_se) {
-
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
-
-          sigma(fit_rel) * sqrt(N / min(n, n_t)))
-
-
-      } else {
-
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
-
-          sigma(fit_rel))
-      }
-
-    } else if (rel_func == "rf") {
-
-      rel_preds <- predict(fit_rel, data = data.frame(f = f_u_b), type = "se")
-
-      if (scale_se) {
-
-        Y_u_b <- rnorm(N, rel_preds$predictions,
-
-          rel_preds$se * sqrt(N / min(n, n_t)))
-
-      } else {
-
-        Y_u_b <- rnorm(N, rel_preds$predictions, rel_preds$se)
-      }
-
-    } else if (rel_func == "gam") {
-
-      if (scale_se) {
-
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
-
-          sigma(fit_rel) * sqrt(N / min(n, n_t)))
-
-      } else {
-
-        Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
-
-          sigma(fit_rel))
-      }
-
-    } else {
-
-      stop("Currently only 'lm', 'rf', and 'gam' are supported")
-    }
+    Y_u_b  <- rbinom(N, 1, prob_b)
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b) # -1
+    fit_inf_b <- glm(Y_u_b ~ X_u_b, family = binomial)
 
     #-  iv. Extract Coefficient Estimator
 

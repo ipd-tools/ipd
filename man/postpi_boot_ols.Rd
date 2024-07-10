@@ -41,7 +41,7 @@ Options include "lm" (linear model), "rf" (random forest), and "gam"
 \item{scale_se}{(boolean): Logical argument to scale relationship model
 error variance. Defaults to TRUE; FALSE option is retained for posterity.}
 
-\item{n_t}{(integer, optiona) Size of the dataset used to train the
+\item{n_t}{(integer, optional) Size of the dataset used to train the
 prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
 Defaults to \code{Inf}.}
 }
