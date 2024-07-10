@@ -478,7 +478,7 @@ print(fit_postpi)
 
 ### Summary Method
 
-The `summary` method gives more detailed information about the estimated coefficients, standard errrors, and confidence limits:
+The `summary` method gives more detailed information about the estimated coefficients, standard errors, and confidence limits:
 
 ```{r summary}
 #-- Summarize the Model
