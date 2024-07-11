@@ -26,6 +26,15 @@ rectified_cdf(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL)
 Computes the rectified CDF of the data.
 }
 \examples{
-# Need example code
+
+Y_l <- c(1, 2, 3, 4, 5)
+
+f_l <- c(1.1, 2.2, 3.3, 4.4, 5.5)
+
+f_u <- c(1.2, 2.3, 3.4)
+
+grid <- seq(0, 6, by = 0.5)
+
+rectified_cdf(Y_l, f_l, f_u, grid)
 
 }

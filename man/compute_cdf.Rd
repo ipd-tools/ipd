@@ -21,6 +21,11 @@ grid points.
 Computes the empirical CDF of the data.
 }
 \examples{
-# Need example code
+
+Y <- c(1, 2, 3, 4, 5)
+
+grid <- seq(0, 6, by = 0.5)
+
+compute_cdf(Y, grid)
 
 }

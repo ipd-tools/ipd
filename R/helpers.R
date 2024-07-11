@@ -20,7 +20,12 @@
 #' grid points.
 #'
 #' @examples
-#' # Need example code
+#'
+#' Y <- c(1, 2, 3, 4, 5)
+#'
+#' grid <- seq(0, 6, by = 0.5)
+#'
+#' compute_cdf(Y, grid)
 #'
 #' @export
 
@@ -60,7 +65,14 @@ compute_cdf <- function(Y, grid, w = NULL) {
 #' predictions and its standard deviation at the specified grid points.
 #'
 #' @examples
-#' # Need example code
+#'
+#' Y <- c(1, 2, 3, 4, 5)
+#'
+#' f <- c(1.1, 2.2, 3.3, 4.4, 5.5)
+#'
+#' grid <- seq(0, 6, by = 0.5)
+#'
+#' compute_cdf_diff(Y, f, grid)
 #'
 #' @export
 
@@ -72,11 +84,11 @@ compute_cdf_diff <- function(Y, f, grid, w = NULL) {
 
   indicators_Y <- matrix((Y <= rep(grid, each = n)) * w,
 
-                         ncol = length(grid))
+    ncol = length(grid))
 
   indicators_f <- matrix((f <= rep(grid, each = length(f))) * w,
 
-                         ncol = length(grid))
+    ncol = length(grid))
 
   diff_mn <- apply(indicators_Y - indicators_f, 2, mean)
 
@@ -106,7 +118,16 @@ compute_cdf_diff <- function(Y, f, grid, w = NULL) {
 #' @returns (vector): Rectified CDF of the data at the specified grid points.
 #'
 #' @examples
-#' # Need example code
+#'
+#' Y_l <- c(1, 2, 3, 4, 5)
+#'
+#' f_l <- c(1.1, 2.2, 3.3, 4.4, 5.5)
+#'
+#' f_u <- c(1.2, 2.3, 3.4)
+#'
+#' grid <- seq(0, 6, by = 0.5)
+#'
+#' rectified_cdf(Y_l, f_l, f_u, grid)
 #'
 #' @export
 
@@ -147,15 +168,25 @@ rectified_cdf <- function(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL) {
 #' @param alternative (str, optional): Alternative hypothesis, either
 #' 'two-sided', 'larger' or 'smaller'.
 #'
+#' @returns (float or vector): The rectified p-value.
+#'
 #' @examples
-#' # Need example code
 #'
+#' rectifier <- 0.7
 #'
-#' @returns (float or vector): P-value.
+#' rectifier_std <- 0.5
+#'
+#' imputed_mean <- 1.5
+#'
+#' imputed_std <- 0.3
+#'
+#' rectified_p_value(rectifier, rectifier_std, imputed_mean, imputed_std)
+#'
+#' @export
 
 rectified_p_value <- function(rectifier, rectifier_std,
 
-                              imputed_mean, imputed_std, null = 0, alternative = "two-sided") {
+  imputed_mean, imputed_std, null = 0, alternative = "two-sided") {
 
   rectified_point_estimate <- imputed_mean + rectifier
 
@@ -163,7 +194,7 @@ rectified_p_value <- function(rectifier, rectifier_std,
 
   p_value <- zstat_generic(rectified_point_estimate, 0, rectified_std,
 
-                           alternative, null)[[2]]
+    alternative, null)[[2]]
 
   return(p_value)
 }
@@ -328,7 +359,7 @@ wls <- function(X, Y, w = NULL, return_se = F) {
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "ols")
 #'
 #' form <- Y - f ~ X1
 #'
@@ -436,7 +467,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' @examples
 #'
-#' dat <- simdat()
+#' dat <- simdat(model = "ols")
 #'
 #' form <- Y - f ~ X1
 #'
@@ -542,39 +573,43 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
 
 #--- NORMAL Z-STATISTIC --------------------------------------------------------
 
-# """generic (normal) z-test based on summary statistic
-#
-#     The test statistic is :
-#         tstat = (value1 - value2 - diff) / std_diff
-#
-#     and is assumed to be normally distributed.
-#
-#     Parameters
-#     ----------
-#     value1 : float or ndarray
-#         Value, for example mean, of the first sample.
-#     value2 : float or ndarray
-#         Value, for example mean, of the second sample.
-#     std_diff : float or ndarray
-#         Standard error of the difference value1 - value2
-#     alternative : str
-#         The alternative hypothesis, H1, has to be one of the following
-#
-#            * 'two-sided' : H1: ``value1 - value2 - diff`` not equal to 0.
-#            * 'larger' :   H1: ``value1 - value2 - diff > 0``
-#            * 'smaller' :  H1: ``value1 - value2 - diff < 0``
-#
-#     diff : float
-#         value of difference ``value1 - value2`` under the null hypothesis
-#
-#     Returns
-#     -------
-#     tstat : float or ndarray
-#         Test statistic.
-#     pvalue : float or ndarray
-#         P-value of the hypothesis test assuming that the test statistic is
-#         t-distributed with ``df`` degrees of freedom.
-#     """
+#' Compute Z-Statistic and P-Value
+#'
+#' @description
+#' Computes the z-statistic and the corresponding p-value for a given test.
+#'
+#' @param value1 (numeric): The first value or sample mean.
+#'
+#' @param value2 (numeric): The second value or sample mean.
+#'
+#' @param std_diff (numeric): The standard error of the difference between the
+#' two values.
+#'
+#' @param alternative (character): The alternative hypothesis. Can be one of
+#' "two-sided" (or "2-sided", "2s"), "larger" (or "l"), or "smaller" (or "s").
+#'
+#' @param diff (numeric, optional): The hypothesized difference between the
+#' two values. Default is 0.
+#'
+#' @returns (list): A list containing the following:
+#' \describe{
+#'    \item{zstat}{(numeric): The computed z-statistic.}
+#'    \item{pvalue}{(numeric): The corresponding p-value for the test.}
+#' }
+#'
+#' @examples
+#'
+#' value1 <- 1.5
+#'
+#' value2 <- 1.0
+#'
+#' std_diff <- 0.2
+#'
+#' alternative <- "two-sided"
+#'
+#' result <- zstat_generic(value1, value2, std_diff, alternative)
+#'
+#' @export
 
 zstat_generic <- function(value1, value2, std_diff, alternative, diff = 0) {
 
@@ -660,8 +695,26 @@ zconfint_generic <- function(mean, std_mean, alpha, alternative) {
   return(cbind(lower, upper))
 }
 
+#--- LOG1P EXPONENTIAL ---------------------------------------------------------
 
-### NEED TO DOCUMENT ###########################################################
+#' Log1p Exponential
+#'
+#' @description
+#' Computes the natural logarithm of 1 plus the exponential of the input,
+#' to handle large inputs.
+#'
+#' @param x (vector): A numeric vector of inputs.
+#'
+#' @returns (vector): A numeric vector where each element is the result of
+#' log(1 + exp(x)).
+#'
+#' @examples
+#'
+#' x <- c(-1, 0, 1, 10, 100)
+#'
+#' log1pexp(x)
+#'
+#' @export
 
 log1pexp <- function(x) {
 
@@ -743,7 +796,7 @@ log1pexp <- function(x) {
 
 logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
-                               w_l = NULL, w_u = NULL, use_u = TRUE) {
+  w_l = NULL, w_u = NULL, use_u = TRUE) {
 
   n <- nrow(f_l)
 

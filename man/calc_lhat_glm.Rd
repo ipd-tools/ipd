@@ -44,7 +44,7 @@ interval for GLMs.
 }
 \examples{
 
-dat <- simdat()
+dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 

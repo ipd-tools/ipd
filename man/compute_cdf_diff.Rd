@@ -24,6 +24,13 @@ Computes the difference between the empirical CDFs of the data and the
 predictions.
 }
 \examples{
-# Need example code
+
+Y <- c(1, 2, 3, 4, 5)
+
+f <- c(1.1, 2.2, 3.3, 4.4, 5.5)
+
+grid <- seq(0, 6, by = 0.5)
+
+compute_cdf_diff(Y, f, grid)
 
 }

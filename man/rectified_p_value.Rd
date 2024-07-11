@@ -29,13 +29,21 @@ Defaults to \code{0}.}
 'two-sided', 'larger' or 'smaller'.}
 }
 \value{
-(float or vector): P-value.
+(float or vector): The rectified p-value.
 }
 \description{
 Computes a rectified p-value.
 }
 \examples{
-# Need example code
 
+rectifier <- 0.7
+
+rectifier_std <- 0.5
+
+imputed_mean <- 1.5
+
+imputed_std <- 0.3
+
+rectified_p_value(rectifier, rectifier_std, imputed_mean, imputed_std)
 
 }
