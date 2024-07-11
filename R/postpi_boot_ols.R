@@ -91,7 +91,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- gam(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
+    fit_rel <- gam(Y ~ s(f), data = data.frame(Y = Y_l, f = f_l))
 
   } else {
 
