@@ -325,9 +325,7 @@ glance(fit_postpi)
 
 #-- Augment the Original Data with Fitted Values and Residuals
 
-df <- dat[which(dat$set != "training"),]
-
-augmented_df <- augment(fit_postpi, data = df)
+augmented_df <- augment(fit_postpi)
 
 head(augmented_df)
 ```

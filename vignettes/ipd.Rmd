@@ -523,9 +523,7 @@ The `augment` method adds model predictions and residuals to the original datase
 ```{r augment}
 #-- Augment the Original Data with Fitted Values and Residuals
 
-df <- dat_ols[which(dat_ols$set != "training"),]
-
-augmented_df <- augment(fit_postpi, data = df)
+augmented_df <- augment(fit_postpi)
 
 head(augmented_df)
 ```

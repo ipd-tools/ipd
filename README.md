@@ -407,23 +407,21 @@ tidy(fit_postpi)
 #-- Get a One-Row Summary of the Model
 
 glance(fit_postpi)
-#>        method model intercept  nobs       call
-#> 1 postpi_boot   ols      TRUE 11500 Y - f ~ X1
+#>        method model include_intercept nobs_labeled nobs_unlabeled       call
+#> 1 postpi_boot   ols              TRUE          500           1000 Y - f ~ X1
 
 #-- Augment the Original Data with Fitted Values and Residuals
 
-df <- dat[which(dat$set != "training"),]
-
-augmented_df <- augment(fit_postpi, data = df)
+augmented_df <- augment(fit_postpi)
 
 head(augmented_df)
-#>          X1      X2    X3    X4    Y     f     set .fitted .resid
-#> 10001  2.37 -1.8984  0.20 -0.17  8.2  3.51 labeled    8.03   0.20
-#> 10002 -0.17  1.7428  0.26 -2.05  2.4 -0.20 labeled    0.24   2.12
-#> 10003  0.93 -1.0947  0.76  1.25  2.5  1.62 labeled    3.60  -1.11
-#> 10004 -0.57  0.1757  0.32  0.65 -1.6 -0.81 labeled   -0.99  -0.61
-#> 10005  0.23  2.0620 -1.35  1.46  1.8 -0.42 labeled    1.44   0.34
-#> 10006  1.13 -0.0028  0.23 -0.24  5.0  1.70 labeled    4.23   0.72
+#>          X1     X2    X3    X4     Y      f       set .fitted .resid
+#> 10501  0.99 -3.280 -0.39  0.97  9.02  1.140 unlabeled    3.78   5.24
+#> 10502 -0.66  0.142 -1.36 -0.22 -4.22 -1.750 unlabeled   -1.28  -2.94
+#> 10503  0.58 -1.368 -1.73  0.15  2.40 -0.094 unlabeled    2.52  -0.13
+#> 10504 -0.14 -0.728  0.26 -0.23 -1.23 -0.197 unlabeled    0.33  -1.56
+#> 10505 -0.17 -0.068 -1.10  0.58 -0.19 -0.897 unlabeled    0.24  -0.43
+#> 10506  0.58  0.514 -0.69  0.97  1.48  0.419 unlabeled    2.52  -1.04
 ```
 
 ## Vignette
