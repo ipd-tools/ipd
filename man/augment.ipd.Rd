@@ -4,7 +4,7 @@
 \alias{augment.ipd}
 \title{Augment Data from an IPD Fit}
 \usage{
-\method{augment}{ipd}(x, data = x$data, ...)
+\method{augment}{ipd}(x, data = x$data_u, ...)
 }
 \arguments{
 \item{x}{An object of class \code{ipd}.}
@@ -44,9 +44,7 @@ fit <- ipd(formula, method = "postpi_boot", model = "ols",
 
 #-- Augment Data
 
-df <- dat[which(dat$set != "training"),]
-
-augmented_df <- augment(fit, data = df)
+augmented_df <- augment(fit)
 
 head(augmented_df)
 

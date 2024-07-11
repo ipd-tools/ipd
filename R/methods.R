@@ -311,9 +311,11 @@ glance.ipd <- function(x, ...) {
 
     model = x$model,
 
-    intercept = x$intercept,
+    include_intercept = x$intercept,
 
-    nobs = nrow(x$data),
+    nobs_labeled = nrow(x$data_l),
+
+    nobs_unlabeled = nrow(x$data_u),
 
     call = deparse(x$formula)
   )
@@ -364,15 +366,13 @@ generics::augment
 #'
 #' #-- Augment Data
 #'
-#' df <- dat[which(dat$set != "training"),]
-#'
-#' augmented_df <- augment(fit, data = df)
+#' augmented_df <- augment(fit)
 #'
 #' head(augmented_df)
 #'
 #' @export
 
-augment.ipd <- function(x, data = x$data, ...) {
+augment.ipd <- function(x, data = x$data_u, ...) {
 
   if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
