@@ -14,7 +14,8 @@ postpi_boot_ols(
   se_type = "par",
   rel_func = "lm",
   scale_se = T,
-  n_t = Inf
+  n_t = Inf,
+  seed = NULL
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ error variance. Defaults to TRUE; FALSE option is retained for posterity.}
 \item{n_t}{(integer, optional) Size of the dataset used to train the
 prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
 Defaults to \code{Inf}.}
+
+\item{seed}{(optional) An \code{integer} seed for random number generation.}
 }
 \value{
 A list of outputs: estimate of inference model parameters and

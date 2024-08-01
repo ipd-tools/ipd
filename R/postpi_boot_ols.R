@@ -41,6 +41,8 @@
 #' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
 #' Defaults to \code{Inf}.
 #'
+#' @param seed (optional) An \code{integer} seed for random number generation.
+#'
 #' @returns A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
 #' bootstrap methods.
@@ -73,7 +75,9 @@
 
 postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, se_type = "par", rel_func = "lm", scale_se = T, n_t = Inf) {
+  nboot = 100, se_type = "par", rel_func = "lm", scale_se = T, n_t = Inf,
+
+  seed = NULL) {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
@@ -91,7 +95,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- gam(Y ~ s(f), data = data.frame(Y = Y_l, f = f_l))
+    fit_rel <- lm(Y ~ ns(f), data = data.frame(Y = Y_l, f = f_l))
 
   } else {
 
@@ -100,7 +104,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   #-- 3. Bootstrap
 
-  set.seed(12345)
+  if (!is.null(seed)) set.seed(seed)
 
   n <- nrow(X_l)
 
@@ -125,7 +129,6 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
         Y_u_b <- rnorm(N, predict(fit_rel, data.frame(f = f_u_b)),
 
           sigma(fit_rel) * sqrt(N / min(n, n_t)))
-
 
       } else {
 
@@ -171,7 +174,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b) # -1
+    fit_inf_b <- lm(Y_u_b ~ X_u_b)
 
     #-  iv. Extract Coefficient Estimator
 

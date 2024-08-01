@@ -30,7 +30,7 @@ loss function with respect to the parameter.}
 
 \item{coord}{(int, optional): Coordinate for which to optimize \code{lhat}.
 If \code{None}, it optimizes the total variance over all coordinates.
-Must be in {1, ..., d} where d is the shape of the estimand.}
+Must be in (1, ..., d) where d is the shape of the estimand.}
 
 \item{clip}{(boolean, optional): Whether to clip the value of lhat to be
 non-negative. Defaults to \code{False}.}

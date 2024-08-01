@@ -460,7 +460,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' @param coord (int, optional): Coordinate for which to optimize `lhat`.
 #' If `None`, it optimizes the total variance over all coordinates.
-#' Must be in {1, ..., d} where d is the shape of the estimand.
+#' Must be in (1, ..., d) where d is the shape of the estimand.
 #'
 #' @param clip (boolean, optional): Whether to clip the value of lhat to be
 #' non-negative. Defaults to `False`.

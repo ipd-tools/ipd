@@ -31,7 +31,7 @@
 #'
 #' @param coord (int, optional): Coordinate for which to optimize
 #' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
-#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
+#' coordinates. Must be in (1, ..., d) where d is the dimension of the estimand.
 #'
 #' @param opts (list, optional): Options to pass to the optimizer.
 #' See ?optim for details.
@@ -173,7 +173,7 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' @param coord (int, optional): Coordinate for which to optimize
 #' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
-#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
+#' coordinates. Must be in (1, ..., d) where d is the dimension of the estimand.
 #'
 #' @param opts (list, optional): Options to pass to the optimizer.
 #' See ?optim for details.

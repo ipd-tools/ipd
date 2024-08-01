@@ -27,7 +27,7 @@
 #'
 #' @param coord (int, optional): Coordinate for which to optimize
 #' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
-#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
+#' coordinates. Must be in (1, ..., d) where d is the dimension of the estimand.
 #'
 #' @param w_l (ndarray, optional): Sample weights for the labeled data set.
 #' Defaults to a vector of ones.
@@ -124,7 +124,7 @@ ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
 #'
 #' @param coord (int, optional): Coordinate for which to optimize
 #' \code{lhat = 1}. If \code{NULL}, it optimizes the total variance over all
-#' coordinates. Must be in {1, ..., d} where d is the dimension of the estimand.
+#' coordinates. Must be in (1, ..., d) where d is the dimension of the estimand.
 #'
 #' @param w_l (ndarray, optional): Sample weights for the labeled data set.
 #' Defaults to a vector of ones.
