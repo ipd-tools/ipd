@@ -95,7 +95,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- lm(Y ~ ns(f), data = data.frame(Y = Y_l, f = f_l))
+    fit_rel <- lm(Y ~ ns(f, df = 3), data = data.frame(Y = Y_l, f = f_l))
 
   } else {
 
@@ -185,7 +185,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   #-- 4. Estimate Inference Model Coefficient
 
-  est <- apply(ests_b[1:(nrow(ests_b)/2),], 1, median)
+  est <- apply(ests_b[1:(nrow(ests_b)/2),], 1, mean)
 
   #-- 5. Estimate Inference Model SE
 
@@ -193,7 +193,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- a. Parametric Bootstrap
 
-    se <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, median)
+    se <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, mean)
 
   } else if (se_type == "npar") {
 
