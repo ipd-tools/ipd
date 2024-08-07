@@ -98,7 +98,7 @@ postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- glm(Y_u_b ~ X_u_b, family = binomial)
+    fit_inf_b <- glm(Y_u_b ~ X_u_b - 1, family = binomial)
 
     #-  iv. Extract Coefficient Estimator
 

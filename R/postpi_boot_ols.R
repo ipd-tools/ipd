@@ -174,7 +174,7 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b)
+    fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
 
     #-  iv. Extract Coefficient Estimator
 
