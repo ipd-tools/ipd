@@ -110,7 +110,9 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   N <- nrow(X_u)
 
-  ests_b <- sapply(1:nboot, function(b) {
+  est_b <- se_b <- matrix(nrow = nboot, ncol = ncol(X_u))
+
+  for(b in 1:nboot) {
 
     #-   i. Sample Predicted Values and Covariates with Replacement
 
@@ -178,14 +180,16 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #-  iv. Extract Coefficient Estimator
 
+    est_b[b,] <- summary(fit_inf_b)$coefficients[, 1]
+
     #-   v. Extract SE of Estimator
 
-    return(summary(fit_inf_b)$coefficients[, 1:2])
-  })
+    se_b[b,]  <- summary(fit_inf_b)$coefficients[, 2]
+  }
 
   #-- 4. Estimate Inference Model Coefficient
 
-  est <- apply(ests_b[1:(nrow(ests_b)/2),], 1, mean)
+  est <- apply(est_b, 2, mean)
 
   #-- 5. Estimate Inference Model SE
 
@@ -193,13 +197,13 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #- a. Parametric Bootstrap
 
-    se <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, mean)
+    se <- apply(se_b, 2, mean)
 
   } else if (se_type == "npar") {
 
     #- b. Nonparametric Bootstrap
 
-    se <- apply(ests_b[1:(nrow(ests_b)/2),], 1, sd)
+    se <- apply(est_b, 2, sd)
 
   } else {
 
