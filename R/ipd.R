@@ -355,7 +355,7 @@ ipd <- function(formula, method, model, data,
 
   func <- get(paste(method, model, sep = "_"))
 
-  fit <- func(X_l, Y_l, f_l, X_u, f_u)
+  fit <- func(X_l, Y_l, f_l, X_u, f_u, ...)
 
   names(fit$est) <- colnames(X_u)
 
