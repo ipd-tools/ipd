@@ -214,13 +214,27 @@ ipd <- function(formula, method, model, data,
 
   label = NULL, unlabeled_data = NULL, seed = NULL,
 
-  intercept = T, alpha = 0.05, alternative = "two-sided", ...) {
+  intercept = TRUE, alpha = 0.05, alternative = "two-sided", ...) {
 
   #--- CHECKS & ASSERTIONS -----------------------------------------------------
 
   #-- CHECK FOR DATA
 
   if (missing(data)) data <- environment(formula)
+
+  #-- CHECK DATA CLASS
+
+  if (!inherits(data, "data.frame")) {
+
+    data <- try(as.data.frame(data), silent = TRUE)
+
+    if (inherits(data, "try-error")) {
+
+      stop(paste("'data' cannot be coerced to a data.frame.",
+
+        "Please provide a valid data.frame."))
+    }
+  }
 
   #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE UNSPECIFIED
 
@@ -284,9 +298,30 @@ ipd <- function(formula, method, model, data,
 
   if(!is.null(label) & is.null(unlabeled_data)) {
 
-    #---- DEFINE VALID label IDENTIFERS
+    #- DROP UNUSED FACTOR LEVELS IN DATA AND REPORT DROPPED LEVELS
 
-    ##--- CHECK ONE OF EACH labeled AND unlabeled IDENTIFIERS EXIST
+    factor_vars <- names(Filter(is.factor, data))
+
+    dropped_levels <- sapply(data[factor_vars],
+
+      function(x) setdiff(levels(x), levels(droplevels(x))))
+
+    if (any(lengths(dropped_levels) > 0)) {
+
+      message("Dropped unused factor levels in the following variables:\n",
+
+        paste(names(dropped_levels)[lengths(dropped_levels) > 0],
+
+          ":", sapply(dropped_levels[lengths(dropped_levels) > 0],
+
+            paste, collapse = ", "), collapse = "\n"))
+    }
+
+    data <- droplevels(data)
+
+    #- DEFINE VALID 'label' IDENTIFERS
+
+    # CHECK ONE OF EACH 'labeled' AND 'unlabeled' IDENTIFIERS EXIST
 
     valid_labeled_df_id <- c("l", "lab", "label", "labeled", "labelled",
 
@@ -314,13 +349,48 @@ ipd <- function(formula, method, model, data,
     data_u <- data[data[[label]] %in% valid_unlabeled_df_id, ]
   }
 
-  if(is.null(label) & !is.null(unlabeled_data)) {
+  #-- IF UNSTACKED DATA ARE PROVIDED
 
-    #- IF UNSTACKED DATA ARE PROVIDED
+  if(is.null(label) & !is.null(unlabeled_data)) {
 
     data_l <- data
 
     data_u <- unlabeled_data
+  }
+
+  #-- CHECK FOR UNUSED FACTOR LEVELS AFTER SPLITTING
+
+  data_l <- droplevels(data_l)
+
+  data_u <- droplevels(data_u)
+
+  differing_levels <- sapply(factor_vars, function(var) {
+
+    levels_l <- levels(data_l[[var]])
+
+    levels_u <- levels(data_u[[var]])
+
+    if (!identical(levels_l, levels_u)) {
+
+      return(paste("Differing levels in '", var, "': labeled = [",
+
+        paste(levels_l, collapse = ", "), "], unlabeled = [",
+
+        paste(levels_u, collapse = ", "), "]", sep = ""))
+    }
+
+    return(NULL)
+  })
+
+  differing_levels <- differing_levels[!sapply(differing_levels, is.null)]
+
+  if (length(differing_levels) > 0) {
+
+    stop(paste0("The following variables have differing factor levels ",
+
+      "between the labeled and unlabeled data:\n",
+
+      paste(differing_levels, collapse = "\n")))
   }
 
   #-- LABELED DATA

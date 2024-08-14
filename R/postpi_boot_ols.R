@@ -71,6 +71,8 @@
 #'
 #' @importFrom gam gam
 #'
+#' @importFrom splines ns
+#'
 #' @export
 
 postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
@@ -95,7 +97,9 @@ postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   } else if (rel_func == "gam") {
 
-    fit_rel <- lm(Y ~ ns(f, df = 3), data = data.frame(Y = Y_l, f = f_l))
+    fit_rel <- lm(Y ~ splines::ns(f, df = 3),
+
+      data = data.frame(Y = Y_l, f = f_l))
 
   } else {
 

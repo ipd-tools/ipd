@@ -12,7 +12,7 @@ ipd(
   label = NULL,
   unlabeled_data = NULL,
   seed = NULL,
-  intercept = T,
+  intercept = TRUE,
   alpha = 0.05,
   alternative = "two-sided",
   ...
