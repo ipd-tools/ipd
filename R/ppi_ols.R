@@ -29,8 +29,15 @@
 #' @param w_u (ndarray, optional): Sample weights for the unlabeled
 #' data set. Defaults to a vector of ones.
 #'
-#' @returns A list of outputs: estimate of inference model parameters and
-#' corresponding standard errors
+#' @returns (list): A list containing the following:
+#'
+#' \describe{
+#'    \item{est}{(vector): vector of PPI OLS regression coefficient
+#'    estimates.}
+#'    \item{se}{(vector): vector of standard errors of the coefficients.}
+#'    \item{rectifier_est}{(vector): vector of the rectifier OLS
+#'    regression coefficient estimates.}
+#' }
 #'
 #' @examples
 #'
@@ -112,7 +119,7 @@ ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
 
   #- Output
 
-  return(list(est = as.vector(theta_hat_pp), se = as.vector(se)))
+  return(list(est = theta_hat_pp, se = se, rectifier_est = delta_hat_f))
 }
 
 #=== END =======================================================================

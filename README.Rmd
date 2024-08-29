@@ -10,7 +10,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
   fig.path = "man/figures/README-", out.width = "100%")
 ```
 
-# IPD: Inference on Predicted Data
+# ipd: Inference on Predicted Data
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml)
@@ -24,13 +24,13 @@ With the rapid advancement of artificial intelligence and machine learning (AI/M
 2. Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
 3. Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
 
-Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and assumption-lean and data-adaptive post-prediction inference (POP-Inf) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `IPD`, a open-source `R` package that implements these methods under the umbrella of IPD.
+Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and assumption-lean and data-adaptive post-prediction inference (POP-Inf) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `ipd`, a open-source `R` package that implements these methods under the umbrella of IPD.
 
 This README provides an overview of the package, including installation instructions, basic usage examples, and links to further documentation. The examples show how to generate data, fit models, and use custom methods provided by the package.
 
 ## Installation
 
-To install the development version of `IPD` from [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools` package:
+To install the development version of `ipd` from [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools` package:
 
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
@@ -44,7 +44,7 @@ devtools::install_github("awanafiaz/IPD")
 
 ## Usage
 
-We provide a simple example to demonstrate the basic use of the functions included in the `IPD` package.
+We provide a simple example to demonstrate the basic use of the functions included in the `ipd` package.
 
 ### Example Setup
 
@@ -196,7 +196,7 @@ We can see that:
 
 ### Model Fitting
 
-We compare two non-`IPD` approaches to analyzing the data to methods included in the `IPD` package.
+We compare two non-IPD approaches to analyzing the data to methods included in the `ipd` package.
 
 #### 0.1 'Naive' Regression Using the Predicted Outcomes
 

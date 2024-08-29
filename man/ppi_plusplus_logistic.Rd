@@ -55,6 +55,19 @@ data set. Defaults to a vector of ones.}
 estimates.}
 \item{se}{(vector): vector of standard errors of the coefficients.}
 \item{lambda}{(float): estimated power-tuning parameter.}
+\item{rectifier_est}{(vector): vector of the rectifier logistic
+regression coefficient estimates.}
+\item{var_u}{(matrix): covariance matrix for the gradients in the
+unlabeled data.}
+\item{var_l}{(matrix): covariance matrix for the gradients in the
+labeled data.}
+\item{grads}{(matrix): matrix of gradients for the
+labeled data.}
+\item{grads_hat_unlabeled}{(matrix): matrix of predicted gradients for
+the unlabeled data.}
+\item{grads_hat}{(matrix): matrix of predicted gradients for the
+labeled data.}
+\item{inv_hessian}{(matrix): inverse Hessian matrix.}
 }
 }
 \description{

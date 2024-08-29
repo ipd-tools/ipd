@@ -29,10 +29,24 @@
 #' @returns (list): A list containing the following:
 #'
 #' \describe{
-#'    \item{est}{(vector): vector of PPI++ logistic regression coefficient
+#'    \item{est}{(vector): vector of PPI logistic regression coefficient
 #'    estimates.}
 #'    \item{se}{(vector): vector of standard errors of the coefficients.}
+#'    \item{rectifier_est}{(vector): vector of the rectifier logistic
+#'    regression coefficient estimates.}
+#'    \item{var_u}{(matrix): covariance matrix for the gradients in the
+#'    unlabeled data.}
+#'    \item{var_l}{(matrix): covariance matrix for the gradients in the
+#'    labeled data.}
+#'    \item{grads}{(matrix): matrix of gradients for the
+#'    labeled data.}
+#'    \item{grads_hat_unlabeled}{(matrix): matrix of predicted gradients for
+#'    the unlabeled data.}
+#'    \item{grads_hat}{(matrix): matrix of predicted gradients for the
+#'    labeled data.}
+#'    \item{inv_hessian}{(matrix): inverse Hessian matrix.}
 #' }
+#'
 #'
 #' @examples
 #'
@@ -64,6 +78,10 @@ ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, opts = NULL) {
 
   p <- ncol(X_u)
 
+  theta0 <- coef(glm(Y_l ~ . - 1,
+
+    data = data.frame(Y_l, X_l), family = binomial))
+
   est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
     opts = opts, lhat = 1)
@@ -76,7 +94,13 @@ ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, opts = NULL) {
 
   Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
 
-  return(list(est = est, se = sqrt(diag(Sigma_hat) / n)))
+  return(list(est = est, se = sqrt(diag(Sigma_hat) / n),
+
+    rectifier_est = theta0 - est, var_u = var_u, var_l = var_l,
+
+    grads = stats$grads, grads_hat_unlabeled = stats$grads_hat_unlabeled,
+
+    grads_hat = stats$grads_hat, inv_hessian = stats$inv_hessian))
 }
 
 #=== END =======================================================================

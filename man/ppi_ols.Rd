@@ -24,8 +24,15 @@ Defaults to a vector of ones.}
 data set. Defaults to a vector of ones.}
 }
 \value{
-A list of outputs: estimate of inference model parameters and
-corresponding standard errors
+(list): A list containing the following:
+
+\describe{
+\item{est}{(vector): vector of PPI OLS regression coefficient
+estimates.}
+\item{se}{(vector): vector of standard errors of the coefficients.}
+\item{rectifier_est}{(vector): vector of the rectifier OLS
+regression coefficient estimates.}
+}
 }
 \description{
 Helper function for prediction-powered inference for OLS estimation

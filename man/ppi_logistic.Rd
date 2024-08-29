@@ -24,9 +24,22 @@ See ?optim for details.}
 (list): A list containing the following:
 
 \describe{
-\item{est}{(vector): vector of PPI++ logistic regression coefficient
+\item{est}{(vector): vector of PPI logistic regression coefficient
 estimates.}
 \item{se}{(vector): vector of standard errors of the coefficients.}
+\item{rectifier_est}{(vector): vector of the rectifier logistic
+regression coefficient estimates.}
+\item{var_u}{(matrix): covariance matrix for the gradients in the
+unlabeled data.}
+\item{var_l}{(matrix): covariance matrix for the gradients in the
+labeled data.}
+\item{grads}{(matrix): matrix of gradients for the
+labeled data.}
+\item{grads_hat_unlabeled}{(matrix): matrix of predicted gradients for
+the unlabeled data.}
+\item{grads_hat}{(matrix): matrix of predicted gradients for the
+labeled data.}
+\item{inv_hessian}{(matrix): inverse Hessian matrix.}
 }
 }
 \description{

@@ -150,9 +150,23 @@ ppi_plusplus_ols_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #' @returns (list): A list containing the following:
 #'
 #' \describe{
-#'    \item{est}{(vector): vector of PPI++ OLS coefficient estimates.}
+#'    \item{est}{(vector): vector of PPI++ OLS regression coefficient
+#'    estimates.}
 #'    \item{se}{(vector): vector of standard errors of the coefficients.}
 #'    \item{lambda}{(float): estimated power-tuning parameter.}
+#'    \item{rectifier_est}{(vector): vector of the rectifier OLS
+#'    regression coefficient estimates.}
+#'    \item{var_u}{(matrix): covariance matrix for the gradients in the
+#'    unlabeled data.}
+#'    \item{var_l}{(matrix): covariance matrix for the gradients in the
+#'    labeled data.}
+#'    \item{grads}{(matrix): matrix of gradients for the
+#'    labeled data.}
+#'    \item{grads_hat_unlabeled}{(matrix): matrix of predicted gradients for
+#'    the unlabeled data.}
+#'    \item{grads_hat}{(matrix): matrix of predicted gradients for the
+#'    labeled data.}
+#'    \item{inv_hessian}{(matrix): inverse Hessian matrix.}
 #' }
 #'
 #' @examples
@@ -193,6 +207,8 @@ ppi_plusplus_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   use_u <- is.null(lhat) || lhat != 0
 
+  delta_hat <- wls(X_l, Y_l - f_l, w = w_l)
+
   est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u, lhat, coord, w_l, w_u)
 
   stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
@@ -214,7 +230,13 @@ ppi_plusplus_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
   Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
 
-  return(list(est = est, se = sqrt(diag(Sigma_hat) / n), lambda = lhat))
+  return(list(est = est, se = sqrt(diag(Sigma_hat) / n), lambda = lhat,
+
+    rectifier_est = delta_hat, var_u = var_u, var_l = var_l,
+
+    grads = stats$grads, grads_hat_unlabeled = stats$grads_hat_unlabeled,
+
+    grads_hat = stats$grads_hat, inv_hessian = stats$inv_hessian))
 }
 
 #=== END =======================================================================
