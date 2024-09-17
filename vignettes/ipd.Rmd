@@ -29,7 +29,7 @@ With the rapid advancement of artificial intelligence and machine learning (AI/M
 2. Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
 3. Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
 
-Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and assumption-lean and data-adaptive post-prediction inference (POP-Inf) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `IPD`, a open-source `R` package that implements these methods under the umbrella of IPD.
+Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and post-prediction adaptive inference (PSPA) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `IPD`, a open-source `R` package that implements these methods under the umbrella of IPD.
 
 This vignette provides a guide to using the `IPD` package, including installation instructions, examples of data generation, model fitting, and usage of custom methods. The examples demonstrate the package's functionality.
 
@@ -358,14 +358,14 @@ IPD::ipd(formula,
   summary()
 ```
 
-#### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
+#### 4. post-prediction adaptive inference (PSPA; Miao et al., 2023)
 
-```{r popinf}
-#-- Fit the POP-Inf Correction
+```{r pspa}
+#-- Fit the PSPA Correction
 
 IPD::ipd(formula, 
          
-  method = "popinf", model = "ols", data = dat_ols, label = "set") |> 
+  method = "pspa", model = "ols", data = dat_ols, label = "set") |> 
   
   summary()
 ```
@@ -442,12 +442,12 @@ IPD::ipd(formula, method = "ppi_plusplus", model = "logistic",
   summary()
 ```
 
-#### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
+#### 4. post-prediction adaptive inference (PSPA; Miao et al., 2023)
 
-```{r popinf2}
-#-- Fit the POP-Inf Correction
+```{r pspa2}
+#-- Fit the PSPA Correction
 
-IPD::ipd(formula, method = "popinf", model = "logistic", 
+IPD::ipd(formula, method = "pspa", model = "logistic", 
          
   data = dat_logistic, label = "set") |> 
   

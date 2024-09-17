@@ -156,9 +156,9 @@ fit6 <- ipd(formula, method = "ppi_plusplus", model = "ols",
 
   data = dat_ols, label = "set")
 
-#-- POP-Inf
+#-- PSPA
 
-fit7 <- ipd(formula, method = "popinf", model = "ols",
+fit7 <- ipd(formula, method = "pspa", model = "ols",
 
   data = dat_ols, label = "set")
 
@@ -166,7 +166,7 @@ fit7 <- ipd(formula, method = "popinf", model = "ols",
 
 mthds <- c("Oracle", "Naive", "Classic",
 
-  "PostPI Bootstrap", "PostPI Analytic", "PPI", "PPI++", "POP-Inf")
+  "PostPI Bootstrap", "PostPI Analytic", "PPI", "PPI++", "PSPA")
 
 fig2_dat <- cbind(mthds,
 
@@ -262,11 +262,11 @@ sim_func <- function(nsims = 1000, n_t = 100, n_l = 100, n_u = 1000,
 
   est_oracle <- est_naive <- est_classic <- est_postpi <- est_ppi <-
 
-     est_plusplus <- est_popinf <- rep(NA, nsims)
+     est_plusplus <- est_pspa <- rep(NA, nsims)
 
   err_oracle <- err_naive <- err_classic <- err_postpi <- err_ppi <-
 
-     err_plusplus <- err_popinf <- rep(NA, nsims)
+     err_plusplus <- err_pspa <- rep(NA, nsims)
 
   for(sim in 1:nsims) {
 
@@ -350,15 +350,15 @@ sim_func <- function(nsims = 1000, n_t = 100, n_l = 100, n_u = 1000,
 
     err_plusplus[sim] <- fit_plusplus$se[2]
 
-    #-- 7. POP-Inf
+    #-- 7. PSPA
 
-    fit_popinf <- ipd(Y - f ~ X1, data = dat_l,
+    fit_pspa <- ipd(Y - f ~ X1, data = dat_l,
 
-      unlabeled_data = dat_u, method = "popinf", model = "ols")
+      unlabeled_data = dat_u, method = "pspa", model = "ols")
 
-    est_popinf[sim] <- fit_popinf$coefficients[2]
+    est_pspa[sim] <- fit_pspa$coefficients[2]
 
-    err_popinf[sim] <- fit_popinf$se[2]
+    err_pspa[sim] <- fit_pspa$se[2]
   }
 
   results <- data.frame(
@@ -369,7 +369,7 @@ sim_func <- function(nsims = 1000, n_t = 100, n_l = 100, n_u = 1000,
     est_postpi,   err_postpi,
     est_ppi,      err_ppi,
     est_plusplus, err_plusplus,
-    est_popinf,   err_popinf)
+    est_pspa,   err_pspa)
 
   results <- results |>
 
@@ -423,13 +423,13 @@ sim_func <- function(nsims = 1000, n_t = 100, n_l = 100, n_u = 1000,
       tval_plusplus = est_plusplus / err_plusplus,
       pval_plusplus = 2 * pt(-abs(tval_plusplus), df = (n_l + n_u - 2)),
 
-      #- 7. POPInf
+      #- 7. PSPA
 
-      upr_popinf  = est_popinf + 1.96 * err_popinf,
-      lwr_popinf  = est_popinf - 1.96 * err_popinf,
-      cov_popinf  = ((upr_popinf > true_beta) & (lwr_popinf < true_beta)),
-      tval_popinf = est_popinf / err_popinf,
-      pval_popinf = 2 * pt(-abs(tval_popinf), df = (n_l + n_u - 2))
+      upr_pspa  = est_pspa + 1.96 * err_pspa,
+      lwr_pspa  = est_pspa - 1.96 * err_pspa,
+      cov_pspa  = ((upr_pspa > true_beta) & (lwr_pspa < true_beta)),
+      tval_pspa = est_pspa / err_pspa,
+      pval_pspa = 2 * pt(-abs(tval_pspa), df = (n_l + n_u - 2))
     )
 
   return(results)
@@ -465,7 +465,7 @@ methods <- c(
 
   "oracle" = "Oracle", "naive" = "Naive", "classic"  = "Classical",
   "postpi" = "PostPI", "ppi"   = "PPI",   "plusplus" = "PPI++",
-  "popinf" = "POP-Inf")
+  "pspa" = "PSPA")
 
 coverages <- results |>
 
@@ -487,9 +487,9 @@ cov_text <- coverages |>
 
       method == "Classical" ~ n_l,
 
-      method %in% c("PPI", "PPI++", "POP-Inf") ~ n_l + n_u),
+      method %in% c("PPI", "PPI++", "PSPA") ~ n_l + n_u),
 
-    ipd = if_else(method %in% c("PostPI", "PPI", "PPI++", "POP-Inf"),
+    ipd = if_else(method %in% c("PostPI", "PPI", "PPI++", "PSPA"),
 
       "IPD Method", "Benchmark Method"),
 
@@ -513,7 +513,7 @@ results_long <- results |>
 
     method = factor(method, names(methods), methods),
 
-    ipd = if_else(method %in% c("PostPI", "PPI", "PPI++", "POP-Inf"),
+    ipd = if_else(method %in% c("PostPI", "PPI", "PPI++", "PSPA"),
 
       "IPD Method", "Benchmark Method"),
 

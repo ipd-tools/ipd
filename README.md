@@ -32,7 +32,7 @@ inference (PostPI) by [Wang et al.,
 prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al.,
 2023a](https://www.science.org/doi/10.1126/science.adi6000) and
 [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and
-assumption-lean and data-adaptive post-prediction inference (POP-Inf) by
+post-prediction adaptive inference (PSPA) by
 [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable
 researchers and practitioners interested in these state-of-the-art
 methods, we have developed `IPD`, a open-source `R` package that
@@ -326,28 +326,28 @@ IPD::ipd(formula,
 #> X1            3.0200    0.0811   2.8611     3.18
 ```
 
-#### 4. Assumption-Lean and Data-Adaptive Post-Prediction Inference (POP-Inf; Miao et al., 2023)
+#### 4. Post-prediction adaptive inference (PSPA; Miao et al., 2023)
 
 ``` r
-#-- Fit the POP-Inf Correction
+#-- Fit the PSPA Correction
 
 IPD::ipd(formula, 
          
-  method = "popinf", model = "ols", data = dat, label = "set") |> 
+  method = "pspa", model = "ols", data = dat, label = "set") |> 
   
   summary()
 #> 
 #> Call:
 #>  Y - f ~ X1 
 #> 
-#> Method: popinf 
+#> Method: pspa 
 #> Model: ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7766    0.0797   0.6203     0.93
-#> X1            3.0197    0.0847   2.8537     3.19
+#> (Intercept)   0.7788    0.0797   0.6226     0.93
+#> X1            3.0151    0.0810   2.8564     3.17
 ```
 
 ### Printing and Tidying
@@ -449,7 +449,7 @@ method/model combinations are currently implemented:
 | [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
 | [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
 | [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [POP-Inf](https://arxiv.org/abs/2311.14220)                     | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
+| [PSPA](https://arxiv.org/abs/2311.14220)                     | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
 | [PSPS](https://arxiv.org/abs/2405.20039)                        | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [PDC](https://arxiv.org/abs/2312.06478)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121)   | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |

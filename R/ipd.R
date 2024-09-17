@@ -18,7 +18,7 @@
 #'
 #' @param method The method to be used for fitting the model. Must be one of
 #' \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-#' \code{"popinf"}, or \code{"ppi_plusplus"}.
+#' \code{"pspa"}, or \code{"ppi_plusplus"}.
 #'
 #' @param model The type of model to be fitted. Must be one of \code{"mean"},
 #' \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.
@@ -114,8 +114,8 @@
 #'    \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 #'    (PPI)}
 #'    \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
-#'    \item{"popinf"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
-#'    Post-Prediction Inference (POP-Inf)}
+#'    \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
+#'    Post-Prediction Inference (PSPA)}
 #' }
 #'
 #' \strong{4. Model:}
@@ -200,9 +200,9 @@
 #'
 #'     data = dat, label = "set")
 #'
-#' #-- POP-Inf (Miao et al., 2023)
+#' #-- PSPA (Miao et al., 2023)
 #'
-#' ipd(formula, method = "popinf", model = "ols",
+#' ipd(formula, method = "pspa", model = "ols",
 #'
 #'     data = dat, label = "set")
 #'
@@ -268,13 +268,13 @@ ipd <- function(formula, method, model, data,
 
   #-- CHECK FOR VALID METHOD
 
-  if (!(method %in% c("postpi_analytic", "postpi_boot", "ppi", "popinf",
+  if (!(method %in% c("postpi_analytic", "postpi_boot", "ppi", "pspa",
 
     "ppi_plusplus"))) {
 
     stop(paste("'method' must be one of c('postpi_analytic', 'postpi_boot',",
 
-      "'ppi', 'popinf', 'ppi_plusplus').\nSee the 'Details' section of the",
+      "'ppi', 'pspa', 'ppi_plusplus').\nSee the 'Details' section of the",
 
       "documentation for more information."))
   }
@@ -294,30 +294,33 @@ ipd <- function(formula, method, model, data,
 
   #--- PREPARE DATA ------------------------------------------------------------
 
+  #-- DROP UNUSED FACTOR LEVELS IN DATA AND REPORT DROPPED LEVELS
+
+  factor_vars <- names(Filter(is.factor, data))
+
   #-- IF STACKED DATA ARE PROVIDED
 
-  if(!is.null(label) & is.null(unlabeled_data)) {
+  if (!is.null(label) & is.null(unlabeled_data)) {
 
-    #- DROP UNUSED FACTOR LEVELS IN DATA AND REPORT DROPPED LEVELS
+    if (!is.null(factor_vars)) {
 
-    factor_vars <- names(Filter(is.factor, data))
+      dropped_levels <- sapply(data[factor_vars],
 
-    dropped_levels <- sapply(data[factor_vars],
+        function(x) setdiff(levels(x), levels(droplevels(x))))
 
-      function(x) setdiff(levels(x), levels(droplevels(x))))
+      if (any(lengths(dropped_levels) > 0)) {
 
-    if (any(lengths(dropped_levels) > 0)) {
+        message("Dropped unused factor levels in the following variables:\n",
 
-      message("Dropped unused factor levels in the following variables:\n",
+                paste(names(dropped_levels)[lengths(dropped_levels) > 0],
 
-        paste(names(dropped_levels)[lengths(dropped_levels) > 0],
+                      ":", sapply(dropped_levels[lengths(dropped_levels) > 0],
 
-          ":", sapply(dropped_levels[lengths(dropped_levels) > 0],
+                                  paste, collapse = ", "), collapse = "\n"))
+      }
 
-            paste, collapse = ", "), collapse = "\n"))
+      data <- droplevels(data)
     }
-
-    data <- droplevels(data)
 
     #- DEFINE VALID 'label' IDENTIFERS
 
