@@ -14,7 +14,7 @@ Imports:
     gam,
     ranger,
     stats,
-    POPInf,
+    pspa,
     generics
 Suggests: 
     knitr,
@@ -22,8 +22,7 @@ Suggests:
     tidyverse,
     patchwork,
     testthat (>= 3.0.0)
-Remotes:
-    qlu-lab/POPInf
+Remotes: qlu-lab/pspa
 Config/testthat/edition: 3
 URL: https://github.com/awanafiaz/IPD
 BugReports: https://github.com/awanafiaz/IPD/issues

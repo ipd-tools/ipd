@@ -28,7 +28,7 @@ corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).}
 
 \item{method}{The method to be used for fitting the model. Must be one of
 \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-\code{"popinf"}, or \code{"ppi_plusplus"}.}
+\code{"pspa"}, or \code{"ppi_plusplus"}.}
 
 \item{model}{The type of model to be fitted. Must be one of \code{"mean"},
 \code{"quantile"}, \code{"ols"}, or \code{"logistic"}.}
@@ -145,8 +145,8 @@ Use the \code{method} argument to specify the fitting method:
 \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 (PPI)}
 \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
-\item{"popinf"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
-Post-Prediction Inference (POP-Inf)}
+\item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
+Post-Prediction Inference (PSPA)}
 }
 
 \strong{4. Model:}
@@ -214,9 +214,9 @@ ipd(formula, method = "ppi_plusplus", model = "ols",
 
     data = dat, label = "set")
 
-#-- POP-Inf (Miao et al., 2023)
+#-- PSPA (Miao et al., 2023)
 
-ipd(formula, method = "popinf", model = "ols",
+ipd(formula, method = "pspa", model = "ols",
 
     data = dat, label = "set")
 
