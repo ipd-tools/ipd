@@ -59,6 +59,8 @@ pspa_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
   fit <- pspa::pspa_y(X_lab = X_l, X_unlab = X_u,
 
     Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
+                      
+    intercept = T,
 
     weights = weights, alpha = alpha, method = "logistic")
 
