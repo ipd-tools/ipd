@@ -4,7 +4,7 @@
 \alias{pspa_logistic}
 \title{PSPA Logistic Regression}
 \usage{
-pspa_logistic(X_l, Y_l, f_l, X_u, f_u, weights = NA)
+pspa_logistic(X_l, Y_l, f_l, X_u, f_u, weights = NA, alpha = 0.05)
 }
 \arguments{
 \item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
