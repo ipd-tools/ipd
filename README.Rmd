@@ -13,20 +13,35 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 # ipd: Inference on Predicted Data
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-## <img src="man/figures/IPD_LOGO.png" align="right" height="200" style="float:right; height:200px;">
+## <img src="man/figures/ipd.png" align="right" height="200" style="float:right; height:200px;"/>
 
-With the rapid advancement of artificial intelligence and machine learning (AI/ML), researchers from a wide range of disciplines increasingly use predictions from pre-trained algorithms as outcome variables in statistical analyses. However, reifying algorithmically-derived values as measured outcomes may lead to biased estimates and anti-conservative inference ([Hoffman et al., 2023](https://arxiv.org/abs/2401.08702)). The statistical challenges encountered when drawing inference on predicted data (IPD) include: 
+### Overview
 
-1. Understanding the relationship between predicted outcomes and their true, unobserved counterparts
-2. Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
-3. Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
+`ipd` is an open-source `R` software package for the downstream modeling of an outcome and its associated features where a potentially sizable portion of the outcome data has been imputed by an artificial intelligence or machine learning (AI/ML) prediction algorithm. The package implements several recent proposed methods for inference on predicted data (IPD) with a single, user-friendly wrapper function, `ipd`. The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augment` methods to facilitate easy model inspection.
 
-Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and post-prediction adaptive inference (PSPA) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers and practitioners interested in these state-of-the-art methods, we have developed `ipd`, a open-source `R` package that implements these methods under the umbrella of IPD.
+### Background
 
-This README provides an overview of the package, including installation instructions, basic usage examples, and links to further documentation. The examples show how to generate data, fit models, and use custom methods provided by the package.
+Using predictions from pre-trained algorithms as outcomes in downstream statistical analyses can lead to biased estimates and misleading conclusions. The statistical challenges encountered when drawing inference on predicted data (IPD) include:
+
+1.  Understanding the relationship between predicted outcomes and their true, unobserved counterparts
+2.  Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
+3.  Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
+
+Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and post-prediction adaptive inference (PSPA) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:
+
+1.  A dataset consisting of our outcome and features of interst, where the outcome is only observed for a small 'labeled' subset and missing for a, typically larger, 'unlabeled' subset.
+2.  Access to an algorithm to predict the missing outcome in the entire dataset using the fully observed features.
+
+![Overview of data and setup for IPD](man/figures/ipd_overview.png)
+
+We can use these methods for IPD to obtain corrected estimates and standard errors by using the predicted outcomes and unlabeled features to augment the labeled subset of the data.
+
+To enable researchers and practitioners interested in these state-of-the-art methods, we have developed the `ipd` package in `R` to implement these methods under the umbrella of IPD. This README provides an overview of the package, including installation instructions, basic usage examples, and links to further documentation. The examples show how to generate data, fit models, and use custom methods provided by the package.
 
 ## Installation
 
@@ -44,21 +59,11 @@ devtools::install_github("awanafiaz/IPD")
 
 ## Usage
 
-We provide a simple example to demonstrate the basic use of the functions included in the `ipd` package.
-
-### Example Setup
-
-1. We have two datasets: a labeled dataset, \(\mathcal{L} = \left[Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right]\), and an unlabeled dataset, \(\left[X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right]\). The labeled set is typically smaller in size compared to the unlabeled set. 
-2. We have access to an algorithm \(f(X)\) that can predict our outcome of interest \(Y\).
-3. Our interest is in performing inference on a quantity such as the outcome mean or quantile, or to recover a downstream inferential (mean) model:
-
-$$\mathbb{E}\left[Y^{\mathcal{U}} \mid \boldsymbol{X}^{\mathcal{U}}\right] = g^{-1}\left(\boldsymbol{X}^{\mathcal{U}'}\beta\right),$$
-
-where \(\beta\) is a vector of regression coefficients and \(g(\cdot)\) is a given link function, such as the identity link for linear regression, the logistic link for logistic regression, or the log link for Poisson regression. However, we do not observe \(Y^\mathcal{U}\), only the predicted \(f(X^\mathcal{U})\). We can use methods for IPD to obtain corrected estimates and standard errors when we replace these unobserved \(Y^\mathcal{U}\) by \(f(X^\mathcal{U})\).
+We provide a simple example to demonstrate the basic use of the functions included in the `ipd` package. 
 
 ### Data Generation
 
-You can generate synthetic datasets for different types of regression models using the provided `simdat` function by specifying the sizes of the datasets, the effect size, residual variance, and the type of model. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models. 
+You can generate synthetic datasets for different types of regression models using the provided `simdat` function by specifying the sizes of the datasets, the effect size, residual variance, and the type of model. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models. The `simdat` function generate a data.frame with three subsets: (1) an independent "training" set with additional observations used to fit a prediction model, and "labeled" and "unlabeled" sets which contain the observed and predicted outcomes and the simulated features of interest. 
 
 ```{r example}
 #-- Load the IPD Library
@@ -71,9 +76,7 @@ set.seed(123)
 
 n <- c(10000, 500, 1000)
 
-dat <- simdat(n = n, effect = 3, sigma_Y = 1,
-
-  model = "ols", shift = 1, scale = 2)
+dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
@@ -89,114 +92,154 @@ head(dat[dat$set == "unlabeled",])
 
 The `simdat` function provides observed and unobserved outcomes for both the labeled and unlabeled datasets, though in practice the observed outcomes are not in the unlabeled set. We can visualize the relationships between these variables:
 
-```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.height=2}
+```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.height=4}
 
 library(tidyverse)
 
 library(patchwork)
 
+#-- Plot example labeled data
+
 dat_labeled <- dat[dat$set == "labeled",]
 
-p1_fit <- lm(Y ~ X1, data = dat_labeled)
+p1 <- dat_labeled |>
 
-p1 <- dat_labeled |> ggplot(aes(x = X1, y = Y)) + 
-  
-  theme_bw() + coord_fixed(1/3) +
-  
-  geom_point() + 
-  
-  geom_smooth(method = "lm") +
-  
-  scale_x_continuous(limits = c(-2.5, 2.5)) +
-  
-  scale_y_continuous(limits = c(-7.5, 7.5)) +
-  
-  annotate("text", x = -5, y = 10, 
-           
-    label = paste(
-      
-      "Estimated Intercept:", round(coef(p1_fit)[1], 2),
-      
-      "\nEstimated Slope:",   round(coef(p1_fit)[2], 2), 
-      
-      "\nResidual Variance:", round(sigma(p1_fit)^2, 2)),
-    
-    hjust = 0, vjust = 1, size = 5, color = "black") +
-  
-  labs(x = expression(X[1]), y = "Y")
+  pivot_longer(Y:f) |>
 
-p2_fit <- lm(f ~ X1, data = dat_labeled)
-  
-p2 <- dat_labeled |> ggplot(aes(x = X1, y = f)) + 
-  
-  theme_bw() + coord_fixed(1/3) +
-  
-  geom_point() + 
-  
-  geom_smooth(method = "lm") +
-  
-  scale_x_continuous(limits = c(-2.5, 2.5)) +
-  
-  scale_y_continuous(limits = c(-7.5, 7.5)) +
-  
-  annotate("text", x = -5, y = 10, 
-           
-    label = paste(
-      
-      "Estimated Intercept:", round(coef(p2_fit)[1], 2),
-      
-      "\nEstimated Slope:",   round(coef(p2_fit)[2], 2), 
-      
-      "\nResidual Variance:", round(sigma(p2_fit)^2, 2)),
-    
-    hjust = 0, vjust = 1, size = 5, color = "black") +
-  
-  labs(x = expression(X[1]), y = "f(X)")
+  mutate(
 
-p3_fit <- lm(Y ~ f, data = dat_labeled)
+    name = factor(name, levels = c("f", "Y"),
 
-p3 <- dat_labeled |> ggplot(aes(x = f, y = Y)) + 
-  
-  theme_bw() + coord_fixed(1/3) +
-  
-  geom_point() + 
-  
-  geom_smooth(method = "lm") +
-  
-  scale_x_continuous(limits = c(-2.5, 2.5)) +
-  
-  scale_y_continuous(limits = c(-7.5, 7.5)) +
-  
-  annotate("text", x = -5, y = 10, 
-           
-    label = paste(
-      
-      "Estimated Intercept:", round(coef(p3_fit)[1], 2),
-      
-      "\nEstimated Slope:",   round(coef(p3_fit)[2], 2), 
-      
-      "\nResidual Variance:", round(sigma(p3_fit)^2, 2)),
-    
-    hjust = 0, vjust = 1, size = 5, color = "black") +
-  
-  labs(x = "f(X)", y = "Y")
+      labels = c("Predicted ", "Observed ")) |> fct_rev()) |>
 
-(p1 + theme(plot.margin = unit(c(0,20,0, 0), "pt"))) +
-(p2 + theme(plot.margin = unit(c(0,20,0,20), "pt"))) +
-(p3 + theme(plot.margin = unit(c(0, 0,0,20), "pt"))) +
+  ggplot(aes(x = X1, y = value, group = name, color = name, fill = name)) +
+
+    theme_bw() + coord_fixed(1/3) +
   
+    geom_abline(slope = 1, intercept = 0) +
+
+    geom_point(alpha = 0.5) +
+
+    geom_smooth(method = "lm") +
+
+    scale_x_continuous(limits = c(-2.5, 2.5)) +
+
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+
+    scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
+
+    scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
+
+    labs(
+      
+      x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
+       
+      title = "Outcomes vs. Covariate") +
+
+    theme(
+
+      legend.direction = "horizontal",
+
+      legend.position = "inside",
+
+      legend.position.inside = c(0.5, 0.91),
+
+      axis.title = element_text(size = 8),
+
+      axis.text = element_text(size = 8),
+      
+      title = element_text(size = 8))
+
+p2 <- dat_labeled |> 
+  
+  ggplot(aes(x = f, y = Y)) +
+
+    theme_bw() + coord_fixed(1) +
+  
+    geom_abline(slope = 1, intercept = 1) +
+
+    geom_point(color = "#00C1D5", alpha = 0.5) +
+
+    geom_smooth(method = "lm", color = "#00C1D5") +
+
+    scale_x_continuous(limits = c(-7.5, 7.5)) +
+
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+
+    labs(
+      
+      x = "\nPredicted Outcome", y = "Observed Outcome\n",
+       
+      title = "Predicted vs. Observed Outcomes") +
+
+    theme(
+
+      axis.title = element_text(size = 8),
+
+      axis.text = element_text(size = 8),
+      
+      title = element_text(size = 8))
+
+fig1 <- (p1 + theme(plot.margin = unit(c(0,20,0, 0), "pt"))) +
+
+  (p2 + theme(plot.margin = unit(c(0,20,0,20), "pt"))) +
+
   plot_annotation(tag_levels = "A")
+
+fig1
 
 ```
 
 We can see that:
 
-- The relationship between the true outcome and the covariate (plot A) is less variable than the relationship between the predicted outcome and the covariate (plot B)
-- There is uncertainty in predicting the outcomes that needs to be accounted for (plot C)
+-   The predicted outcomes are more correlated with the covariate than the true outcomes (plot A)
+-   The predicted outcomes are not perfect substitutes for the true outcomes (plot B)
 
 ### Model Fitting
 
-We compare two non-IPD approaches to analyzing the data to methods included in the `ipd` package.
+We compare two non-IPD approaches to analyzing the data to methods included in the `ipd` package. A summary comparison is provided in the table below, followed by the specific calls for each method:
+
+```{r overalltab, echo=FALSE}
+
+fit0 <- lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |> summary()
+fit1 <- lm(Y ~ X1, data = dat[dat$set == "labeled",])   |> summary()
+
+formula <- Y - f ~ X1
+
+nboot <- 200
+
+fit2 <- IPD::ipd(formula, method = "postpi_boot", model = "ols", 
+                 data = dat, label = "set", nboot = nboot) |> summary()
+
+fit3 <- IPD::ipd(formula, method = "postpi_analytic", model = "ols", 
+                 data = dat, label = "set") |> summary()
+
+fit4 <- IPD::ipd(formula, method = "ppi", model = "ols", 
+                 data = dat, label = "set") |> summary()
+
+fit5 <- IPD::ipd(formula, method = "ppi_plusplus", model = "ols", 
+                 data = dat, label = "set") |> summary()
+
+fit6 <- IPD::ipd(formula, method = "pspa", model = "ols", 
+                 data = dat, label = "set") |> summary()
+
+sumtab <- rbind(
+  
+  fit0$coefficients[2, 1:2],
+  fit1$coefficients[2, 1:2],
+  fit2$coefficients[2, 1:2],
+  fit3$coefficients[2, 1:2],
+  fit4$coefficients[2, 1:2],
+  fit5$coefficients[2, 1:2])
+
+rownames(sumtab) <- c("Naive", "Classic", "PostPI (Bootstrap)", 
+                      "PostPI (Analytic)", "PPI++", "PSPA")
+
+sumtab
+
+```
+
+We can see that the IPD methods have similar estimates and standard errors, while the 'naive' method has a different estimate and standard errors that are too small.
 
 #### 0.1 'Naive' Regression Using the Predicted Outcomes
 
@@ -276,7 +319,7 @@ IPD::ipd(formula,
   summary()
 ```
 
-#### 4. post-prediction adaptive inference (PSPA; Miao et al., 2023)
+#### 4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ```{r pspa}
 #-- Fit the PSPA Correction
@@ -330,7 +373,7 @@ augmented_df <- augment(fit_postpi)
 head(augmented_df)
 ```
 
-## Vignette 
+## Vignette
 
 For additional details, we provide more use cases and examples in the package vignette:
 
@@ -340,27 +383,23 @@ vignette("ipd")
 
 ## Feedback
 
-For questions, comments, or any other feedback, please contact the developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
+For questions, comments, or any other feedback, please contact the developers at [ssalerno\@fredhutch.org](ssalerno@fredhutch.org).
 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD). The following method/model combinations are currently implemented:
 
 | Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression | Multiclass Regression |
-|-----------------------------------------------------------------|--------------------|---------------------|--------------------|---------------------|--------------------|-----------------------|
+|----------------|----------|----------|----------|----------|----------|----------|
 | [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
 | [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
 | [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PSPA](https://arxiv.org/abs/2311.14220)                     | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
+| [PSPA](https://arxiv.org/abs/2311.14220)                        | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
 | [PSPS](https://arxiv.org/abs/2405.20039)                        | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [PDC](https://arxiv.org/abs/2312.06478)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121)   | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [PPBoot](https://arxiv.org/abs/2405.18379)                      | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [DSL](https://arxiv.org/abs/2306.04746)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-
-
-
-
 
 ## License
 

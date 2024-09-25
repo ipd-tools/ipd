@@ -1,23 +1,33 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# IPD: Inference on Predicted Data
+# ipd: Inference on Predicted Data
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-## <img src="man/figures/IPD_LOGO.png" align="right" height="200" style="float:right; height:200px;">
+## <img src="man/figures/ipd.png" align="right" height="200" style="float:right; height:200px;"/>
 
-With the rapid advancement of artificial intelligence and machine
-learning (AI/ML), researchers from a wide range of disciplines
-increasingly use predictions from pre-trained algorithms as outcome
-variables in statistical analyses. However, reifying
-algorithmically-derived values as measured outcomes may lead to biased
-estimates and anti-conservative inference ([Hoffman et al.,
-2023](https://arxiv.org/abs/2401.08702)). The statistical challenges
-encountered when drawing inference on predicted data (IPD) include:
+### Overview
+
+`ipd` is an open-source `R` software package for the downstream modeling
+of an outcome and its associated features where a potentially sizable
+portion of the outcome data has been imputed by an artificial
+intelligence or machine learning (AI/ML) prediction algorithm. The
+package implements several recent proposed methods for inference on
+predicted data (IPD) with a single, user-friendly wrapper function,
+`ipd`. The package also provides custom `print`, `summary`, `tidy`,
+`glance`, and `augment` methods to facilitate easy model inspection.
+
+### Background
+
+Using predictions from pre-trained algorithms as outcomes in downstream
+statistical analyses can lead to biased estimates and misleading
+conclusions. The statistical challenges encountered when drawing
+inference on predicted data (IPD) include:
 
 1.  Understanding the relationship between predicted outcomes and their
     true, unobserved counterparts
@@ -32,20 +42,39 @@ inference (PostPI) by [Wang et al.,
 prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al.,
 2023a](https://www.science.org/doi/10.1126/science.adi6000) and
 [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and
-post-prediction adaptive inference (PSPA) by
-[Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable
-researchers and practitioners interested in these state-of-the-art
-methods, we have developed `IPD`, a open-source `R` package that
-implements these methods under the umbrella of IPD.
+post-prediction adaptive inference (PSPA) by [Miao et al.,
+2023](https://arxiv.org/abs/2311.14220). Each method was developed to
+perform inference on a quantity such as the outcome mean or quantile, or
+a regression coefficient, when we have:
 
-This README provides an overview of the package, including installation
-instructions, basic usage examples, and links to further documentation.
-The examples show how to generate data, fit models, and use custom
-methods provided by the package.
+1.  A dataset consisting of our outcome and features of interst, where
+    the outcome is only observed for a small ‘labeled’ subset and
+    missing for a, typically larger, ‘unlabeled’ subset.
+2.  Access to an algorithm to predict the missing outcome in the entire
+    dataset using the fully observed features.
+
+<figure>
+<img src="man/figures/ipd_overview.png"
+alt="Overview of data and setup for IPD" />
+<figcaption aria-hidden="true">Overview of data and setup for
+IPD</figcaption>
+</figure>
+
+We can use these methods for IPD to obtain corrected estimates and
+standard errors by using the predicted outcomes and unlabeled features
+to augment the labeled subset of the data.
+
+To enable researchers and practitioners interested in these
+state-of-the-art methods, we have developed the `ipd` package in `R` to
+implement these methods under the umbrella of IPD. This README provides
+an overview of the package, including installation instructions, basic
+usage examples, and links to further documentation. The examples show
+how to generate data, fit models, and use custom methods provided by the
+package.
 
 ## Installation
 
-To install the development version of `IPD` from
+To install the development version of `ipd` from
 [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools`
 package:
 
@@ -62,31 +91,7 @@ devtools::install_github("awanafiaz/IPD")
 ## Usage
 
 We provide a simple example to demonstrate the basic use of the
-functions included in the `IPD` package.
-
-### Example Setup
-
-1.  We have two datasets: a labeled dataset,
-    $\mathcal{L} = \left[Y^\mathcal{L}, X^\mathcal{L}, f\left(X^\mathcal{L}\right)\right]$,
-    and an unlabeled dataset,
-    $\left[X^\mathcal{U}, f\left(X^\mathcal{U}\right)\right]$. The
-    labeled set is typically smaller in size compared to the unlabeled
-    set.
-2.  We have access to an algorithm $f(X)$ that can predict our outcome
-    of interest $Y$.
-3.  Our interest is in performing inference on a quantity such as the
-    outcome mean or quantile, or to recover a downstream inferential
-    (mean) model:
-
-$$\mathbb{E}\left[Y^{\mathcal{U}} \mid \boldsymbol{X}^{\mathcal{U}}\right] = g^{-1}\left(\boldsymbol{X}^{\mathcal{U}'}\beta\right),$$
-
-where $\beta$ is a vector of regression coefficients and $g(\cdot)$ is a
-given link function, such as the identity link for linear regression,
-the logistic link for logistic regression, or the log link for Poisson
-regression. However, we do not observe $Y^\mathcal{U}$, only the
-predicted $f(X^\mathcal{U})$. We can use methods for IPD to obtain
-corrected estimates and standard errors when we replace these unobserved
-$Y^\mathcal{U}$ by $f(X^\mathcal{U})$.
+functions included in the `ipd` package.
 
 ### Data Generation
 
@@ -94,7 +99,11 @@ You can generate synthetic datasets for different types of regression
 models using the provided `simdat` function by specifying the sizes of
 the datasets, the effect size, residual variance, and the type of model.
 The function currently supports “mean”, “quantile”, “ols”, “logistic”,
-and “poisson” models.
+and “poisson” models. The `simdat` function generate a data.frame with
+three subsets: (1) an independent “training” set with additional
+observations used to fit a prediction model, and “labeled” and
+“unlabeled” sets which contain the observed and predicted outcomes and
+the simulated features of interest.
 
 ``` r
 #-- Load the IPD Library
@@ -107,40 +116,38 @@ set.seed(123)
 
 n <- c(10000, 500, 1000)
 
-dat <- simdat(n = n, effect = 3, sigma_Y = 1,
-
-  model = "ols", shift = 1, scale = 2)
+dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
 options(digits=2)
 
 head(dat[dat$set == "training",])
-#>       X1    X2    X3     X4    Y  f      set
-#> 1 -0.560 -0.56  0.82 -0.356 -1.3 NA training
-#> 2 -0.230  0.13 -1.54  0.040 -2.7 NA training
-#> 3  1.559  1.82 -0.59  1.152  5.4 NA training
-#> 4  0.071  0.16 -0.18  1.485 -0.3 NA training
-#> 5  0.129 -0.72 -0.71  0.634  1.1 NA training
-#> 6  1.715  0.58 -0.54 -0.037  4.4 NA training
+#>       X1    X2    X3     X4     Y  f      set
+#> 1 -0.560 -0.56  0.82 -0.356 -0.15 NA training
+#> 2 -0.230  0.13 -1.54  0.040 -4.49 NA training
+#> 3  1.559  1.82 -0.59  1.152 -1.08 NA training
+#> 4  0.071  0.16 -0.18  1.485 -3.67 NA training
+#> 5  0.129 -0.72 -0.71  0.634  2.19 NA training
+#> 6  1.715  0.58 -0.54 -0.037 -1.42 NA training
 
 head(dat[dat$set == "labeled",])
-#>          X1      X2    X3    X4    Y     f     set
-#> 10001  2.37 -1.8984  0.20 -0.17  8.2  3.51 labeled
-#> 10002 -0.17  1.7428  0.26 -2.05  2.4 -0.20 labeled
-#> 10003  0.93 -1.0947  0.76  1.25  2.5  1.62 labeled
-#> 10004 -0.57  0.1757  0.32  0.65 -1.6 -0.81 labeled
-#> 10005  0.23  2.0620 -1.35  1.46  1.8 -0.42 labeled
-#> 10006  1.13 -0.0028  0.23 -0.24  5.0  1.70 labeled
+#>          X1      X2    X3    X4     Y     f     set
+#> 10001  2.37 -1.8984  0.20 -0.17  1.40  3.24 labeled
+#> 10002 -0.17  1.7428  0.26 -2.05  3.56  1.03 labeled
+#> 10003  0.93 -1.0947  0.76  1.25 -3.66  2.37 labeled
+#> 10004 -0.57  0.1757  0.32  0.65 -0.56  0.58 labeled
+#> 10005  0.23  2.0620 -1.35  1.46 -0.82 -0.15 labeled
+#> 10006  1.13 -0.0028  0.23 -0.24  7.30  2.16 labeled
 
 head(dat[dat$set == "unlabeled",])
-#>          X1     X2    X3    X4     Y      f       set
-#> 10501  0.99 -3.280 -0.39  0.97  9.02  1.140 unlabeled
-#> 10502 -0.66  0.142 -1.36 -0.22 -4.22 -1.750 unlabeled
-#> 10503  0.58 -1.368 -1.73  0.15  2.40 -0.094 unlabeled
-#> 10504 -0.14 -0.728  0.26 -0.23 -1.23 -0.197 unlabeled
-#> 10505 -0.17 -0.068 -1.10  0.58 -0.19 -0.897 unlabeled
-#> 10506  0.58  0.514 -0.69  0.97  1.48  0.419 unlabeled
+#>          X1     X2    X3    X4    Y     f       set
+#> 10501  0.99 -3.280 -0.39  0.97  8.4  1.25 unlabeled
+#> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.08 unlabeled
+#> 10503  0.58 -1.368 -1.73  0.15  5.6 -0.31 unlabeled
+#> 10504 -0.14 -0.728  0.26 -0.23 -4.2  0.91 unlabeled
+#> 10505 -0.17 -0.068 -1.10  0.58  2.2 -0.39 unlabeled
+#> 10506  0.58  0.514 -0.69  0.97 -1.2  0.76 unlabeled
 ```
 
 The `simdat` function provides observed and unobserved outcomes for both
@@ -152,16 +159,28 @@ relationships between these variables:
 
 We can see that:
 
-- The relationship between the true outcome and the covariate (plot A)
-  is less variable than the relationship between the predicted outcome
-  and the covariate (plot B)
-- There is uncertainty in predicting the outcomes that needs to be
-  accounted for (plot C)
+- The predicted outcomes are more correlated with the covariate than the
+  true outcomes (plot A)
+- The predicted outcomes are not perfect substitutes for the true
+  outcomes (plot B)
 
 ### Model Fitting
 
-We compare two non-`IPD` approaches to analyzing the data to methods
-included in the `IPD` package.
+We compare two non-IPD approaches to analyzing the data to methods
+included in the `ipd` package. A summary comparison is provided in the
+table below, followed by the specific calls for each method:
+
+    #>                    Estimate Std.Error
+    #> Naive                  0.98      0.03
+    #> Classic                1.10      0.19
+    #> PostPI (Bootstrap)     1.16      0.18
+    #> PostPI (Analytic)      1.15      0.18
+    #> PPI++                  1.12      0.19
+    #> PSPA                   1.12      0.19
+
+We can see that the IPD methods have similar estimates and standard
+errors, while the ‘naive’ method has a different estimate and standard
+errors that are too small.
 
 #### 0.1 ‘Naive’ Regression Using the Predicted Outcomes
 
@@ -177,18 +196,18 @@ lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |>
 #> 
 #> Residuals:
 #>     Min      1Q  Median      3Q     Max 
-#> -1.2932 -0.3219 -0.0054  0.3220  1.4735 
+#> -2.5426 -0.6138 -0.0153  0.6345  2.8907 
 #> 
 #> Coefficients:
 #>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)  -0.1054     0.0152   -6.96  6.3e-12 ***
-#> X1            1.4989     0.0151   99.34  < 2e-16 ***
+#> (Intercept)   0.8391     0.0297    28.3   <2e-16 ***
+#> X1            0.9848     0.0296    33.3   <2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 0.48 on 998 degrees of freedom
-#> Multiple R-squared:  0.908,  Adjusted R-squared:  0.908 
-#> F-statistic: 9.87e+03 on 1 and 998 DF,  p-value: <2e-16
+#> Residual standard error: 0.94 on 998 degrees of freedom
+#> Multiple R-squared:  0.527,  Adjusted R-squared:  0.526 
+#> F-statistic: 1.11e+03 on 1 and 998 DF,  p-value: <2e-16
 ```
 
 #### 0.2 ‘Classic’ Regression Using only the Labeled Data
@@ -204,19 +223,19 @@ lm(Y ~ X1, data = dat[dat$set == "labeled",]) |>
 #> lm(formula = Y ~ X1, data = dat[dat$set == "labeled", ])
 #> 
 #> Residuals:
-#>    Min     1Q Median     3Q    Max 
-#> -8.506 -1.023  0.008  0.920  8.388 
+#>     Min      1Q  Median      3Q     Max 
+#> -15.262  -2.828  -0.094   2.821  11.685 
 #> 
 #> Coefficients:
 #>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)   0.7792     0.0805    9.67   <2e-16 ***
-#> X1            3.0190     0.0828   36.44   <2e-16 ***
+#> (Intercept)    0.908      0.187    4.86  1.6e-06 ***
+#> X1             1.097      0.192    5.71  1.9e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.8 on 498 degrees of freedom
-#> Multiple R-squared:  0.727,  Adjusted R-squared:  0.727 
-#> F-statistic: 1.33e+03 on 1 and 498 DF,  p-value: <2e-16
+#> Residual standard error: 4.2 on 498 degrees of freedom
+#> Multiple R-squared:  0.0614, Adjusted R-squared:  0.0596 
+#> F-statistic: 32.6 on 1 and 498 DF,  p-value: 1.95e-08
 ```
 
 You can fit the various IPD methods to your data and obtain summaries
@@ -250,8 +269,8 @@ IPD::ipd(formula,
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7536    0.0722   0.6120     0.90
-#> X1            3.0690    0.0720   2.9279     3.21
+#> (Intercept)    0.866     0.183    0.507     1.22
+#> X1             1.164     0.183    0.806     1.52
 ```
 
 #### 1.2 PostPI Analytic Correction (Wang et al., 2020)
@@ -274,8 +293,8 @@ IPD::ipd(formula,
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7398    0.0722   0.5982     0.88
-#> X1            3.0722    0.0719   2.9312     3.21
+#> (Intercept)    0.865     0.183    0.505     1.22
+#> X1             1.145     0.182    0.788     1.50
 ```
 
 #### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
@@ -298,8 +317,8 @@ IPD::ipd(formula,
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7605    0.0717   0.6200     0.90
-#> X1            3.0316    0.0748   2.8849     3.18
+#> (Intercept)    0.871     0.182    0.514     1.23
+#> X1             1.122     0.195    0.740     1.50
 ```
 
 #### 3. PPI++ (Angelopoulos et al., 2023)
@@ -322,11 +341,11 @@ IPD::ipd(formula,
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7777    0.0798   0.6213     0.93
-#> X1            3.0200    0.0811   2.8611     3.18
+#> (Intercept)    0.881     0.182    0.524     1.24
+#> X1             1.116     0.187    0.750     1.48
 ```
 
-#### 4. Post-prediction adaptive inference (PSPA; Miao et al., 2023)
+#### 4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ``` r
 #-- Fit the PSPA Correction
@@ -346,8 +365,8 @@ IPD::ipd(formula,
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7788    0.0797   0.6226     0.93
-#> X1            3.0151    0.0810   2.8564     3.17
+#> (Intercept)    0.881     0.182    0.524     1.24
+#> X1             1.109     0.187    0.743     1.47
 ```
 
 ### Printing and Tidying
@@ -375,7 +394,7 @@ print(fit_postpi)
 #> 
 #> Coefficients:
 #> (Intercept)          X1 
-#>        0.75        3.07
+#>        0.86        1.15
 
 #-- Summarize the Model
 
@@ -394,15 +413,15 @@ print(summ_fit_postpi)
 #> 
 #> Coefficients:
 #>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)   0.7536    0.0722   0.6120     0.90
-#> X1            3.0690    0.0720   2.9279     3.21
+#> (Intercept)    0.860     0.183    0.502     1.22
+#> X1             1.148     0.182    0.790     1.50
 
 #-- Tidy the Model Output
 
 tidy(fit_postpi)
 #>                    term estimate std.error conf.low conf.high
-#> (Intercept) (Intercept)     0.75     0.072     0.61       0.9
-#> X1                   X1     3.07     0.072     2.93       3.2
+#> (Intercept) (Intercept)     0.86      0.18     0.50       1.2
+#> X1                   X1     1.15      0.18     0.79       1.5
 
 #-- Get a One-Row Summary of the Model
 
@@ -415,13 +434,13 @@ glance(fit_postpi)
 augmented_df <- augment(fit_postpi)
 
 head(augmented_df)
-#>          X1     X2    X3    X4     Y      f       set .fitted .resid
-#> 10501  0.99 -3.280 -0.39  0.97  9.02  1.140 unlabeled    3.78   5.24
-#> 10502 -0.66  0.142 -1.36 -0.22 -4.22 -1.750 unlabeled   -1.28  -2.94
-#> 10503  0.58 -1.368 -1.73  0.15  2.40 -0.094 unlabeled    2.52  -0.13
-#> 10504 -0.14 -0.728  0.26 -0.23 -1.23 -0.197 unlabeled    0.33  -1.56
-#> 10505 -0.17 -0.068 -1.10  0.58 -0.19 -0.897 unlabeled    0.24  -0.43
-#> 10506  0.58  0.514 -0.69  0.97  1.48  0.419 unlabeled    2.52  -1.04
+#>          X1     X2    X3    X4    Y     f       set .fitted .resid
+#> 10501  0.99 -3.280 -0.39  0.97  8.4  1.25 unlabeled   1.992    6.5
+#> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.08 unlabeled   0.099   -7.3
+#> 10503  0.58 -1.368 -1.73  0.15  5.6 -0.31 unlabeled   1.522    4.1
+#> 10504 -0.14 -0.728  0.26 -0.23 -4.2  0.91 unlabeled   0.702   -4.9
+#> 10505 -0.17 -0.068 -1.10  0.58  2.2 -0.39 unlabeled   0.667    1.5
+#> 10506  0.58  0.514 -0.69  0.97 -1.2  0.76 unlabeled   1.521   -2.7
 ```
 
 ## Vignette
@@ -449,7 +468,7 @@ method/model combinations are currently implemented:
 | [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
 | [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
 | [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PSPA](https://arxiv.org/abs/2311.14220)                     | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
+| [PSPA](https://arxiv.org/abs/2311.14220)                        | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
 | [PSPS](https://arxiv.org/abs/2405.20039)                        | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [PDC](https://arxiv.org/abs/2312.06478)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
 | [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121)   | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
