@@ -14,7 +14,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
 
@@ -45,16 +45,16 @@ To enable researchers and practitioners interested in these state-of-the-art met
 
 ## Installation
 
-To install the development version of `ipd` from [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools` package:
+To install the development version of `ipd` from [GitHub](https://github.com/awanafiaz/ipd), you can use the `devtools` package:
 
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
 
 install.packages("devtools")   
 
-#-- Install the IPD package from GitHub
+#-- Install the ipd package from GitHub
 
-devtools::install_github("awanafiaz/IPD")
+devtools::install_github("awanafiaz/ipd")
 ```
 
 ## Usage
@@ -66,9 +66,9 @@ We provide a simple example to demonstrate the basic use of the functions includ
 You can generate synthetic datasets for different types of regression models using the provided `simdat` function by specifying the sizes of the datasets, the effect size, residual variance, and the type of model. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models. The `simdat` function generate a data.frame with three subsets: (1) an independent "training" set with additional observations used to fit a prediction model, and "labeled" and "unlabeled" sets which contain the observed and predicted outcomes and the simulated features of interest. 
 
 ```{r example}
-#-- Load the IPD Library
+#-- Load the ipd Library
 
-library(IPD)
+library(ipd)
 
 #-- Generate Example Data for Linear Regression
 
@@ -208,19 +208,19 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-fit2 <- IPD::ipd(formula, method = "postpi_boot", model = "ols", 
+fit2 <- ipd::ipd(formula, method = "postpi_boot", model = "ols", 
                  data = dat, label = "set", nboot = nboot) |> summary()
 
-fit3 <- IPD::ipd(formula, method = "postpi_analytic", model = "ols", 
+fit3 <- ipd::ipd(formula, method = "postpi_analytic", model = "ols", 
                  data = dat, label = "set") |> summary()
 
-fit4 <- IPD::ipd(formula, method = "ppi", model = "ols", 
+fit4 <- ipd::ipd(formula, method = "ppi", model = "ols", 
                  data = dat, label = "set") |> summary()
 
-fit5 <- IPD::ipd(formula, method = "ppi_plusplus", model = "ols", 
+fit5 <- ipd::ipd(formula, method = "ppi_plusplus", model = "ols", 
                  data = dat, label = "set") |> summary()
 
-fit6 <- IPD::ipd(formula, method = "pspa", model = "ols", 
+fit6 <- ipd::ipd(formula, method = "pspa", model = "ols", 
                  data = dat, label = "set") |> summary()
 
 sumtab <- rbind(
@@ -274,7 +274,7 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
@@ -288,7 +288,7 @@ IPD::ipd(formula,
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "postpi_analytic", model = "ols", data = dat, label = "set") |> 
   
@@ -300,7 +300,7 @@ IPD::ipd(formula,
 ```{r ppi_ols}
 #-- Fit the PPI Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "ppi", model = "ols", data = dat, label = "set") |> 
   
@@ -312,7 +312,7 @@ IPD::ipd(formula,
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "ppi_plusplus", model = "ols", data = dat, label = "set") |> 
   
@@ -324,7 +324,7 @@ IPD::ipd(formula,
 ```{r pspa}
 #-- Fit the PSPA Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "pspa", model = "ols", data = dat, label = "set") |> 
   
@@ -340,7 +340,7 @@ The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augm
 
 nboot <- 200
 
-fit_postpi <- IPD::ipd(formula, 
+fit_postpi <- ipd::ipd(formula, 
          
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
@@ -387,7 +387,7 @@ For questions, comments, or any other feedback, please contact the developers at
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD). The following method/model combinations are currently implemented:
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/ipd). The following method/model combinations are currently implemented:
 
 | Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression | Multiclass Regression |
 |----------------|----------|----------|----------|----------|----------|----------|

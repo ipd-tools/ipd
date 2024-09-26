@@ -1,4 +1,4 @@
-Package: IPD
+Package: ipd
 Title: Inference on Predicted Data
 Version: 0.0.0.9000
 Authors@R: 
@@ -24,6 +24,6 @@ Suggests:
     testthat (>= 3.0.0)
 Remotes: qlu-lab/pspa
 Config/testthat/edition: 3
-URL: https://github.com/awanafiaz/IPD
-BugReports: https://github.com/awanafiaz/IPD/issues
+URL: https://github.com/awanafiaz/ipd
+BugReports: https://github.com/awanafiaz/ipd/issues
 VignetteBuilder: knitr
