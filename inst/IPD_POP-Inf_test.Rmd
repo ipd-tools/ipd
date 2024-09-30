@@ -1,5 +1,5 @@
 ---
-title: "Test POP-Inf in IPD R package"
+title: "Test POP-Inf in ipd R package"
 author: "Jiacheng Miao <jiacheng.miao@wisc.edu>"
 date: "2024-02-19"
 output: html_document
@@ -10,7 +10,7 @@ output: html_document
 rm(list = ls())
 #- Generate Example Data
 set.seed(42)
-dat <- IPD::simdat()
+dat <- ipd::simdat()
 
 form <- Y - Yhat ~ X1
 
@@ -20,7 +20,7 @@ f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-IPD::popinf_mean(Y_l, f_l, f_u)
+ipd::popinf_mean(Y_l, f_l, f_u)
 ```
 
 ## Linear regression
@@ -28,7 +28,7 @@ IPD::popinf_mean(Y_l, f_l, f_u)
 rm(list = ls())
 #- Generate Example Data
 set.seed(42)
-dat <- IPD::simdat()
+dat <- ipd::simdat()
 
 form <- Y - Yhat ~ X1
 
@@ -42,7 +42,7 @@ X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-IPD::popinf_ols(X_l, Y_l, f_l, X_u, f_u)
+ipd::popinf_ols(X_l, Y_l, f_l, X_u, f_u)
 ```
 
 ## Logistic regression
@@ -50,7 +50,7 @@ IPD::popinf_ols(X_l, Y_l, f_l, X_u, f_u)
 rm(list = ls())
 #- Generate Example Data
 set.seed(42)
-dat <- IPD::simdat()
+dat <- ipd::simdat()
 
 form <- Y - Yhat ~ X1
 
@@ -67,7 +67,7 @@ X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 f_u <- ifelse(f_u > quantile(f_u, 0.75), 1, 0)
 
-IPD::popinf_logistic(X_l, Y_l, f_l, X_u, f_u)
+ipd::popinf_logistic(X_l, Y_l, f_l, X_u, f_u)
 
 ```
 
@@ -76,7 +76,7 @@ IPD::popinf_logistic(X_l, Y_l, f_l, X_u, f_u)
 rm(list = ls())
 #- Generate Example Data
 set.seed(42)
-dat <- IPD::simdat()
+dat <- ipd::simdat()
 
 form <- Y - Yhat ~ X1
 
@@ -93,7 +93,7 @@ X_u <- model.matrix(form, data = dat[dat$set == "unlabeled",])
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 f_u <- round(f_u - min(f_u))
 
-IPD::popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
+ipd::popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
 ```
 
 ## Quantile Estimation
@@ -101,7 +101,7 @@ IPD::popinf_poisson(X_l, Y_l, f_l, X_u, f_u)
 rm(list = ls())
 #- Generate Example Data
 set.seed(42)
-dat <- IPD::simdat()
+dat <- ipd::simdat()
 
 form <- Y - Yhat ~ X1
 
@@ -111,5 +111,5 @@ f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
 f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-IPD::popinf_quantile(Y_l, f_l, f_u, q = 0.5)
+ipd::popinf_quantile(Y_l, f_l, f_u, q = 0.5)
 ```

@@ -12,11 +12,11 @@ install.packages("devtools")
 
 #-- Install the IPD package from GitHub
 
-devtools::install_github("awanafiaz/IPD")
+devtools::install_github("awanafiaz/ipd")
 
 #-- Load the IPD library
 
-library(IPD)
+library(ipd)
 
 #-- Load additional libraries
 

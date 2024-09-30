@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(IPD)
+library(ipd)
 
-test_check("IPD")
+test_check("ipd")

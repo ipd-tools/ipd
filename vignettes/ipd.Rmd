@@ -47,26 +47,26 @@ where \(\beta\) is a vector of regression coefficients and \(g(\cdot)\) is a giv
 
 ## Installation
 
-To install the development version of `ipd` from [GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools` package:
+To install the development version of `ipd` from [GitHub](https://github.com/awanafiaz/ipd), you can use the `devtools` package:
 
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
 
 install.packages("devtools")   
 
-#-- Install the IPD package from GitHub
+#-- Install the ipd package from GitHub
 
-devtools::install_github("awanafiaz/IPD")
+devtools::install_github("awanafiaz/ipd")
 ```
 
 # Usage
 
-We provide a simple example to demonstrate the basic use of the functions included in the `IPD` package.
+We provide a simple example to demonstrate the basic use of the functions included in the `ipd` package.
 
 ```{r setup}
-#-- Load IPD Package
+#-- Load ipd Package
 
-library(IPD)
+library(ipd)
 ```
 
 ## Data Generation
@@ -315,7 +315,7 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "postpi_boot", model = "ols", data = dat_ols, label = "set", 
   
@@ -329,7 +329,7 @@ IPD::ipd(formula,
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "postpi_analytic", model = "ols", data = dat_ols, label = "set") |> 
   
@@ -341,7 +341,7 @@ IPD::ipd(formula,
 ```{r ppi_ols}
 #-- Fit the PPI Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "ppi", model = "ols", data = dat_ols, label = "set") |> 
   
@@ -353,7 +353,7 @@ IPD::ipd(formula,
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "ppi_plusplus", model = "ols", data = dat_ols, label = "set") |> 
   
@@ -365,7 +365,7 @@ IPD::ipd(formula,
 ```{r pspa}
 #-- Fit the PSPA Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "pspa", model = "ols", data = dat_ols, label = "set") |> 
   
@@ -413,7 +413,7 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-IPD::ipd(formula, method = "postpi_boot", model = "logistic", 
+ipd::ipd(formula, method = "postpi_boot", model = "logistic", 
          
   data = dat_logistic, label = "set", nboot = nboot) |> 
   
@@ -425,7 +425,7 @@ IPD::ipd(formula, method = "postpi_boot", model = "logistic",
 ```{r ppi2}
 #-- Fit the PPI Correction
 
-IPD::ipd(formula, method = "ppi", model = "logistic", 
+ipd::ipd(formula, method = "ppi", model = "logistic", 
          
   data = dat_logistic, label = "set") |> 
   
@@ -437,7 +437,7 @@ IPD::ipd(formula, method = "ppi", model = "logistic",
 ```{r ppi_plusplus2}
 #-- Fit the PPI++ Correction
 
-IPD::ipd(formula, method = "ppi_plusplus", model = "logistic", 
+ipd::ipd(formula, method = "ppi_plusplus", model = "logistic", 
          
   data = dat_logistic, label = "set") |> 
   
@@ -449,7 +449,7 @@ IPD::ipd(formula, method = "ppi_plusplus", model = "logistic",
 ```{r pspa2}
 #-- Fit the PSPA Correction
 
-IPD::ipd(formula, method = "pspa", model = "logistic", 
+ipd::ipd(formula, method = "pspa", model = "logistic", 
          
   data = dat_logistic, label = "set") |> 
   
@@ -465,7 +465,7 @@ The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augm
 
 nboot <- 200
 
-fit_postpi <- IPD::ipd(formula, 
+fit_postpi <- ipd::ipd(formula, 
          
   method = "postpi_boot", model = "ols", data = dat_ols, label = "set", 
   
@@ -544,7 +544,7 @@ For questions, comments, or any other feedback, please contact the developers at
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/IPD).
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/ipd).
 
 ## License
 
