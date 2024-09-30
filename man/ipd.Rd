@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipd.R
 \name{ipd}
 \alias{ipd}
-\title{Inference on Predicted Data (IPD)}
+\title{Inference on Predicted Data (ipd)}
 \usage{
 ipd(
   formula,
@@ -74,7 +74,7 @@ A list containing the fitted model components:
 \item{coefficients}{Estimated coefficients of the model}
 \item{se}{Standard errors of the estimated coefficients}
 \item{ci}{Confidence intervals for the estimated coefficients}
-\item{formula}{The formula used to fit the IPD model.}
+\item{formula}{The formula used to fit the ipd model.}
 \item{data}{The data frame used for model fitting.}
 \item{method}{The method used for model fitting.}
 \item{model}{The type of model fitted.}
@@ -86,7 +86,7 @@ errors, confidence intervals, and additional method-specific output.}
 }
 }
 \description{
-The main wrapper function to conduct IPD using various methods
+The main wrapper function to conduct ipd using various methods
 and models, and returns a list of fitted model components.
 }
 \details{
