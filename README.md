@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/IPD/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
 
@@ -30,11 +30,11 @@ conclusions. The statistical challenges encountered when drawing
 inference on predicted data (IPD) include:
 
 1.  Understanding the relationship between predicted outcomes and their
-    true, unobserved counterparts
+    true, unobserved counterparts.
 2.  Quantifying the robustness of the AI/ML models to resampling or
-    uncertainty about the training data
+    uncertainty about the training data.
 3.  Appropriately propagating both bias and uncertainty from predictions
-    into downstream inferential tasks
+    into downstream inferential tasks.
 
 Several works have proposed methods for IPD, including post-prediction
 inference (PostPI) by [Wang et al.,
@@ -75,7 +75,7 @@ package.
 ## Installation
 
 To install the development version of `ipd` from
-[GitHub](https://github.com/awanafiaz/IPD), you can use the `devtools`
+[GitHub](https://github.com/awanafiaz/ipd), you can use the `devtools`
 package:
 
 ``` r
@@ -83,9 +83,9 @@ package:
 
 install.packages("devtools")   
 
-#-- Install the IPD package from GitHub
+#-- Install the ipd package from GitHub
 
-devtools::install_github("awanafiaz/IPD")
+devtools::install_github("awanafiaz/ipd")
 ```
 
 ## Usage
@@ -106,9 +106,9 @@ observations used to fit a prediction model, and “labeled” and
 the simulated features of interest.
 
 ``` r
-#-- Load the IPD Library
+#-- Load the ipd Library
 
-library(IPD)
+library(ipd)
 
 #-- Generate Example Data for Linear Regression
 
@@ -252,7 +252,7 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
@@ -278,7 +278,7 @@ IPD::ipd(formula,
 ``` r
 #-- Fit the PostPI Analytic Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "postpi_analytic", model = "ols", data = dat, label = "set") |> 
   
@@ -302,7 +302,7 @@ IPD::ipd(formula,
 ``` r
 #-- Fit the PPI Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "ppi", model = "ols", data = dat, label = "set") |> 
   
@@ -326,7 +326,7 @@ IPD::ipd(formula,
 ``` r
 #-- Fit the PPI++ Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "ppi_plusplus", model = "ols", data = dat, label = "set") |> 
   
@@ -350,7 +350,7 @@ IPD::ipd(formula,
 ``` r
 #-- Fit the PSPA Correction
 
-IPD::ipd(formula, 
+ipd::ipd(formula, 
          
   method = "pspa", model = "ols", data = dat, label = "set") |> 
   
@@ -379,7 +379,7 @@ and `augment` methods to facilitate easy model inspection:
 
 nboot <- 200
 
-fit_postpi <- IPD::ipd(formula, 
+fit_postpi <- ipd::ipd(formula, 
          
   method = "postpi_boot", model = "ols", data = dat, label = "set", 
   
@@ -460,20 +460,20 @@ developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request
-on [GitHub](https://github.com/awanafiaz/IPD). The following
+on [GitHub](https://github.com/awanafiaz/ipd). The following
 method/model combinations are currently implemented:
 
-| Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression | Multiclass Regression |
-|-----------------------------------------------------------------|--------------------|---------------------|--------------------|---------------------|--------------------|-----------------------|
-| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PSPA](https://arxiv.org/abs/2311.14220)                        | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
-| [PSPS](https://arxiv.org/abs/2405.20039)                        | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [PDC](https://arxiv.org/abs/2312.06478)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121)   | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [PPBoot](https://arxiv.org/abs/2405.18379)                      | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [DSL](https://arxiv.org/abs/2306.04746)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+| Method | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression | Multiclass Regression |
+|----|----|----|----|----|----|----|
+| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x: | :x: | :white_check_mark: | :white_check_mark: | :x: | :x: |
+| [PPI](https://www.science.org/doi/10.1126/science.adi6000) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: |
+| [PPI++](https://arxiv.org/abs/2311.01453) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: |
+| [PSPA](https://arxiv.org/abs/2311.14220) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: |
+| [PSPS](https://arxiv.org/abs/2405.20039) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [PDC](https://arxiv.org/abs/2312.06478) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [PPBoot](https://arxiv.org/abs/2405.18379) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [DSL](https://arxiv.org/abs/2306.04746) | :x: | :x: | :x: | :x: | :x: | :x: |
 
 ## License
 

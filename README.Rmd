@@ -28,9 +28,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 
 Using predictions from pre-trained algorithms as outcomes in downstream statistical analyses can lead to biased estimates and misleading conclusions. The statistical challenges encountered when drawing inference on predicted data (IPD) include:
 
-1.  Understanding the relationship between predicted outcomes and their true, unobserved counterparts
-2.  Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data
-3.  Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks
+1.  Understanding the relationship between predicted outcomes and their true, unobserved counterparts.
+2.  Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data.
+3.  Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks.
 
 Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and post-prediction adaptive inference (PSPA) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:
 
