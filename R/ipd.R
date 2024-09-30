@@ -1,12 +1,12 @@
 #===============================================================================
-# IPD WRAPPER FUNCTION
+# ipd WRAPPER FUNCTION
 #===============================================================================
 
-#--- MAIN IPD WRAPPER FUNCTION -------------------------------------------------
+#--- MAIN ipd WRAPPER FUNCTION -------------------------------------------------
 
-#' Inference on Predicted Data (IPD)
+#' Inference on Predicted Data (ipd)
 #'
-#' @description The main wrapper function to conduct IPD using various methods
+#' @description The main wrapper function to conduct ipd using various methods
 #' and models, and returns a list of fitted model components.
 #'
 #' @param formula An object of class \code{formula}: a symbolic description of
