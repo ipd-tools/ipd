@@ -30,11 +30,11 @@ conclusions. The statistical challenges encountered when drawing
 inference on predicted data (IPD) include:
 
 1.  Understanding the relationship between predicted outcomes and their
-    true, unobserved counterparts.
+    true, unobserved counterparts
 2.  Quantifying the robustness of the AI/ML models to resampling or
-    uncertainty about the training data.
+    uncertainty about the training data
 3.  Appropriately propagating both bias and uncertainty from predictions
-    into downstream inferential tasks.
+    into downstream inferential tasks
 
 Several works have proposed methods for IPD, including post-prediction
 inference (PostPI) by [Wang et al.,
@@ -75,7 +75,7 @@ package.
 ## Installation
 
 To install the development version of `ipd` from
-[GitHub](https://github.com/awanafiaz/ipd), you can use the `devtools`
+[GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools`
 package:
 
 ``` r
@@ -85,7 +85,7 @@ install.packages("devtools")
 
 #-- Install the ipd package from GitHub
 
-devtools::install_github("awanafiaz/ipd")
+devtools::install_github("ipd-tools/ipd")
 ```
 
 ## Usage
