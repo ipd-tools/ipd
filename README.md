@@ -30,11 +30,11 @@ conclusions. The statistical challenges encountered when drawing
 inference on predicted data (IPD) include:
 
 1.  Understanding the relationship between predicted outcomes and their
-    true, unobserved counterparts
+    true, unobserved counterparts.
 2.  Quantifying the robustness of the AI/ML models to resampling or
-    uncertainty about the training data
+    uncertainty about the training data.
 3.  Appropriately propagating both bias and uncertainty from predictions
-    into downstream inferential tasks
+    into downstream inferential tasks.
 
 Several works have proposed methods for IPD, including post-prediction
 inference (PostPI) by [Wang et al.,
@@ -160,9 +160,9 @@ relationships between these variables:
 We can see that:
 
 - The predicted outcomes are more correlated with the covariate than the
-  true outcomes (plot A)
+  true outcomes (plot A).
 - The predicted outcomes are not perfect substitutes for the true
-  outcomes (plot B)
+  outcomes (plot B).
 
 ### Model Fitting
 
