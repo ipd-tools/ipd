@@ -13,7 +13,7 @@ postpi_boot_ols(
   nboot = 100,
   se_type = "par",
   rel_func = "lm",
-  scale_se = T,
+  scale_se = TRUE,
   n_t = Inf,
   seed = NULL
 )

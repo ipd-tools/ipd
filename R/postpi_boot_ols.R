@@ -43,7 +43,7 @@
 #'
 #' @param seed (optional) An \code{integer} seed for random number generation.
 #'
-#' @returns A list of outputs: estimate of inference model parameters and
+#' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
 #' bootstrap methods.
 #'
@@ -77,7 +77,7 @@
 
 postpi_boot_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, se_type = "par", rel_func = "lm", scale_se = T, n_t = Inf,
+  nboot = 100, se_type = "par", rel_func = "lm", scale_se = TRUE, n_t = Inf,
 
   seed = NULL) {
 

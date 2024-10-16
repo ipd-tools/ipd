@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
 
@@ -75,7 +75,7 @@ package.
 ## Installation
 
 To install the development version of `ipd` from
-[GitHub](https://github.com/awanafiaz/ipd), you can use the `devtools`
+[GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools`
 package:
 
 ``` r
@@ -85,7 +85,7 @@ install.packages("devtools")
 
 #-- Install the ipd package from GitHub
 
-devtools::install_github("awanafiaz/ipd")
+devtools::install_github("ipd-tools/ipd")
 ```
 
 ## Usage
@@ -160,9 +160,9 @@ relationships between these variables:
 We can see that:
 
 - The predicted outcomes are more correlated with the covariate than the
-  true outcomes (plot A)
+  true outcomes (plot A).
 - The predicted outcomes are not perfect substitutes for the true
-  outcomes (plot B)
+  outcomes (plot B).
 
 ### Model Fitting
 
@@ -460,7 +460,7 @@ developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request
-on [GitHub](https://github.com/awanafiaz/ipd). The following
+on [GitHub](https://github.com/ipd-tools/ipd). The following
 method/model combinations are currently implemented:
 
 | Method | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression | Multiclass Regression |
@@ -473,7 +473,7 @@ method/model combinations are currently implemented:
 | [PDC](https://arxiv.org/abs/2312.06478) | :x: | :x: | :x: | :x: | :x: | :x: |
 | [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121) | :x: | :x: | :x: | :x: | :x: | :x: |
 | [PPBoot](https://arxiv.org/abs/2405.18379) | :x: | :x: | :x: | :x: | :x: | :x: |
-| [DSL](https://arxiv.org/abs/2306.04746) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [DSL](https://naokiegami.com/paper/dsl.pdf) | :x: | :x: | :x: | :x: | :x: | :x: |
 
 ## License
 

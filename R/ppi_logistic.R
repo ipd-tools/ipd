@@ -26,7 +26,7 @@
 #' @param opts (list, optional): Options to pass to the optimizer.
 #' See ?optim for details.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #'
 #' \describe{
 #'    \item{est}{(vector): vector of PPI logistic regression coefficient

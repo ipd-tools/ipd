@@ -27,7 +27,7 @@
 #' @param alpha (scalar): type I error rate for hypothesis testing - values in
 #' (0, 1); defaults to 0.05
 #'
-#' @returns A list of outputs: estimate of inference model parameters and
+#' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error.
 #'
 #' @examples
@@ -48,7 +48,7 @@
 #'
 #' pspa_logistic(X_l, Y_l, f_l, X_u, f_u)
 #'
-#' @import stats pspa
+#' @import stats
 #'
 #' @export
 
@@ -56,10 +56,10 @@ pspa_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
   weights = NA, alpha = 0.05) {
 
-  fit <- pspa::pspa_y(X_lab = X_l, X_unlab = X_u,
+  fit <- pspa_y(X_lab = X_l, X_unlab = X_u,
 
     Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
-                      
+
     intercept = T,
 
     weights = weights, alpha = alpha, method = "logistic")

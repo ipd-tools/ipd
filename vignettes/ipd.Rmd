@@ -47,7 +47,7 @@ where \(\beta\) is a vector of regression coefficients and \(g(\cdot)\) is a giv
 
 ## Installation
 
-To install the development version of `ipd` from [GitHub](https://github.com/awanafiaz/ipd), you can use the `devtools` package:
+To install the development version of `ipd` from [GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools` package:
 
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
@@ -56,7 +56,7 @@ install.packages("devtools")
 
 #-- Install the ipd package from GitHub
 
-devtools::install_github("awanafiaz/ipd")
+devtools::install_github("ipd-tools/ipd")
 ```
 
 # Usage
@@ -444,7 +444,7 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "logistic",
   summary()
 ```
 
-#### 4. post-prediction adaptive inference (PSPA; Miao et al., 2023)
+#### 4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ```{r pspa2}
 #-- Fit the PSPA Correction
@@ -544,7 +544,7 @@ For questions, comments, or any other feedback, please contact the developers at
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/awanafiaz/ipd).
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/ipd-tools/ipd).
 
 ## License
 

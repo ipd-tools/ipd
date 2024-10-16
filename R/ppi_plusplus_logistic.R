@@ -42,7 +42,7 @@
 #' @param w_u (ndarray, optional): Sample weights for the unlabeled
 #' data set. Defaults to a vector of ones.
 #'
-#' @returns (vector): vector of prediction-powered point estimates of the
+#' @return (vector): vector of prediction-powered point estimates of the
 #' logistic regression coefficients.
 #'
 #' @examples
@@ -184,7 +184,7 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #' @param w_u (ndarray, optional): Sample weights for the unlabeled
 #' data set. Defaults to a vector of ones.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #'
 #' \describe{
 #'    \item{est}{(vector): vector of PPI++ logistic regression coefficient

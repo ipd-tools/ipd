@@ -28,7 +28,7 @@
 #' (TRUE) or an approximate solution based on a linearly spaced grid of 5000
 #' values (FALSE).
 #'
-#' @returns tuple: Lower and upper bounds of the prediction-powered confidence
+#' @return tuple: Lower and upper bounds of the prediction-powered confidence
 #' interval for the quantile.
 #'
 #' @examples
