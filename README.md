@@ -455,7 +455,7 @@ vignette("ipd")
 ## Feedback
 
 For questions, comments, or any other feedback, please contact the
-developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
+developers (<ssalerno@fredhutch.org>).
 
 ## Contributing
 

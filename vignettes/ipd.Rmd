@@ -540,7 +540,7 @@ The `ipd` package offers a suite of functions for conducting inference on predic
 
 ## Feedback
 
-For questions, comments, or any other feedback, please contact the developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
+For questions, comments, or any other feedback, please contact the developers (<ssalerno@fredhutch.org>).
 
 ## Contributing
 
