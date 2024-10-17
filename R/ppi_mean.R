@@ -25,7 +25,7 @@
 #' @param alternative (string): Alternative hypothesis. Must be one of
 #' \code{"two-sided"}, \code{"less"}, or \code{"greater"}.
 #'
-#' @returns tuple: Lower and upper bounds of the prediction-powered confidence
+#' @return tuple: Lower and upper bounds of the prediction-powered confidence
 #' interval for the mean.
 #'
 #' @examples

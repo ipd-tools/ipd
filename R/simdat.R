@@ -42,14 +42,6 @@
 #'
 #' head(dat_mean)
 #'
-#' #-- Quantile
-#'
-#' dat_quantile <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
-#'
-#'   model = "quantile")
-#'
-#' head(dat_quantile)
-#'
 #' #-- Linear Regression
 #'
 #' dat_ols <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
@@ -57,22 +49,6 @@
 #'   model = "ols")
 #'
 #' head(dat_ols)
-#'
-#' #-- Logistic Regression
-#'
-#' dat_logistic <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
-#'
-#'   model = "logistic")
-#'
-#' head(dat_logistic)
-#'
-#' #-- Poisson Regression
-#'
-#' dat_poisson <- simdat(c(100, 100, 100), effect = 1, sigma_Y = 1,
-#'
-#'   model = "poisson")
-#'
-#' head(dat_poisson)
 #'
 #' @import stats gam caret
 #'

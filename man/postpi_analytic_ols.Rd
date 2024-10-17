@@ -4,7 +4,7 @@
 \alias{postpi_analytic_ols}
 \title{PostPI OLS (Analytic Correction)}
 \usage{
-postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = T, n_t = Inf)
+postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = TRUE, n_t = Inf)
 }
 \arguments{
 \item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}

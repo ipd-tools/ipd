@@ -30,11 +30,9 @@
 #'
 #' #-- Fit IPD
 #'
-#' nboot <- 200
+#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#' fit <- ipd(formula, method = "postpi_boot", model = "ols",
-#'
-#'   data = dat, label = "set", nboot = nboot)
+#'   data = dat, label = "set")
 #'
 #' #-- Print Output
 #'
@@ -90,11 +88,9 @@ print.ipd <- function(x, ...) {
 #'
 #' #-- Fit IPD
 #'
-#' nboot <- 200
+#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#' fit <- ipd(formula, method = "postpi_boot", model = "ols",
-#'
-#'   data = dat, label = "set", nboot = nboot)
+#'   data = dat, label = "set")
 #'
 #' #-- Summarize Output
 #'
@@ -161,11 +157,9 @@ summary.ipd <- function(object, ...) {
 #'
 #' #-- Fit IPD
 #'
-#' nboot <- 200
+#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#' fit <- ipd(formula, method = "postpi_boot", model = "ols",
-#'
-#'   data = dat, label = "set", nboot = nboot)
+#'   data = dat, label = "set")
 #'
 #' #-- Summarize Output
 #'
@@ -228,11 +222,9 @@ generics::tidy
 #'
 #' #-- Fit IPD
 #'
-#' nboot <- 200
+#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#' fit <- ipd(formula, method = "postpi_boot", model = "ols",
-#'
-#'   data = dat, label = "set", nboot = nboot)
+#'   data = dat, label = "set")
 #'
 #' #-- Tidy Output
 #'
@@ -289,11 +281,9 @@ generics::glance
 #'
 #' #-- Fit IPD
 #'
-#' nboot <- 200
+#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#' fit <- ipd(formula, method = "postpi_boot", model = "ols",
-#'
-#'   data = dat, label = "set", nboot = nboot)
+#'   data = dat, label = "set")
 #'
 #' #-- Glance Output
 #'
@@ -358,11 +348,9 @@ generics::augment
 #'
 #' #-- Fit IPD
 #'
-#' nboot <- 200
+#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#' fit <- ipd(formula, method = "postpi_boot", model = "ols",
-#'
-#'   data = dat, label = "set", nboot = nboot)
+#'   data = dat, label = "set")
 #'
 #' #-- Augment Data
 #'

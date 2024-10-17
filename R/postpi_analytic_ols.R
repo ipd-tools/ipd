@@ -31,7 +31,7 @@
 #' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
 #' Defaults to \code{Inf}.
 #'
-#' @returns A list of outputs: estimate of the inference model parameters and
+#' @return A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
 #'
 #' @examples
@@ -58,7 +58,7 @@
 
 postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  scale_se = T, n_t = Inf) {
+  scale_se = TRUE, n_t = Inf) {
 
   #- 1. Estimate Relationship Model
 

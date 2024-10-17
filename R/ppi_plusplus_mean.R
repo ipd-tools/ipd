@@ -35,7 +35,7 @@
 #' @param w_u (ndarray, optional): Sample weights for the unlabeled
 #' data set. Defaults to a vector of ones.
 #'
-#' @returns float or ndarray: Prediction-powered point estimate of the mean.
+#' @return float or ndarray: Prediction-powered point estimate of the mean.
 #'
 #' @examples
 #'
@@ -132,7 +132,7 @@ ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
 #' @param w_u (ndarray, optional): Sample weights for the unlabeled
 #' data set. Defaults to a vector of ones.
 #'
-#' @returns tuple: Lower and upper bounds of the prediction-powered confidence
+#' @return tuple: Lower and upper bounds of the prediction-powered confidence
 #' interval for the mean.
 #'
 #' @examples

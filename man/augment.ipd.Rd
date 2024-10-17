@@ -36,11 +36,9 @@ formula <- Y - f ~ X1
 
 #-- Fit IPD
 
-nboot <- 200
+fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 
-fit <- ipd(formula, method = "postpi_boot", model = "ols",
-
-  data = dat, label = "set", nboot = nboot)
+  data = dat, label = "set")
 
 #-- Augment Data
 

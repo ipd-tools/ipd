@@ -23,7 +23,7 @@
 #' @param alpha (scalar): type I error rate for hypothesis testing - values in
 #' (0, 1); defaults to 0.05.
 #'
-#' @returns A list of outputs: estimate of inference model parameters and
+#' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error.
 #'
 #' @examples
@@ -40,7 +40,7 @@
 #'
 #' pspa_mean(Y_l, f_l, f_u)
 #'
-#' @import stats pspa
+#' @import stats
 #'
 #' @export
 
@@ -48,7 +48,7 @@ pspa_mean <- function(Y_l, f_l, f_u,
 
   weights = NA, alpha = 0.05) {
 
-  fit <- pspa::pspa_y(Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
+  fit <- pspa_y(Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
 
     weights = weights, alpha = alpha, method = "mean")
 

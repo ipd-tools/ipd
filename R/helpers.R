@@ -16,7 +16,7 @@
 #'
 #' @param w (vector, optional): n-vector of sample weights.
 #'
-#' @returns (list): Empirical CDF and its standard deviation at the specified
+#' @return (list): Empirical CDF and its standard deviation at the specified
 #' grid points.
 #'
 #' @examples
@@ -61,7 +61,7 @@ compute_cdf <- function(Y, grid, w = NULL) {
 #'
 #' @param w (vector, optional): n-vector of sample weights.
 #'
-#' @returns (list): Difference between the empirical CDFs of the data and the
+#' @return (list): Difference between the empirical CDFs of the data and the
 #' predictions and its standard deviation at the specified grid points.
 #'
 #' @examples
@@ -115,7 +115,7 @@ compute_cdf_diff <- function(Y, f, grid, w = NULL) {
 #'
 #' @param w_u (vector, optional): Sample weights for the unlabeled data set.
 #'
-#' @returns (vector): Rectified CDF of the data at the specified grid points.
+#' @return (vector): Rectified CDF of the data at the specified grid points.
 #'
 #' @examples
 #'
@@ -168,7 +168,7 @@ rectified_cdf <- function(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL) {
 #' @param alternative (str, optional): Alternative hypothesis, either
 #' 'two-sided', 'larger' or 'smaller'.
 #'
-#' @returns (float or vector): The rectified p-value.
+#' @return (float or vector): The rectified p-value.
 #'
 #' @examples
 #'
@@ -215,7 +215,7 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #' @param return_se (bool, optional): Whether to return the standard errors of
 #' the coefficients.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #'
 #' \describe{
 #'    \item{theta}{(vector): p-vector of ordinary least squares estimates of
@@ -236,7 +236,7 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #'
 #' @export
 
-ols <- function(X, Y, return_se = F) {
+ols <- function(X, Y, return_se = FALSE) {
 
   fit <- lm(Y ~ X - 1)
 
@@ -270,7 +270,7 @@ ols <- function(X, Y, return_se = F) {
 #' @param return_se (bool, optional): Whether to return the standard errors of
 #' the coefficients.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #'
 #' \describe{
 #'    \item{theta}{(vector): p-vector of weighted least squares estimates of
@@ -293,7 +293,7 @@ ols <- function(X, Y, return_se = F) {
 #'
 #' @export
 
-wls <- function(X, Y, w = NULL, return_se = F) {
+wls <- function(X, Y, w = NULL, return_se = FALSE) {
 
   if (is.null(w) || all(w == 1)) {
 
@@ -342,7 +342,7 @@ wls <- function(X, Y, w = NULL, return_se = F) {
 #'
 #' @param use_u (boolean, optional): Whether to use the unlabeled data set.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #'
 #' \describe{
 #'    \item{grads}{(matrix): n x p matrix gradient of the loss function with
@@ -489,7 +489,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #'   stats$inv_hessian, coord = NULL, clip = FALSE)
 #'
-#' @returns (float): Optimal value of `lhat` in \[0,1\].
+#' @return (float): Optimal value of `lhat` in \[0,1\].
 #'
 #' @export
 
@@ -591,7 +591,7 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
 #' @param diff (numeric, optional): The hypothesized difference between the
 #' two values. Default is 0.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #' \describe{
 #'    \item{zstat}{(numeric): The computed z-statistic.}
 #'    \item{pvalue}{(numeric): The corresponding p-value for the test.}
@@ -653,7 +653,7 @@ zstat_generic <- function(value1, value2, std_diff, alternative, diff = 0) {
 #' @param alternative (string): Alternative hypothesis, either 'two-sided',
 #' 'larger' or 'smaller'.
 #'
-#' @returns (vector): Lower and upper (1 - alpha) * 100% confidence limits.
+#' @return (vector): Lower and upper (1 - alpha) * 100% confidence limits.
 #'
 #' @examples
 #'
@@ -705,7 +705,7 @@ zconfint_generic <- function(mean, std_mean, alpha, alternative) {
 #'
 #' @param x (vector): A numeric vector of inputs.
 #'
-#' @returns (vector): A numeric vector where each element is the result of
+#' @return (vector): A numeric vector where each element is the result of
 #' log(1 + exp(x)).
 #'
 #' @examples
@@ -757,7 +757,7 @@ log1pexp <- function(x) {
 #'
 #' @param use_u (bool, optional): Whether to use the unlabeled data set.
 #'
-#' @returns (list): A list containing the following:
+#' @return (list): A list containing the following:
 #'
 #' \describe{
 #'    \item{grads}{(matrix): n x p matrix gradient of the loss function with
@@ -859,6 +859,895 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
     list(grads = grads, grads_hat = grads_hat,
 
          grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
+}
+
+#=== PSPA ======================================================================
+
+#-------------------------------------------------------------------------------
+# PSPA: Post-Prediction Adaptive Inference
+# Jiacheng Miao, Xinran Miao, Yixuan Wu, Jiwei Zhao, and Qiongshi Lu
+# Available from https://arxiv.org/abs/2311.14220
+#-------------------------------------------------------------------------------
+
+#--- PSPA M-ESTIMATION FOR PREDICTED -------------------------------------------
+
+#' PSPA M-Estimation for ML-predicted labels
+#'
+#' \code{pspa_y} function conducts post-prediction M-Estimation.
+#'
+#' @param X_lab Array or data.frame containing observed covariates in
+#' labeled data.
+#'
+#' @param X_unlab Array or data.frame containing observed or predicted
+#' covariates in unlabeled data.
+#'
+#' @param Y_lab Array or data.frame of observed outcomes in
+#' labeled data.
+#'
+#' @param Yhat_lab Array or data.frame of predicted outcomes in
+#' labeled data.
+#'
+#' @param Yhat_unlab Array or data.frame of predicted outcomes in
+#' unlabeled data.
+#'
+#' @param alpha Specifies the confidence level as 1 - alpha for
+#' confidence intervals.
+#'
+#' @param weights weights vector PSPA linear regression (d-dimensional, where
+#' d equals the number of covariates).
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param intercept Boolean indicating if the input covariates' data contains
+#' the intercept (TRUE if the input data contains)
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return  A summary table presenting point estimates, standard error,
+#' confidence intervals (1 - alpha), P-values, and weights.
+#'
+#' @examples
+#'
+#' data <- sim_data_y()
+#'
+#' X_lab <- data$X_lab
+#'
+#' X_unlab <- data$X_unlab
+#'
+#' Y_lab <- data$Y_lab
+#'
+#' Yhat_lab <- data$Yhat_lab
+#'
+#' Yhat_unlab <- data$Yhat_unlab
+#'
+#' pspa_y(X_lab = X_lab, X_unlab = X_unlab,
+#'
+#'  Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab,
+#'
+#'  alpha = 0.05, method = "ols")
+#'
+#' @export
+
+pspa_y <- function(X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
+
+  alpha = 0.05, weights = NA, quant = NA, intercept = FALSE, method) {
+
+  ## Common Values
+
+  if (method %in% c("ols", "logistic", "poisson")) {
+
+    if (intercept) {
+
+      X_lab <- as.matrix(X_lab)
+      X_unlab <- as.matrix(X_unlab)
+
+    } else {
+
+      X_lab <- cbind(1, as.matrix(X_lab))
+      X_unlab <- cbind(1, as.matrix(X_unlab))
+    }
+  }
+
+  Y_lab <- as.matrix(as.numeric(unlist(Y_lab)))
+
+  Yhat_lab <- as.matrix(as.numeric(unlist(Yhat_lab)))
+
+  Yhat_unlab <- as.matrix(as.numeric(unlist(Yhat_unlab)))
+
+  n <- nrow(Y_lab)
+
+  N <- nrow(Yhat_unlab)
+
+  if (method %in% c("mean", "quantile")) {
+
+    q <- 1
+
+  } else {
+
+    q <- ncol(X_lab)
+  }
+
+  ## Initial Values
+  est <- est_ini(X_lab, Y_lab, quant, method)
+
+  if (is.na(sum(weights))) {
+
+    current_w <- rep(0, q)
+
+    optimized_weight <- optim_weights(X_lab, X_unlab,
+
+      Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method)
+
+    current_w <- optimized_weight
+
+  } else {
+
+    current_w <- weights
+  }
+
+  ## Calculate Final Coefficients and Standard Errors
+
+  est <- optim_est(X_lab, X_unlab,
+
+    Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method)
+
+  final_sigma <- Sigma_cal(X_lab, X_unlab,
+
+    Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method)
+
+  standard_errors <- sqrt(diag(final_sigma) / n)
+
+  p_values <- 2 * pnorm(abs(est / standard_errors), lower.tail = FALSE)
+
+  ## Create Output Table
+
+  lower_ci <- est - qnorm(1 - alpha / 2) * standard_errors
+
+  upper_ci <- est + qnorm(1 - alpha / 2) * standard_errors
+
+  output_table <- data.frame(
+
+    Estimate = est, Std.Error = standard_errors,
+    Lower.CI = lower_ci, Upper.CI = upper_ci,
+    P.value = p_values, Weight = current_w)
+
+  colnames(output_table) <- c(
+
+    "Estimate", "Std.Error", "Lower.CI", "Upper.CI", "P.value", "Weight")
+
+  return(output_table)
+}
+
+#=== PSPA UTILS ================================================================
+
+#-------------------------------------------------------------------------------
+# General functions for M-estimation and Z-estimation
+#-------------------------------------------------------------------------------
+
+#--- BREAD FOR PSPA ------------------------------------------------------------
+
+#' Calculation of the matrix A based on single dataset
+#'
+#' \code{A} function for the calculation of the matrix A based on single dataset
+#'
+#' @param X Array or data.frame containing covariates
+#'
+#' @param Y Array or data.frame of outcomes
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param theta parameter theta
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return  matrix A based on single dataset
+#'
+#' @export
+
+A <- function(X, Y, quant = NA, theta, method) {
+
+  if (method == "ols") {
+
+    n <- nrow(X)
+
+    A <- (1 / n) * t(X) %*% X
+
+  } else if (method == "quantile") {
+
+    ## Kernel Density Estimation
+
+    A <- sapply(theta,
+
+      function(a, b) density(b, from = a, to = a, n = 1)$y, unlist(Y))
+
+  } else if (method == "mean") {
+
+    A <- 1
+
+  } else if (method %in% c("logistic", "poisson")) {
+
+    n <- nrow(X)
+
+    mid <- sqrt(diag(as.vector(link_Hessian(X %*% theta, method)))) %*% X
+
+    A <- 1 / n * t(mid) %*% mid
+  }
+
+  return(A)
+}
+
+#--- INITIAL ESTIMATES ---------------------------------------------------------
+
+#' Initial estimation
+#'
+#' \code{est_ini} function for initial estimation
+#'
+#' @param X Array or data.frame containing covariates
+#'
+#' @param Y Array or data.frame of outcomes
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return initial estimatior
+#'
+#' @export
+
+est_ini <- function(X, Y, quant = NA, method) {
+
+  if (method == "ols") {
+
+    est <- lm(Y ~ X - 1)$coef
+
+  } else if (method == "quantile") {
+
+    est <- quantile(Y, quant)
+
+  } else if (method == "mean") {
+
+    est <- mean(Y)
+
+  } else if (method == "logistic") {
+
+    est <- glm(Y ~ X - 1, family = binomial)$coef
+
+  } else if (method == "poisson") {
+
+    est <- glm(Y ~ X - 1, family = poisson)$coef
+  }
+
+  return(est)
+}
+
+#--- ESTIMATING EQUATION -------------------------------------------------------
+
+#' Estimating equation
+#'
+#' \code{psi} function for estimating equation
+#'
+#' @param X Array or data.frame containing covariates
+#'
+#' @param Y Array or data.frame of outcomes
+#'
+#' @param theta parameter theta
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return esimating equation
+#'
+#' @export
+
+psi <- function(X, Y, theta, quant = NA, method) {
+
+  if (method == "quantile") {
+
+    psi <- t(as.matrix(-quant + 1 * (as.numeric(Y) <= as.vector(theta))))
+
+  } else if (method == "mean") {
+
+    psi <- t(as.matrix(as.vector(theta) - as.numeric(Y)))
+
+  } else if (method %in% c("ols", "logistic", "poisson")) {
+
+    t <- X %*% theta
+
+    res <- Y - link_grad(t, method)
+
+    psi <- -t(as.vector(res) * X)
+  }
+
+  return(psi)
+}
+
+#--- SAMPLE EXPECTATION OF PSI -------------------------------------------------
+
+#' Sample expectation of psi
+#'
+#' \code{mean_psi} function for sample expectation of psi
+#'
+#' @param X Array or data.frame containing covariates
+#'
+#' @param Y Array or data.frame of outcomes
+#'
+#' @param theta parameter theta
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return sample expectation of psi
+#'
+#' @export
+
+mean_psi <- function(X, Y, theta, quant = NA, method) {
+
+  psi <- as.matrix(rowMeans(psi(X, Y, theta, quant, method)))
+
+  return(psi)
+}
+
+#--- SAMPLE EXPECTATION OF PSPA PSI --------------------------------------------
+
+#' Sample expectation of PSPA psi
+#'
+#' \code{mean_psi_pop} function for sample expectation of PSPA psi
+#'
+#' @param X_lab Array or data.frame containing observed covariates in
+#' labeled data.
+#'
+#' @param X_unlab Array or data.frame containing observed or predicted
+#' covariates in unlabeled data.
+#'
+#' @param Y_lab Array or data.frame of observed outcomes in labeled data.
+#'
+#' @param Yhat_lab Array or data.frame of predicted outcomes in labeled data.
+#'
+#' @param Yhat_unlab Array or data.frame of predicted outcomes in
+#' unlabeled data.
+#'
+#' @param w weights vector PSPA linear regression (d-dimensional, where
+#' d equals the number of covariates).
+#'
+#' @param theta parameter theta
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return sample expectation of PSPA psi
+#'
+#' @export
+
+mean_psi_pop <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+  w, theta, quant = NA, method) {
+
+  if (method %in% c("ols", "logistic", "poisson")) {
+
+    psi_pop <- mean_psi(X_lab, Y_lab, theta, quant, method) + diag(w) %*% (
+
+      mean_psi(X_unlab, Yhat_unlab, theta, quant, method) -
+
+      mean_psi(X_lab,   Yhat_lab,   theta, quant, method))
+
+  } else if (method %in% c("mean", "quantile")) {
+
+    psi_pop <- mean_psi(X_lab, Y_lab, theta, quant, method) + w * (
+
+      mean_psi(X_unlab, Yhat_unlab, theta, quant, method) -
+
+      mean_psi(X_lab,   Yhat_lab,   theta, quant, method))
+  }
+
+  return(psi_pop)
+}
+
+#=== STATISTICS FOR GLMS =======================================================
+
+#--- GRADIENT OF THE LINK FUNCTION ---------------------------------------------
+
+#' Gradient of the link function
+#'
+#' \code{link_grad} function for gradient of the link function
+#'
+#' @param t t
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return gradient of the link function
+#'
+#' @export
+
+link_grad <- function(t, method) {
+
+  if (method == "ols") {
+
+    grad <- t
+
+  } else if (method == "logistic") {
+
+    grad <- 1 / (1 + exp(-t))
+
+  } else if (method == "poisson") {
+
+    grad <- exp(t)
+  }
+
+  return(grad)
+}
+
+#--- HESSIAN OF THE LINK FUNCTION ----------------------------------------------
+
+#' Hessians of the link function
+#'
+#' \code{link_Hessian} function for Hessians of the link function
+#'
+#' @param t t
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return Hessians of the link function
+#'
+#' @export
+
+link_Hessian <- function(t, method) {
+
+  if (method == "logistic") {
+
+    hes <- exp(t) / (1 + exp(t))^2
+
+  } else if (method == "poisson") {
+
+    hes <- exp(t)
+  }
+
+  return(hes)
+}
+
+#--- COVARIANCE MATRIX OF ESTIMATING EQUATION ----------------------------------
+
+#' Variance-covariance matrix of the estimation equation
+#'
+#' \code{Sigma_cal} function for variance-covariance matrix of the
+#' estimation equation
+#'
+#' @param X_lab Array or data.frame containing observed covariates in
+#' labeled data.
+#'
+#' @param X_unlab Array or data.frame containing observed or predicted
+#' covariates in unlabeled data.
+#'
+#' @param Y_lab Array or data.frame of observed outcomes in labeled data.
+#'
+#' @param Yhat_lab Array or data.frame of predicted outcomes in labeled data.
+#'
+#' @param Yhat_unlab Array or data.frame of predicted outcomes in
+#' unlabeled data.
+#'
+#' @param w weights vector PSPA linear regression (d-dimensional, where
+#' d equals the number of covariates).
+#'
+#' @param theta parameter theta
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return variance-covariance matrix of the estimation equation
+#'
+#' @export
+
+Sigma_cal <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+  w, theta, quant = NA, method) {
+
+  psi_y_lab <- psi(
+
+    X_lab, Y_lab, theta, quant = quant, method = method)
+
+  psi_yhat_lab <- psi(
+
+    X_lab, Yhat_lab, theta, quant = quant, method = method)
+
+  psi_yhat_unlab <- psi(
+
+    X_unlab, Yhat_unlab, theta, quant = quant, method = method)
+
+  n <- nrow(Y_lab)
+
+  N <- nrow(Yhat_unlab)
+
+  if (method %in% c("mean", "quantile")) {
+
+    q <- 1
+
+  } else {
+
+    q <- ncol(X_lab)
+  }
+
+  M1 <- cov(t(psi_y_lab))
+
+  M2 <- cov(t(psi_yhat_lab))
+
+  M3 <- cov(t(psi_yhat_unlab))
+
+  M4 <- cov(t(psi_y_lab), t(psi_yhat_lab))
+
+  if (method == "ols") {
+
+    A <- A(rbind(X_lab, X_unlab), c(Y_lab, Yhat_unlab), quant, theta, method)
+
+    A_inv <- solve(A)
+
+  } else if (method %in% c("mean", "quantile")) {
+
+    A <- A(X_lab, Y_lab, quant, theta, method)
+
+    A_inv <- 1/A
+
+  } else {
+
+    A_lab <- A(X_lab, Y_lab, quant, theta, method)
+
+    Ahat_lab <- A(X_lab, Yhat_lab, quant, theta, method)
+
+    Ahat_unlab <- A(X_unlab, Yhat_unlab, quant, theta, method)
+
+    A <- A_lab + diag(w) %*% (Ahat_unlab - Ahat_lab)
+
+    A_inv <- solve(A)
+  }
+
+  rho <- n / N
+
+  if (method %in% c("mean", "quantile")) {
+
+    Sigma <- A_inv * (M1 + w * (M2 + rho * M3) * w - 2 * w * M4) * A_inv
+
+  } else {
+
+    Sigma <- A_inv %*% (M1 + diag(w) %*%
+
+      (M2 + rho * M3) %*% diag(w) - 2 * diag(w) %*% M4) %*% A_inv
+  }
+
+  return(Sigma)
+}
+
+#--- ONE-STEP UPDATE -----------------------------------------------------------
+
+#' One-step update for obtaining estimator
+#'
+#' \code{optim_est} function for One-step update for obtaining estimator
+#'
+#' @param X_lab Array or data.frame containing observed covariates in
+#' labeled data.
+#'
+#' @param X_unlab Array or data.frame containing observed or
+#' predicted covariates in unlabeled data.
+#'
+#' @param Y_lab Array or data.frame of observed outcomes in labeled data.
+#'
+#' @param Yhat_lab Array or data.frame of predicted outcomes in labeled data.
+#'
+#' @param Yhat_unlab Array or data.frame of predicted outcomes in
+#' unlabeled data.
+#'
+#' @param w weights vector PSPA linear regression (d-dimensional, where
+#' d equals the number of covariates).
+#'
+#' @param theta parameter theta
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return estimator
+#'
+#' @export
+
+optim_est <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+  w, theta, quant = NA, method) {
+
+  if (method == "mean") {
+
+    theta <- mean(Y_lab) + as.vector(w) * (mean(Yhat_unlab) - mean(Yhat_lab))
+
+  } else if (method == "quantile") {
+
+    A_lab <- A(X_lab, Y_lab, quant, theta, method)
+
+    Ahat_lab <- A(X_lab, Yhat_lab, quant, theta, method)
+
+    Ahat_unlab <- A(X_unlab, Yhat_unlab, quant, theta, method)
+
+    A <- A_lab + w * (Ahat_unlab - Ahat_lab)
+
+    A_inv <- 1 / A
+
+    theta <- theta - A_inv * mean_psi_pop(
+
+      X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+      w, theta, quant = quant, method = method)
+
+  } else if (method == "ols") {
+
+    A <- A(rbind(X_lab, X_unlab), c(Y_lab, Yhat_unlab), quant, theta, method)
+
+    A_inv <- solve(A)
+
+    theta <- theta - A_inv %*% mean_psi_pop(
+
+      X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+      w, theta, quant = quant, method = method)
+
+  } else {
+
+    A_lab <- A(X_lab, Y_lab, quant, theta, method)
+
+    Ahat_lab <- A(X_lab, Yhat_lab, quant, theta, method)
+
+    Ahat_unlab <- A(X_unlab, Yhat_unlab, quant, theta, method)
+
+    A <- A_lab + diag(w) %*% (Ahat_unlab - Ahat_lab)
+
+    A_inv <- solve(A)
+
+    theta <- theta - A_inv %*% mean_psi_pop(
+
+      X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+      w, theta, quant = quant, method = method)
+  }
+
+  return(theta)
+}
+
+#--- ONE-STEP UPDATE - WEIGHT VECTOR -------------------------------------------
+
+#' One-step update for obtaining the weight vector
+#'
+#' \code{optim_weights} function for One-step update for obtaining estimator
+#'
+#' @param X_lab Array or data.frame containing observed covariates in
+#' labeled data.
+#'
+#' @param X_unlab Array or data.frame containing observed or
+#' predicted covariates in unlabeled data.
+#'
+#' @param Y_lab Array or data.frame of observed outcomes in labeled data.
+#'
+#' @param Yhat_lab Array or data.frame of predicted outcomes in labeled data.
+#'
+#' @param Yhat_unlab Array or data.frame of predicted outcomes in unlabeled data.
+#'
+#' @param w weights vector PSPA linear regression (d-dimensional, where
+#' d equals the number of covariates).
+#'
+#' @param theta parameter theta
+#'
+#' @param quant quantile for quantile estimation
+#'
+#' @param method indicates the method to be used for M-estimation.
+#' Options include "mean", "quantile", "ols", "logistic", and "poisson".
+#'
+#' @return weights
+#'
+#' @export
+
+optim_weights <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+
+  w, theta, quant = NA, method) {
+
+  ## Objective Function
+
+  psi_y_lab <- psi(
+
+    X_lab, Y_lab, theta, quant = quant, method = method)
+
+  psi_yhat_lab <- psi(
+
+    X_lab, Yhat_lab, theta, quant = quant, method = method)
+
+  psi_yhat_unlab <- psi(
+
+    X_unlab, Yhat_unlab, theta, quant = quant, method = method)
+
+  n <- nrow(Y_lab)
+
+  N <- nrow(Yhat_unlab)
+
+  if (method %in% c("mean", "quantile")) {
+
+    q <- 1
+
+  } else {
+
+    q <- ncol(X_lab)
+  }
+
+  A_lab_inv <- solve(A(X_lab, Y_lab, quant, theta, method))
+
+  M2 <- cov(t(psi_yhat_lab))
+
+  M3 <- cov(t(psi_yhat_unlab))
+
+  M4 <- cov(t(psi_y_lab), t(psi_yhat_lab))
+
+  rho <- n / N
+
+  w <- diag(A_lab_inv %*% M4 %*% A_lab_inv) /
+
+    diag(A_lab_inv %*% (M2 + rho * M3) %*% A_lab_inv)
+
+  ## Lower Bound: 0; Upper Bound: 1
+
+  w[w < 0] <- 0
+
+  w[w > 1] <- 1
+
+  return(w)
+}
+
+#=== SIMULATE PSPA DATA ========================================================
+
+#' Simulate the data for testing the functions
+#'
+#' \code{sim_data_y} for simulation with ML-predicted Y
+#'
+#' @param r imputation correlation
+#'
+#' @param binary simulate binary outcome or not
+#'
+#' @return simulated data
+#'
+#' @import randomForest MASS
+#'
+#' @export
+
+sim_data_y <- function(r = 0.9, binary = FALSE) {
+
+  ## Input Parameters
+
+  n_train <- 500
+
+  n_lab <- 500
+
+  n_unlab <- 5000
+
+  sigma_Y <- sqrt(5)
+
+  ## Simulate Data
+
+  mu <- c(0, 0) # Mean Vector
+
+  Sigma <- matrix(c(1, 0, 0, 1), 2, 2) # Covariance Matrix
+
+  n_data <- n_unlab + n_lab + n_train
+
+  data <- as.data.frame(MASS::mvrnorm(n_data, mu, Sigma))
+
+  colnames(data) <- c("X1", "X2")
+
+  beta_1 <- beta_2 <- r * sigma_Y / sqrt(2 * 3)
+
+  data$epsilon <- rnorm(n_data, 0, sqrt(1 - r^2)) * sigma_Y
+
+  data$Y <- data$X1 * beta_1 + data$X2 * beta_2 + data$X1^2 *
+
+    beta_1 + data$X2^2 * beta_1 + data$epsilon
+
+  if (binary) {
+
+    data$Y <- ifelse(data$Y > median(unlist(data$Y)), 1, 0)
+
+    ## Split Data
+
+    train_data <- data[1:n_train, ]
+
+    lab_data <- data[(n_train + 1):(n_lab + n_train), ]
+
+    unlab_data <- data[(n_lab + n_train + 1):n_data, ]
+
+    ## Fit Machine Learning Model
+
+    train_data$Y <- as.factor(train_data$Y)
+
+    train_fit <- randomForest::randomForest(Y ~ X1 + X2, data = train_data)
+
+    lab_data$Y_hat <- predict(train_fit, newdata = lab_data)
+
+    unlab_data$Y_hat <- predict(train_fit, newdata = unlab_data)
+
+    X_lab <- as.data.frame(lab_data$X1)
+
+    X_unlab <- as.data.frame(unlab_data$X1)
+
+    Y_lab <- as.data.frame(lab_data$Y)
+
+    Yhat_lab <- as.data.frame(as.numeric(lab_data$Y_hat) - 1)
+
+    Yhat_unlab <- as.data.frame(as.numeric(unlab_data$Y_hat) - 1)
+
+    colnames(X_lab) <- "X1"
+
+    colnames(X_unlab) <- "X1"
+
+    colnames(Y_lab) <- "Y"
+
+    colnames(Yhat_lab) <- "Y_hat"
+
+    colnames(Yhat_unlab) <- "Y_hat"
+
+    out <- list(
+
+      X_lab = X_lab, X_unlab = X_unlab,
+
+      Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab)
+
+  } else {
+
+    ## Split Data
+
+    train_data <- data[1:n_train, ]
+
+    lab_data <- data[(n_train + 1):(n_lab + n_train), ]
+
+    unlab_data <- data[(n_lab + n_train + 1):n_data, ]
+
+    # Fit Machine Learning Model
+
+    train_fit <- randomForest::randomForest(Y ~ X1 + X2, data = train_data)
+
+    lab_data$Y_hat <- predict(train_fit, newdata = lab_data)
+
+    unlab_data$Y_hat <- predict(train_fit, newdata = unlab_data)
+
+    X_lab <- as.data.frame(lab_data$X1)
+
+    X_unlab <- as.data.frame(unlab_data$X1)
+
+    Y_lab <- as.data.frame(lab_data$Y)
+
+    Yhat_lab <- as.data.frame(lab_data$Y_hat)
+
+    Yhat_unlab <- as.data.frame(unlab_data$Y_hat)
+
+    colnames(X_lab) <- "X1"
+
+    colnames(X_unlab) <- "X1"
+
+    colnames(Y_lab) <- "Y"
+
+    colnames(Yhat_lab) <- "Y_hat"
+
+    colnames(Yhat_unlab) <- "Y_hat"
+
+    out <- list(
+
+      X_lab = X_lab, X_unlab = X_unlab,
+
+      Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab)
+  }
+
+  return(out)
 }
 
 #=== END =======================================================================

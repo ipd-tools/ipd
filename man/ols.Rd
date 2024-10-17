@@ -4,7 +4,7 @@
 \alias{ols}
 \title{Ordinary Least Squares}
 \usage{
-ols(X, Y, return_se = F)
+ols(X, Y, return_se = FALSE)
 }
 \arguments{
 \item{X}{(matrix): n x p matrix of covariates.}

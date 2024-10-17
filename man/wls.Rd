@@ -4,7 +4,7 @@
 \alias{wls}
 \title{Weighted Least Squares}
 \usage{
-wls(X, Y, w = NULL, return_se = F)
+wls(X, Y, w = NULL, return_se = FALSE)
 }
 \arguments{
 \item{X}{(matrix): n x p matrix of covariates.}

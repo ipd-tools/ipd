@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/awanafiaz/ipd/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
 
@@ -460,7 +460,7 @@ developers at [ssalerno@fredhutch.org](ssalerno@fredhutch.org).
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request
-on [GitHub](https://github.com/awanafiaz/ipd). The following
+on [GitHub](https://github.com/ipd-tools/ipd). The following
 method/model combinations are currently implemented:
 
 | Method | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression | Multiclass Regression |
@@ -473,7 +473,7 @@ method/model combinations are currently implemented:
 | [PDC](https://arxiv.org/abs/2312.06478) | :x: | :x: | :x: | :x: | :x: | :x: |
 | [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121) | :x: | :x: | :x: | :x: | :x: | :x: |
 | [PPBoot](https://arxiv.org/abs/2405.18379) | :x: | :x: | :x: | :x: | :x: | :x: |
-| [DSL](https://arxiv.org/abs/2306.04746) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [DSL](https://naokiegami.com/paper/dsl.pdf) | :x: | :x: | :x: | :x: | :x: | :x: |
 
 ## License
 
