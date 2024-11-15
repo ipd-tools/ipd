@@ -15,6 +15,7 @@ ipd(
   intercept = TRUE,
   alpha = 0.05,
   alternative = "two-sided",
+  n_t = Inf,
   ...
 )
 }
@@ -61,6 +62,10 @@ model? Default is \code{TRUE}.}
 
 \item{alternative}{A string specifying the alternative hypothesis. Must be
 one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.}
+
+\item{n_t}{(integer, optional) Size of the dataset used to train the
+prediction function (necessary for the \code{"postpi"} methods if \code{n_t} <
+\code{nrow(X_l)}. Defaults to \code{Inf}.}
 
 \item{...}{Additional arguments to be passed to the fitting function. See
 the \code{Details} section for more information.}
