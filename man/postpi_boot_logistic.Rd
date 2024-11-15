@@ -4,7 +4,16 @@
 \alias{postpi_boot_logistic}
 \title{PostPI Logistic Regression (Bootstrap Correction)}
 \usage{
-postpi_boot_logistic(X_l, Y_l, f_l, X_u, f_u, nboot = 100, se_type = "par")
+postpi_boot_logistic(
+  X_l,
+  Y_l,
+  f_l,
+  X_u,
+  f_u,
+  nboot = 100,
+  se_type = "par",
+  seed = NULL
+)
 }
 \arguments{
 \item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
@@ -22,6 +31,8 @@ postpi_boot_logistic(X_l, Y_l, f_l, X_u, f_u, nboot = 100, se_type = "par")
 \item{se_type}{(string): Which method to calculate the standard errors.
 Options include "par" (parametric) or "npar" (nonparametric).
 Defaults to "par".}
+
+\item{seed}{(optional) An \code{integer} seed for random number generation.}
 }
 \value{
 A list of outputs: estimate of inference model parameters and

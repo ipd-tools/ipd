@@ -19,6 +19,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, echo=FALSE}
+default_options <- options()
+```
+
 # Introduction
 
 ## Background
@@ -528,6 +532,10 @@ The `augment` method adds model predictions and residuals to the original datase
 augmented_df <- augment(fit_postpi)
 
 head(augmented_df)
+```
+
+```{r, echo=FALSE}
+options(default_options)
 ```
 
 # Conclusions

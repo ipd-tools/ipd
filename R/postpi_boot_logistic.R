@@ -30,6 +30,8 @@
 #' Options include "par" (parametric) or "npar" (nonparametric).
 #' Defaults to "par".
 #'
+#' @param seed (optional) An \code{integer} seed for random number generation.
+#'
 #' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
 #' bootstrap methods.
@@ -60,7 +62,7 @@
 
 postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
-  nboot = 100, se_type = "par") {
+  nboot = 100, se_type = "par", seed = NULL) {
 
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
@@ -74,7 +76,7 @@ postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
   #-- 3. Bootstrap
 
-  set.seed(12345)
+  if (!is.null(seed)) set.seed(seed)
 
   n <- nrow(X_l)
 

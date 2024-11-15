@@ -52,6 +52,10 @@
 #' @param alternative A string specifying the alternative hypothesis. Must be
 #' one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.
 #'
+#' @param n_t (integer, optional) Size of the dataset used to train the
+#' prediction function (necessary for the \code{"postpi"} methods if \code{n_t} <
+#' \code{nrow(X_l)}. Defaults to \code{Inf}.
+#'
 #' @param ... Additional arguments to be passed to the fitting function. See
 #' the \code{Details} section for more information.
 #'
@@ -212,9 +216,9 @@
 
 ipd <- function(formula, method, model, data,
 
-  label = NULL, unlabeled_data = NULL, seed = NULL,
+  label = NULL, unlabeled_data = NULL, seed = NULL, intercept = TRUE,
 
-  intercept = TRUE, alpha = 0.05, alternative = "two-sided", ...) {
+  alpha = 0.05, alternative = "two-sided", n_t = Inf, ...) {
 
   #--- CHECKS & ASSERTIONS -----------------------------------------------------
 
@@ -404,7 +408,7 @@ ipd <- function(formula, method, model, data,
 
   } else {
 
-    X_l <- model.matrix(formula - 1, data = data_l)
+    X_l <- model.matrix(update(formula, . ~ . - 1), data = data_l)
   }
 
   Y_l <- data_l[ , all.vars(formula)[1]] |> matrix(ncol = 1)
@@ -419,7 +423,7 @@ ipd <- function(formula, method, model, data,
 
   } else {
 
-    X_u <- model.matrix(formula - 1, data = data_u)
+    X_u <- model.matrix(update(formula, . ~ . - 1), data = data_u)
   }
 
   f_u <- data_u[ , all.vars(formula)[2]] |> matrix(ncol = 1)
@@ -428,7 +432,14 @@ ipd <- function(formula, method, model, data,
 
   func <- get(paste(method, model, sep = "_"))
 
-  fit <- func(X_l, Y_l, f_l, X_u, f_u, ...)
+  if(grepl("postpi", method) && model == "ols") {
+
+    fit <- func(X_l, Y_l, f_l, X_u, f_u, n_t = n_t, ...)
+
+  } else {
+
+    fit <- func(X_l, Y_l, f_l, X_u, f_u, ...)
+  }
 
   names(fit$est) <- colnames(X_u)
 

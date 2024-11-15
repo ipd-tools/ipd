@@ -6,19 +6,7 @@
 
 #--- LOAD NECESSARY PACKAGES ---------------------------------------------------
 
-#-- Install devtools if it is not already installed
-
-install.packages("devtools")
-
-#-- Install the IPD package from GitHub
-
-devtools::install_github("awanafiaz/ipd")
-
-#-- Load the IPD library
-
 library(ipd)
-
-#-- Load additional libraries
 
 library(tidyverse)
 
