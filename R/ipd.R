@@ -417,13 +417,17 @@ ipd <- function(formula, method, model, data,
 
   #-- UNLABELED DATA
 
+  formula_u <- as.formula(paste(all.vars(formula)[2], "~",
+
+    paste(all.vars(formula)[-c(1, 2)], collapse = " + ")))
+
   if (intercept) {
 
-    X_u <- model.matrix(formula, data = data_u)
+    X_u <- model.matrix(formula_u, data = data_u)
 
   } else {
 
-    X_u <- model.matrix(update(formula, . ~ . - 1), data = data_u)
+    X_u <- model.matrix(update(formula_u, . ~ . - 1), data = data_u)
   }
 
   f_u <- data_u[ , all.vars(formula)[2]] |> matrix(ncol = 1)
