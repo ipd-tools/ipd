@@ -16,6 +16,7 @@ ipd(
   alpha = 0.05,
   alternative = "two-sided",
   n_t = Inf,
+  na_action = "na.fail",
   ...
 )
 }
@@ -66,6 +67,10 @@ one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.}
 \item{n_t}{(integer, optional) Size of the dataset used to train the
 prediction function (necessary for the \code{"postpi"} methods if \code{n_t} <
 \code{nrow(X_l)}. Defaults to \code{Inf}.}
+
+\item{na_action}{(string, optional) How missing covariate data should be
+handled. Currently \code{"na.fail"} and \code{"na.omit"} are accommodated.
+Defaults to \code{"na.fail"}.}
 
 \item{...}{Additional arguments to be passed to the fitting function. See
 the \code{Details} section for more information.}
