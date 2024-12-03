@@ -1,6 +1,4 @@
-url: ~
+url: https://ipd-tools.github.io/ipd/
 template:
   bootstrap: 5
-  bslib:
-    primary: "#998972"
 
