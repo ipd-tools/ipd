@@ -13,3 +13,7 @@
   * Provides a more informative error message and lists which covariates are missing observations.
   
 * `ipd()` now takes an additional argument, `n_t`, which denotes the (optional) size of the training set used to generate the prediction rule. Defaults to `Inf` but is necessary for the `postpi_X` methods if `n_t` < `n`, `N`, the number of labeled and unlabeled observations, respectively, in the data being analyzed.
+
+# ipd 0.1.4
+
+* 
