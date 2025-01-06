@@ -39,11 +39,11 @@ dat <- simdat(model = "quantile")
 
 form <- Y - f ~ X1
 
-Y_l <- dat[dat$set == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 
-f_l <- dat[dat$set == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
 ppi_quantile(Y_l, f_l, f_u, q = 0.5)
 

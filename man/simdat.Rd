@@ -35,7 +35,7 @@ inference. Defaults is 1.}
 \value{
 A data.frame containing n rows and columns corresponding to
 the labeled outcome (Y), the predicted outcome (f), a character variable
-(set) indicating which data set the observation belongs to (training,
+(set_label) indicating which data set the observation belongs to (training,
 labeled, or unlabeled), and four independent, normally distributed
 predictors (X1, X2, X3, and X4), where applicable.
 }

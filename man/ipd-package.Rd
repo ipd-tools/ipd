@@ -77,7 +77,7 @@ formula <- Y - f ~ X1
 
 fit_postpi1 <- ipd(formula, method = "postpi_analytic", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- PostPI Bootstrap Correction (Wang et al., 2020)
 
@@ -85,25 +85,25 @@ nboot <- 200
 
 fit_postpi2 <- ipd(formula, method = "postpi_boot", model = "ols",
 
-    data = dat, label = "set", nboot = nboot)
+    data = dat, label = "set_label", nboot = nboot)
 
 #-- PPI (Angelopoulos et al., 2023)
 
 fit_ppi <- ipd(formula, method = "ppi", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- PPI++ (Angelopoulos et al., 2023)
 
 fit_plusplus <- ipd(formula, method = "ppi_plusplus", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- PSPA (Miao et al., 2023)
 
 fit_pspa <- ipd(formula, method = "pspa", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- Print the Model
 

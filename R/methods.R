@@ -32,7 +32,7 @@
 #'
 #' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#'   data = dat, label = "set")
+#'   data = dat, label = "set_label")
 #'
 #' #-- Print Output
 #'
@@ -90,7 +90,7 @@ print.ipd <- function(x, ...) {
 #'
 #' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#'   data = dat, label = "set")
+#'   data = dat, label = "set_label")
 #'
 #' #-- Summarize Output
 #'
@@ -159,7 +159,7 @@ summary.ipd <- function(object, ...) {
 #'
 #' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#'   data = dat, label = "set")
+#'   data = dat, label = "set_label")
 #'
 #' #-- Summarize Output
 #'
@@ -224,7 +224,7 @@ generics::tidy
 #'
 #' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#'   data = dat, label = "set")
+#'   data = dat, label = "set_label")
 #'
 #' #-- Tidy Output
 #'
@@ -283,7 +283,7 @@ generics::glance
 #'
 #' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#'   data = dat, label = "set")
+#'   data = dat, label = "set_label")
 #'
 #' #-- Glance Output
 #'
@@ -350,7 +350,7 @@ generics::augment
 #'
 #' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 #'
-#'   data = dat, label = "set")
+#'   data = dat, label = "set_label")
 #'
 #' #-- Augment Data
 #'

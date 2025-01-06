@@ -28,7 +28,7 @@
 #'
 #' @return A data.frame containing n rows and columns corresponding to
 #' the labeled outcome (Y), the predicted outcome (f), a character variable
-#' (set) indicating which data set the observation belongs to (training,
+#' (set_label) indicating which data set the observation belongs to (training,
 #' labeled, or unlabeled), and four independent, normally distributed
 #' predictors (X1, X2, X3, and X4), where applicable.
 #'
@@ -257,48 +257,52 @@ simdat <- function(n = c(300, 300, 300), effect = 1, sigma_Y = 1,
 
   #-- CREATE DATA.FRAME
 
-  set <- rep(c("training", "labeled", "unlabeled"), n)
+  set_label <- rep(c("training", "labeled", "unlabeled"), n)
 
   if (model %in% c("mean", "quantile")) {
 
-    dat <- data.frame(Y, f = NA, set)
+    dat <- data.frame(Y, f = NA, set_label)
 
   } else if (model %in% c("ols", "logistic", "poisson")) {
 
-    dat <- data.frame(X, Y, f = NA, set)
+    dat <- data.frame(X, Y, f = NA, set_label)
   }
 
   #-- GENERATE PREDICTIONS
 
   if (model %in% c("mean", "quantile")) {
 
-    dat[set == "labeled", "f"] <- (mean(dat[set == "training", "Y"]) +
+    dat[set_label == "labeled", "f"] <- (
 
-      rnorm(n[2], 0, sigma_Y) - shift) / scale
+      mean(dat[set_label == "training", "Y"]) +
 
-    dat[set == "unlabeled", "f"] <- (mean(dat[set == "training", "Y"]) +
+        rnorm(n[2], 0, sigma_Y) - shift) / scale
 
-      rnorm(n[3], 0, sigma_Y) - shift) / scale
+    dat[set_label == "unlabeled", "f"] <- (
+
+      mean(dat[set_label == "training", "Y"]) +
+
+        rnorm(n[3], 0, sigma_Y) - shift) / scale
 
   } else if (model == "ols") {
 
     fit_gam <- gam::gam(Y ~ gam::s(X1) + gam::s(X2) + gam::s(X3) + gam::s(X4),
 
-      data = dat[set == "training",])
+      data = dat[set_label == "training",])
 
-    dat[set == "labeled", "f"] <- (predict(
+    dat[set_label == "labeled", "f"] <- (predict(
 
-      fit_gam, newdat = dat[set == "labeled",]) - shift) / scale
+      fit_gam, newdat = dat[set_label == "labeled",]) - shift) / scale
 
-    dat[set == "unlabeled", "f"] <- (predict(
+    dat[set_label == "unlabeled", "f"] <- (predict(
 
-      fit_gam, newdat = dat[set == "unlabeled",]) - shift) / scale
+      fit_gam, newdat = dat[set_label == "unlabeled",]) - shift) / scale
 
   } else if (model == "logistic") {
 
     knn_tune <- caret::train(
 
-      factor(Y) ~ X1 + X2 + X3 + X4, data = dat[set == "training",],
+      factor(Y) ~ X1 + X2 + X3 + X4, data = dat[set_label == "training",],
 
       method = "knn", trControl = trainControl(method = "cv"),
 
@@ -306,29 +310,33 @@ simdat <- function(n = c(300, 300, 300), effect = 1, sigma_Y = 1,
 
     fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + X3 + X4,
 
-      data = dat[set == "training",], k = knn_tune$bestTune$k)
+      data = dat[set_label == "training",], k = knn_tune$bestTune$k)
 
-    dat[set == "labeled", "f"] <- predict(
+    dat[set_label == "labeled", "f"] <- predict(
 
-      fit_knn, dat[set == "labeled",], type = "class") |> as.numeric() - 1
+      fit_knn, dat[set_label == "labeled",], type = "class") |>
 
-    dat[set == "unlabeled", "f"] <- predict(
+      as.numeric() - 1
 
-      fit_knn, dat[set == "unlabeled",], type = "class") |> as.numeric() - 1
+    dat[set_label == "unlabeled", "f"] <- predict(
+
+      fit_knn, dat[set_label == "unlabeled",], type = "class") |>
+
+      as.numeric() - 1
 
   } else if (model == "poisson") {
 
     fit_poisson <- glm(Y ~ X1 + X2 + X3 + X4, family = poisson,
 
-      data = dat[set == "training",])
+      data = dat[set_label == "training",])
 
-    dat[set == "labeled", "f"] <- predict(fit_poisson,
+    dat[set_label == "labeled", "f"] <- predict(fit_poisson,
 
-      newdata = dat[set == "labeled",], type = "response")
+      newdata = dat[set_label == "labeled",], type = "response")
 
-    dat[set == "unlabeled", "f"] <- predict(fit_poisson,
+    dat[set_label == "unlabeled", "f"] <- predict(fit_poisson,
 
-      newdata = dat[set == "unlabeled",], type = "response")
+      newdata = dat[set_label == "unlabeled",], type = "response")
   }
 
   return(dat)

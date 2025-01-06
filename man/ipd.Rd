@@ -82,7 +82,7 @@ Defaults to \code{"na.fail"}.}
 
 \item{...}{Additional arguments to be passed to the fitting function. See
 the \code{Details} section for more information. See
-\strong{5. Auxilliary Arguments} and \strong{6. Other Arguments} in the
+\strong{5. Auxiliary Arguments} and \strong{6. Other Arguments} in the
 \strong{Details} below for more information.}
 }
 \value{
@@ -132,8 +132,8 @@ For option (1), provide one data argument (\code{data}) which contains a
 stacked \code{data.frame} with both the unlabeled and labeled data and a
 \code{label} argument that specifies the column identifying the labeled
 versus the unlabeled observations in the stacked \code{data.frame} (e.g.,
-\code{label = "set"} if the column "set" in the stacked data denotes which
-set an observation belongs to).
+\code{label = "set_label"} if the column "set_label" in the stacked data
+denotes which set an observation belongs to).
 
 NOTE: Labeled data identifiers can be:
 
@@ -220,7 +220,7 @@ formula <- Y - f ~ X1
 
 ipd(formula, method = "postpi_analytic", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- PostPI Bootstrap Correction (Wang et al., 2020)
 
@@ -228,24 +228,24 @@ nboot <- 200
 
 ipd(formula, method = "postpi_boot", model = "ols",
 
-    data = dat, label = "set", nboot = nboot)
+    data = dat, label = "set_label", nboot = nboot)
 
 #-- PPI (Angelopoulos et al., 2023)
 
 ipd(formula, method = "ppi", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- PPI++ (Angelopoulos et al., 2023)
 
 ipd(formula, method = "ppi_plusplus", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 #-- PSPA (Miao et al., 2023)
 
 ipd(formula, method = "pspa", model = "ols",
 
-    data = dat, label = "set")
+    data = dat, label = "set_label")
 
 }

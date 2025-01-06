@@ -38,7 +38,7 @@ formula <- Y - f ~ X1
 
 fit <- ipd(formula, method = "postpi_analytic", model = "ols",
 
-  data = dat, label = "set")
+  data = dat, label = "set_label")
 
 #-- Augment Data
 

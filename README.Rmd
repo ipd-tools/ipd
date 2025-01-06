@@ -82,11 +82,11 @@ dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
 
 options(digits=2)
 
-head(dat[dat$set == "training",])
+head(dat[dat$set_label == "training",])
 
-head(dat[dat$set == "labeled",])
+head(dat[dat$set_label == "labeled",])
 
-head(dat[dat$set == "unlabeled",])
+head(dat[dat$set_label == "unlabeled",])
 
 ```
 
@@ -100,7 +100,7 @@ library(patchwork)
 
 #-- Plot example labeled data
 
-dat_labeled <- dat[dat$set == "labeled",]
+dat_labeled <- dat[dat$set_label == "labeled",]
 
 p1 <- dat_labeled |>
 
@@ -201,27 +201,27 @@ We compare two non-IPD approaches to analyzing the data to methods included in t
 
 ```{r overalltab, echo=FALSE}
 
-fit0 <- lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |> summary()
-fit1 <- lm(Y ~ X1, data = dat[dat$set == "labeled",])   |> summary()
+fit0 <- lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |> summary()
+fit1 <- lm(Y ~ X1, data = dat[dat$set_label == "labeled",])   |> summary()
 
 formula <- Y - f ~ X1
 
 nboot <- 200
 
 fit2 <- ipd::ipd(formula, method = "postpi_boot", model = "ols", 
-                 data = dat, label = "set", nboot = nboot) |> summary()
+                 data = dat, label = "set_label", nboot = nboot) |> summary()
 
 fit3 <- ipd::ipd(formula, method = "postpi_analytic", model = "ols", 
-                 data = dat, label = "set") |> summary()
+                 data = dat, label = "set_label") |> summary()
 
 fit4 <- ipd::ipd(formula, method = "ppi", model = "ols", 
-                 data = dat, label = "set") |> summary()
+                 data = dat, label = "set_label") |> summary()
 
 fit5 <- ipd::ipd(formula, method = "ppi_plusplus", model = "ols", 
-                 data = dat, label = "set") |> summary()
+                 data = dat, label = "set_label") |> summary()
 
 fit6 <- ipd::ipd(formula, method = "pspa", model = "ols", 
-                 data = dat, label = "set") |> summary()
+                 data = dat, label = "set_label") |> summary()
 
 sumtab <- rbind(
   
@@ -246,7 +246,7 @@ We can see that the IPD methods have similar estimates and standard errors, whil
 ```{r naive}
 #--- Fit the Naive Regression
 
-lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |> 
+lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |> 
   
   summary()
 ```
@@ -256,7 +256,7 @@ lm(f ~ X1, data = dat[dat$set == "unlabeled",]) |>
 ```{r classic}
 #--- Fit the Classic Regression
 
-lm(Y ~ X1, data = dat[dat$set == "labeled",]) |> 
+lm(Y ~ X1, data = dat[dat$set_label == "labeled",]) |> 
   
   summary()
 ```
@@ -276,7 +276,7 @@ nboot <- 200
 
 ipd::ipd(formula, 
          
-  method = "postpi_boot", model = "ols", data = dat, label = "set", 
+  method = "postpi_boot", model = "ols", data = dat, label = "set_label", 
   
   nboot = nboot) |> 
   
@@ -290,7 +290,7 @@ ipd::ipd(formula,
 
 ipd::ipd(formula, 
          
-  method = "postpi_analytic", model = "ols", data = dat, label = "set") |> 
+  method = "postpi_analytic", model = "ols", data = dat, label = "set_label") |> 
   
   summary()
 ```
@@ -302,7 +302,7 @@ ipd::ipd(formula,
 
 ipd::ipd(formula, 
          
-  method = "ppi", model = "ols", data = dat, label = "set") |> 
+  method = "ppi", model = "ols", data = dat, label = "set_label") |> 
   
   summary()
 ```
@@ -314,7 +314,7 @@ ipd::ipd(formula,
 
 ipd::ipd(formula, 
          
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set") |> 
+  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label") |> 
   
   summary()
 ```
@@ -326,7 +326,7 @@ ipd::ipd(formula,
 
 ipd::ipd(formula, 
          
-  method = "pspa", model = "ols", data = dat, label = "set") |> 
+  method = "pspa", model = "ols", data = dat, label = "set_label") |> 
   
   summary()
 ```
@@ -342,7 +342,7 @@ nboot <- 200
 
 fit_postpi <- ipd::ipd(formula, 
          
-  method = "postpi_boot", model = "ols", data = dat, label = "set", 
+  method = "postpi_boot", model = "ols", data = dat, label = "set_label", 
   
   nboot = nboot)
   

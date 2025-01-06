@@ -36,11 +36,11 @@ dat <- simdat(model = "mean")
 
 form <- Y - f ~ 1
 
-Y_l <- dat[dat$set == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
 
-f_l <- dat[dat$set == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
 
-f_u <- dat[dat$set == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
 pspa_mean(Y_l, f_l, f_u)
 

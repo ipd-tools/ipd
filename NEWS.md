@@ -25,3 +25,5 @@
   * Clarified that not all columns in data are used in prediction unless explicitly referenced in the `formula` argument or in the `label` argument if the data are passed as one stacked data frame. 
 
 * Updated the documentation for `simdat()` to include a more thorough explanation of how to simulate data with this function. 
+
+* `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
