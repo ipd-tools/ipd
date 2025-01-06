@@ -26,32 +26,39 @@ the model to be fitted. Must be of the form \code{Y - f ~ X}, where \code{Y}
 is the name of the column corresponding to the observed outcome in the
 labeled data, \code{f} is the name of the column corresponding to the
 predicted outcome in both labeled and unlabeled data, and \code{X}
-corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).}
+corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
+See \strong{1. Formula} in the \strong{Details} below for more information.}
 
-\item{method}{The method to be used for fitting the model. Must be one of
+\item{method}{The IPD method to be used for fitting the model. Must be one of
 \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-\code{"pspa"}, or \code{"ppi_plusplus"}.}
+\code{"ppi_plusplus"}, or \code{"pspa"}.
+See \strong{3. Method} in the \strong{Details} below for more information.}
 
-\item{model}{The type of model to be fitted. Must be one of \code{"mean"},
-\code{"quantile"}, \code{"ols"}, or \code{"logistic"}.}
+\item{model}{The type of downstream inferential model to be fitted, or the
+parameter being estimated. Must be one of \code{"mean"},
+\code{"quantile"}, \code{"ols"}, \code{"logistic"}, or \code{"poisson"}.
+See \strong{4. Model} in the \strong{Details} below for more information.}
 
 \item{data}{A \code{data.frame} containing the variables in the model,
 either a stacked data frame with a specific column identifying the labeled
 versus unlabeled observations (\code{label}), or only the labeled data
 set. Must contain columns for the observed outcomes (\code{Y}), the
 predicted outcomes (\code{f}), and the features (\code{X}) needed to specify
-the \code{formula}.}
+the \code{formula}. See \strong{2. Data} in the \strong{Details} below for
+more information.}
 
 \item{label}{A \code{string}, \code{int}, or \code{logical} specifying the
 column in the data that distinguishes between the labeled and unlabeled
 observations. See the \code{Details} section for more information. If NULL,
-\code{unlabeled_data} must be specified.}
+\code{unlabeled_data} must be specified. See \strong{2. Data} in the
+\strong{Details} below for more information.}
 
 \item{unlabeled_data}{(optional) A \code{data.frame} of unlabeled data. If
 NULL, \code{label} must be specified. Specifying both the \code{label} and
 \code{unlabeled_data} arguments will result in an error message. If
 specified, must contain columns for the predicted outcomes (\code{f}), and
-the features (\code{X}) needed to specify the \code{formula}.}
+the features (\code{X}) needed to specify the \code{formula}. See
+\strong{2. Data} in the \strong{Details} below for more information.}
 
 \item{seed}{(optional) An \code{integer} seed for random number generation.}
 
@@ -65,15 +72,18 @@ model? Default is \code{TRUE}.}
 one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.}
 
 \item{n_t}{(integer, optional) Size of the dataset used to train the
-prediction function (necessary for the \code{"postpi"} methods if \code{n_t} <
-\code{nrow(X_l)}. Defaults to \code{Inf}.}
+prediction function (necessary for the \code{"postpi_analytic"} and
+\code{"postpi_boot"} methods if \code{n_t} < \code{nrow(X_l)}.
+Defaults to \code{Inf}.}
 
 \item{na_action}{(string, optional) How missing covariate data should be
 handled. Currently \code{"na.fail"} and \code{"na.omit"} are accommodated.
 Defaults to \code{"na.fail"}.}
 
 \item{...}{Additional arguments to be passed to the fitting function. See
-the \code{Details} section for more information.}
+the \code{Details} section for more information. See
+\strong{5. Auxilliary Arguments} and \strong{6. Other Arguments} in the
+\strong{Details} below for more information.}
 }
 \value{
 a summary of model output.
@@ -120,8 +130,10 @@ for the unlabeled data (\code{unlabeled_data}).
 
 For option (1), provide one data argument (\code{data}) which contains a
 stacked \code{data.frame} with both the unlabeled and labeled data and a
-\code{label} argument that specify the column that identifies the labeled
-versus the unlabeled observations in the stacked \code{data.frame}
+\code{label} argument that specifies the column identifying the labeled
+versus the unlabeled observations in the stacked \code{data.frame} (e.g.,
+\code{label = "set"} if the column "set" in the stacked data denotes which
+set an observation belongs to).
 
 NOTE: Labeled data identifiers can be:
 
@@ -143,15 +155,20 @@ Unlabeled data identifiers can be:
 
 For option (2), provide separate data arguments for the labeled data set
 (\code{data}) and the unlabeled data set (\code{unlabeled_data}). If the
-second argument is provided, the function ignores the label identifier and
-assumes the data provided is stacked.
+second argument is provided, the function ignores the \code{label} identifier
+and assumes the data provided are not stacked.
+
+NOTE: Not all columns in \code{data} or \code{unlabeled_data} may be used
+unless explicitly referenced in the \code{formula} argument or in the
+\code{label} argument (if the data are passed as one stacked data frame).
 
 \strong{3. Method:}
 
 Use the \code{method} argument to specify the fitting method:
 
 \describe{
-\item{"postpi"}{Wang et al. (2020) Post-Prediction Inference (PostPI)}
+\item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Analytic Correction}
+\item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Bootstrap Correction}
 \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 (PPI)}
 \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
@@ -161,14 +178,15 @@ Post-Prediction Inference (PSPA)}
 
 \strong{4. Model:}
 
-Use the \code{model} argument to specify the type of model:
+Use the \code{model} argument to specify the type of downstream inferential
+model or parameter to be estimated:
 
 \describe{
-\item{"mean"}{Mean value of the outcome}
-\item{"quantile"}{\code{q}th quantile of the outcome}
-\item{"ols"}{Linear regression}
-\item{"logistic"}{Logistic regression}
-\item{"poisson"}{Poisson regression}
+\item{"mean"}{Mean value of a continuous outcome}
+\item{"quantile"}{\code{q}th quantile of a continuous outcome}
+\item{"ols"}{Linear regression coefficients for a continuous outcome}
+\item{"logistic"}{Logistic regression coefficients for a binary outcome}
+\item{"poisson"}{Poisson regression coefficients for a count outcome}
 }
 
 The \code{ipd} wrapper function will concatenate the \code{method} and
