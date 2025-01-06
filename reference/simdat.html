@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@ inference. Defaults is 1.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data.frame containing n rows and columns corresponding to
 the labeled outcome (Y), the predicted outcome (f), a character variable
-(set) indicating which data set the observation belongs to (training,
+(set_label) indicating which data set the observation belongs to (training,
 labeled, or unlabeled), and four independent, normally distributed
 predictors (X1, X2, X3, and X4), where applicable.</p>
     </div>
@@ -217,13 +217,13 @@ and \(\hat{\gamma}_4\) are the estimated coefficients.</p>
 <span class="r-in"><span>  model <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat_mean</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Y  f      set</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1.2358347 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.3104177 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2.2010616 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.5780407 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2.2034014 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.3235828 NA training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           Y  f set_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1.2358347 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.3104177 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2.2010616 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.5780407 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2.2034014 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.3235828 NA  training</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- Linear Regression</span></span></span>
 <span class="r-in"><span></span></span>
@@ -232,13 +232,13 @@ and \(\hat{\gamma}_4\) are the estimated coefficients.</p>
 <span class="r-in"><span>  model <span class="op">=</span> <span class="st">"ols"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat_ols</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            X1         X2          X3           X4          Y  f      set</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.01987176 -0.1397668  1.13837121 -0.318232616  1.2596350 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.38072091  0.6508478 -1.36065237 -0.083392001  0.7739356 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.16047478  0.8209136 -0.45652812 -0.027092071  0.6575092 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.29612624 -1.1946885 -0.28393557 -0.989618989  2.5554902 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.86328948 -0.7039109 -0.01353596 -0.639295088 -1.3541555 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.78215060 -0.1660609 -0.26126609  0.005894084  1.7686558 NA training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            X1         X2          X3           X4          Y  f set_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.01987176 -0.1397668  1.13837121 -0.318232616  1.2596350 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.38072091  0.6508478 -1.36065237 -0.083392001  0.7739356 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.16047478  0.8209136 -0.45652812 -0.027092071  0.6575092 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.29612624 -1.1946885 -0.28393557 -0.989618989  2.5554902 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.86328948 -0.7039109 -0.01353596 -0.639295088 -1.3541555 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.78215060 -0.1660609 -0.26126609  0.005894084  1.7686558 NA  training</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

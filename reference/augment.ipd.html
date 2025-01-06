@@ -9,7 +9,7 @@ information about each observation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,13 +80,13 @@ values and residuals.</p>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="simdat.html">simdat</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">300</span>, <span class="fl">300</span><span class="op">)</span>, effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            X1          X2         X3         X4          Y  f      set</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.08378436  1.42014307 -0.1615291 -0.2004525 -0.2871755 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.98294375 -1.30333434 -1.0273652 -1.6867582  0.3242501 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.87506732  0.05942012 -1.0964411 -0.0696362 -2.2601440 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.18614466 -1.30651333 -0.2979100  1.4198123  1.1182872 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.63348570  0.32404466 -1.0075244 -0.4614362 -1.5729777 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.09079746  0.11532808 -0.6296308 -0.4045431  0.1953583 NA training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            X1          X2         X3         X4          Y  f set_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.08378436  1.42014307 -0.1615291 -0.2004525 -0.2871755 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.98294375 -1.30333434 -1.0273652 -1.6867582  0.3242501 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.87506732  0.05942012 -1.0964411 -0.0696362 -2.2601440 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.18614466 -1.30651333 -0.2979100  1.4198123  1.1182872 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.63348570  0.32404466 -1.0075244 -0.4614362 -1.5729777 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.09079746  0.11532808 -0.6296308 -0.4045431  0.1953583 NA  training</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">f</span> <span class="op">~</span> <span class="va">X1</span></span></span>
 <span class="r-in"><span></span></span>
@@ -94,7 +94,7 @@ values and residuals.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"postpi_analytic"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- Augment Data</span></span></span>
 <span class="r-in"><span></span></span>
@@ -108,7 +108,7 @@ values and residuals.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 604 -0.5649962  0.146649326 -0.2847619  1.1671536 -1.5503196 -0.1018075</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 605  2.4380768 -0.137673699  2.1158117  0.8717130  7.3772118  4.9138749</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 606  0.9143936 -1.111515668 -0.4280861 -0.6254231  2.3323484  1.3288926</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           set    .fitted     .resid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     set_label    .fitted     .resid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 601 unlabeled 0.01990047 -1.7478975</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 602 unlabeled 1.86134104 -3.0092947</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 603 unlabeled 1.19502145 -0.3974588</span>

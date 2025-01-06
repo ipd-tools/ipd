@@ -19,7 +19,7 @@ real-world applications."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,13 +132,13 @@ refer to the associated manuscripts at the following references:</p><ul><li><p><
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="simdat.html">simdat</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">300</span>, <span class="fl">300</span><span class="op">)</span>, effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           X1          X2         X3          X4         Y  f      set</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.5855288 -0.78486098  1.1872102  1.05076285 1.4008570 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.7094660 -2.56005244 -0.3567140 -0.07179733 4.1079201 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.1093033  0.07280078  1.2122385  0.11673662 1.4501726 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.4534972  0.75024358 -0.6939527  0.97786651 1.2987926 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.6058875 -0.12824888  1.3560616 -1.03154201 2.5256490 NA training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -1.8179560 -0.48786673  0.9057313  2.19912933 0.2889297 NA training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           X1          X2         X3          X4         Y  f set_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.5855288 -0.78486098  1.1872102  1.05076285 1.4008570 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.7094660 -2.56005244 -0.3567140 -0.07179733 4.1079201 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.1093033  0.07280078  1.2122385  0.11673662 1.4501726 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.4534972  0.75024358 -0.6939527  0.97786651 1.2987926 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.6058875 -0.12824888  1.3560616 -1.03154201 2.5256490 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -1.8179560 -0.48786673  0.9057313  2.19912933 0.2889297 NA  training</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">f</span> <span class="op">~</span> <span class="va">X1</span></span></span>
 <span class="r-in"><span></span></span>
@@ -146,7 +146,7 @@ refer to the associated manuscripts at the following references:</p><ul><li><p><
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit_postpi1</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"postpi_analytic"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- PostPI Bootstrap Correction (Wang et al., 2020)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -154,25 +154,25 @@ refer to the associated manuscripts at the following references:</p><ul><li><p><
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit_postpi2</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"postpi_boot"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set"</span>, nboot <span class="op">=</span> <span class="va">nboot</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span>, nboot <span class="op">=</span> <span class="va">nboot</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- PPI (Angelopoulos et al., 2023)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit_ppi</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"ppi"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- PPI++ (Angelopoulos et al., 2023)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit_plusplus</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"ppi_plusplus"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- PSPA (Miao et al., 2023)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit_pspa</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"pspa"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- Print the Model</span></span></span>
 <span class="r-in"><span></span></span>
@@ -232,7 +232,7 @@ refer to the associated manuscripts at the following references:</p><ul><li><p><
 <span class="r-out co"><span class="r-pr">#&gt;</span> 604 -0.6623572  1.2474343  0.18896582  0.2288555  0.1193828 -0.04566093</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 605 -0.1329536 -1.2482755 -0.21736688 -0.1678426 -0.8563329  0.54360381</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 606 -1.3217017 -1.9347187  0.07163463 -0.6305805 -0.2815313 -0.40867991</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           set    .fitted      .resid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     set_label    .fitted      .resid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 601 unlabeled -0.7035172 -0.41806977</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 602 unlabeled  0.9553931 -1.34541177</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 603 unlabeled  0.3482713  0.85592425</span>
