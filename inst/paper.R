@@ -26,7 +26,7 @@ dat_ols <- simdat(n = n, effect = 1, sigma_Y = 4,
 
 #-- Plot example labeled data
 
-dat_ols_labeled <- dat_ols[dat_ols$set == "labeled",]
+dat_ols_labeled <- dat_ols[dat_ols$set_label == "labeled",]
 
 p1 <- dat_ols_labeled |>
 
@@ -100,9 +100,9 @@ fig1
 
 #--- MODEL FITTING -------------------------------------------------------------
 
-dat_ols_l <- dat_ols[dat_ols$set == "labeled",]
+dat_ols_l <- dat_ols[dat_ols$set_label == "labeled",]
 
-dat_ols_u <- dat_ols[dat_ols$set == "unlabeled",]
+dat_ols_u <- dat_ols[dat_ols$set_label == "unlabeled",]
 
 #-- Oracle Regression
 
@@ -124,31 +124,31 @@ formula <- Y - f ~ X1
 
 fit3 <- ipd(formula, method = "postpi_boot", model = "ols",
 
-  data = dat_ols, label = "set", rel_func = "gam", nboot = 200)
+  data = dat_ols, label = "set_label", rel_func = "gam", nboot = 200)
 
 #-- PostPI Analytic Correction
 
 fit4 <- ipd(formula, method = "postpi_analytic", model = "ols",
 
-  data = dat_ols, label = "set")
+  data = dat_ols, label = "set_label")
 
 #-- PPI
 
 fit5 <- ipd(formula,  method = "ppi", model = "ols",
 
-  data = dat_ols, label = "set")
+  data = dat_ols, label = "set_label")
 
 #-- PPI++
 
 fit6 <- ipd(formula, method = "ppi_plusplus", model = "ols",
 
-  data = dat_ols, label = "set")
+  data = dat_ols, label = "set_label")
 
 #-- PSPA
 
 fit7 <- ipd(formula, method = "pspa", model = "ols",
 
-  data = dat_ols, label = "set")
+  data = dat_ols, label = "set_label")
 
 #--- SUMMARIZE RESULTS ---------------------------------------------------------
 
@@ -226,7 +226,7 @@ fig2
 
 #--- PRINTING, SUMMARIZING, AND TIDYING ----------------------------------------
 
-df <- dat_ols[which(dat_ols$set != "training"),]
+df <- dat_ols[which(dat_ols$set_label != "training"),]
 
 print(fit3)                                      #- Print
 
@@ -272,13 +272,13 @@ sim_func <- function(nsims = 1000, n_t = 100, n_l = 100, n_u = 1000,
 
     dat_l = dat |>
 
-      filter(set == "labeled")
+      filter(set_label == "labeled")
 
     #-- UNLABELED DATA
 
     dat_u = dat |>
 
-      filter(set == "unlabeled")
+      filter(set_label == "unlabeled")
 
     #--- FIT VARIOUS METHODS ---------------------------------------------------
 
