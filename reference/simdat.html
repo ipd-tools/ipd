@@ -70,8 +70,8 @@ inference. Defaults is 1.</p></dd>
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
 <dd><p>The type of model to be generated. Must be one of
-<code>"mean"</code>, <code>"quantile"</code>, <code>"ols"</code>, or <code>"logistic"</code>.
-Default is <code>"ols"</code>.</p></dd>
+<code>"mean"</code>, <code>"quantile"</code>, <code>"ols"</code>, <code>"logistic"</code>, or
+<code>"poisson"</code>. Default is <code>"ols"</code>.</p></dd>
 
 
 <dt id="arg-shift">shift<a class="anchor" aria-label="anchor" href="#arg-shift"></a></dt>
@@ -91,6 +91,120 @@ the labeled outcome (Y), the predicted outcome (f), a character variable
 (set) indicating which data set the observation belongs to (training,
 labeled, or unlabeled), and four independent, normally distributed
 predictors (X1, X2, X3, and X4), where applicable.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The <code>simdat</code> function generates three datasets consisting of independent
+realizations of \(Y\) (for <code>model</code> = <code>"mean"</code> or
+<code>"quantile"</code>), or \(\{Y, \boldsymbol{X}\}\) (for <code>model</code> =
+<code>"ols"</code>, <code>"logistic"</code>, or <code>"poisson"</code>): a <em>training</em>
+dataset of size \(n_t\), a <em>labeled</em> dataset of size \(n_l\), and
+an <em>unlabeled</em> dataset of size \(n_u\). These sizes are specified by
+the argument <code>n</code>.</p>
+<p>NOTE: In the <em>unlabeled</em> data subset, outcome data are still generated
+to facilitate a benchmark for comparison with an "oracle" model that uses
+the true \(Y^{\mathcal{U}}\) values for estimation and inference.</p>
+<p><strong>Generating Data</strong></p>
+<p>For <code>"mean"</code> and <code>"quantile"</code>, we simulate a continuous outcome,
+\(Y \in \mathbb{R}\), with mean given by the <code>effect</code> argument and
+error variance given by the <code>sigma_y</code> argument.</p>
+<p>For <code>"ols"</code>, <code>"logistic"</code>, or <code>"poisson"</code> models, predictor
+data, \(\boldsymbol{X} \in \mathbb{R}^4\) are simulated such that the
+\(i\)th observation follows a standard multivariate normal distribution
+with a zero mean vector and identity covariance matrix:</p>
+<p>$$
+  \boldsymbol{X_i} = (X_{i1}, X_{i2}, X_{i3}, X_{i4}) \sim \mathcal{N}_4(\boldsymbol{0}, \boldsymbol{I}).
+$$</p>
+<p>For <code>"ols"</code>, a continuous outcome \(Y \in \mathbb{R}\) is simulated
+to depend on \(X_1\) through a linear term with the effect size specified
+by the <code>effect</code> argument, while the other predictors,
+\(\boldsymbol{X} \setminus X_1\), have nonlinear effects:</p>
+<p>$$
+  Y_i = effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y,
+$$</p>
+<p>and \(\varepsilon_y \sim \mathcal{N}(0, sigma_y)\), where the
+<code>sigma_y</code> argument specifies the error variance.</p>
+<p>For <code>"logistic"</code>, we simulate:</p>
+<p>$$
+  \Pr(Y_i = 1 \mid \boldsymbol{X}) = logit^{-1}(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
+$$</p>
+<p>and generate:</p>
+<p>$$
+  Y_i \sim Bern[1, \Pr(Y_i = 1 \mid \boldsymbol{X})]
+$$</p>
+<p>where \(\varepsilon_y \sim \mathcal{N}(0, sigma\_y)\).</p>
+<p>For <code>"poisson"</code>, we simulate:</p>
+<p>$$
+  \lambda_Y = exp(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
+$$</p>
+<p>and generate:</p>
+<p>$$
+  Y_i \sim Poisson(\lambda_Y)
+$$</p>
+<p><strong>Generating Predictions</strong></p>
+<p>To generate predicted outcomes for <code>"mean"</code> and <code>"quantile"</code>, we
+simulate a continuous variable with mean given by the empirical mean of the
+training data and error variance given by the <code>sigma_y</code> argument.</p>
+<p>For <code>"ols"</code>, we fit a generalized additive model (GAM) on the
+simulated <em>training</em> dataset and calculate predictions for the
+<em>labeled</em> and <em>unlabeled</em> datasets as deterministic functions of
+\(\boldsymbol{X}\). Specifically, we fit the following GAM:</p>
+<p>$$
+  Y^{\mathcal{T}} = s_0 + s_1(X_1^{\mathcal{T}}) + s_2(X_2^{\mathcal{T}}) +
+  s_3(X_3^{\mathcal{T}}) + s_4(X_4^{\mathcal{T}}) + \varepsilon_p,
+$$</p>
+<p>where \(\mathcal{T}\) denotes the <em>training</em> dataset, \(s_0\) is an
+intercept term, and \(s_1(\cdot)\), \(s_2(\cdot)\), \(s_3(\cdot)\),
+and \(s_4(\cdot)\) are smoothing spline functions for \(X_1\), \(X_2\),
+\(X_3\), and \(X_4\), respectively, with three target equivalent degrees
+of freedom. Residual error is modeled as \(\varepsilon_p\).</p>
+<p>Predictions for <em>labeled</em> and <em>unlabeled</em> datasets are calculated
+as:</p>
+<p>$$
+ f(\boldsymbol{X}^{\mathcal{L}\cup\mathcal{U}}) = \hat{s}_0 + \hat{s}_1(X_1^{\mathcal{L}\cup\mathcal{U}}) +
+\hat{s}_2(X_2^{\mathcal{L}\cup\mathcal{U}}) + \hat{s}_3(X_3^{\mathcal{L}\cup\mathcal{U}}) +
+\hat{s}_4(X_4^{\mathcal{L}\cup\mathcal{U}}),
+$$</p>
+<p>where \(\hat{s}_0, \hat{s}_1, \hat{s}_2, \hat{s}_3\), and \(\hat{s}_4\)
+are estimates of \(s_0, s_1, s_2, s_3\), and \(s_4\), respectively.</p>
+<p>NOTE: For continuous outcomes, we provide optional arguments <code>shift</code> and
+<code>scale</code> to further apply a location shift and scaling factor,
+respectively, to the predicted outcomes. These default to <code>shift = 0</code>
+and <code>scale = 1</code>, i.e., no location shift or scaling.</p>
+<p>For <code>"logistic"</code>, we train k-nearest neighbors (k-NN) classifiers on
+the simulated <em>training</em> dataset for values of \(k\) ranging from 1
+to 10. The optimal \(k\) is chosen via cross-validation, minimizing the
+misclassification error on the validation folds. Predictions for the
+<em>labeled</em> and <em>unlabeled</em> datasets are obtained by applying the
+k-NN classifier with the optimal \(k\) to \(\boldsymbol{X}\).</p>
+<p>Specifically, for each observation in the <em>labeled</em> and <em>unlabeled</em>
+datasets:</p>
+<p>$$
+  \hat{Y} = \operatorname{argmax}_c \sum_{i \in \mathcal{N}_k} I(Y_i = c),
+$$</p>
+<p>where \(\mathcal{N}_k\) represents the set of \(k\) nearest neighbors in
+the training dataset, \(c\) indexes the possible classes (0 or 1), and
+\(I(\cdot)\) is an indicator function.</p>
+<p>For <code>"poisson"</code>, we fit a generalized linear model (GLM) with a log link
+function to the simulated <em>training</em> dataset. The model is of the form:</p>
+<p>$$
+  \log(\mu^{\mathcal{T}}) = \gamma_0 + \gamma_1 X_1^{\mathcal{T}} + \gamma_2 X_2^{\mathcal{T}} +
+  \gamma_3 X_3^{\mathcal{T}} + \gamma_4 X_4^{\mathcal{T}},
+$$</p>
+<p>where \(\mu^{\mathcal{T}}\) is the expected count for the response variable
+in the <em>training</em> dataset, \(\gamma_0\) is the intercept, and
+\(\gamma_1\), \(\gamma_2\), \(\gamma_3\), and \(\gamma_4\) are the
+regression coefficients for the predictors \(X_1\), \(X_2\), \(X_3\),
+and \(X_4\), respectively.</p>
+<p>Predictions for the <em>labeled</em> and <em>unlabeled</em> datasets are
+calculated as:</p>
+<p>$$
+  \hat{\mu}^{\mathcal{L} \cup \mathcal{U}} = \exp(\hat{\gamma}_0 + \hat{\gamma}_1 X_1^{\mathcal{L} \cup \mathcal{U}} +
+  \hat{\gamma}_2 X_2^{\mathcal{L} \cup \mathcal{U}} + \hat{\gamma}_3 X_3^{\mathcal{L} \cup \mathcal{U}} +
+  \hat{\gamma}_4 X_4^{\mathcal{L} \cup \mathcal{U}}),
+$$</p>
+<p>where \(\hat{\gamma}_0\), \(\hat{\gamma}_1\), \(\hat{\gamma}_2\), \(\hat{\gamma}_3\),
+and \(\hat{\gamma}_4\) are the estimated coefficients.</p>
     </div>
 
     <div class="section level2">

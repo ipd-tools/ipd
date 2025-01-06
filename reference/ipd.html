@@ -70,18 +70,22 @@ the model to be fitted. Must be of the form <code>Y - f ~ X</code>, where <code>
 is the name of the column corresponding to the observed outcome in the
 labeled data, <code>f</code> is the name of the column corresponding to the
 predicted outcome in both labeled and unlabeled data, and <code>X</code>
-corresponds to the features of interest (i.e., <code>X = X1 + ... + Xp</code>).</p></dd>
+corresponds to the features of interest (i.e., <code>X = X1 + ... + Xp</code>).
+See <strong>1. Formula</strong> in the <strong>Details</strong> below for more information.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>The method to be used for fitting the model. Must be one of
+<dd><p>The IPD method to be used for fitting the model. Must be one of
 <code>"postpi_analytic"</code>, <code>"postpi_boot"</code>, <code>"ppi"</code>,
-<code>"pspa"</code>, or <code>"ppi_plusplus"</code>.</p></dd>
+<code>"ppi_plusplus"</code>, or <code>"pspa"</code>.
+See <strong>3. Method</strong> in the <strong>Details</strong> below for more information.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>The type of model to be fitted. Must be one of <code>"mean"</code>,
-<code>"quantile"</code>, <code>"ols"</code>, or <code>"logistic"</code>.</p></dd>
+<dd><p>The type of downstream inferential model to be fitted, or the
+parameter being estimated. Must be one of <code>"mean"</code>,
+<code>"quantile"</code>, <code>"ols"</code>, <code>"logistic"</code>, or <code>"poisson"</code>.
+See <strong>4. Model</strong> in the <strong>Details</strong> below for more information.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -90,14 +94,16 @@ either a stacked data frame with a specific column identifying the labeled
 versus unlabeled observations (<code>label</code>), or only the labeled data
 set. Must contain columns for the observed outcomes (<code>Y</code>), the
 predicted outcomes (<code>f</code>), and the features (<code>X</code>) needed to specify
-the <code>formula</code>.</p></dd>
+the <code>formula</code>. See <strong>2. Data</strong> in the <strong>Details</strong> below for
+more information.</p></dd>
 
 
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
 <dd><p>A <code>string</code>, <code>int</code>, or <code>logical</code> specifying the
 column in the data that distinguishes between the labeled and unlabeled
 observations. See the <code>Details</code> section for more information. If NULL,
-<code>unlabeled_data</code> must be specified.</p></dd>
+<code>unlabeled_data</code> must be specified. See <strong>2. Data</strong> in the
+<strong>Details</strong> below for more information.</p></dd>
 
 
 <dt id="arg-unlabeled-data">unlabeled_data<a class="anchor" aria-label="anchor" href="#arg-unlabeled-data"></a></dt>
@@ -105,7 +111,8 @@ observations. See the <code>Details</code> section for more information. If NULL
 NULL, <code>label</code> must be specified. Specifying both the <code>label</code> and
 <code>unlabeled_data</code> arguments will result in an error message. If
 specified, must contain columns for the predicted outcomes (<code>f</code>), and
-the features (<code>X</code>) needed to specify the <code>formula</code>.</p></dd>
+the features (<code>X</code>) needed to specify the <code>formula</code>. See
+<strong>2. Data</strong> in the <strong>Details</strong> below for more information.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -129,8 +136,9 @@ one of <code>"two-sided"</code>, <code>"less"</code>, or <code>"greater"</code>.
 
 <dt id="arg-n-t">n_t<a class="anchor" aria-label="anchor" href="#arg-n-t"></a></dt>
 <dd><p>(integer, optional) Size of the dataset used to train the
-prediction function (necessary for the <code>"postpi"</code> methods if <code>n_t</code> &lt;
-<code>nrow(X_l)</code>. Defaults to <code>Inf</code>.</p></dd>
+prediction function (necessary for the <code>"postpi_analytic"</code> and
+<code>"postpi_boot"</code> methods if <code>n_t</code> &lt; <code>nrow(X_l)</code>.
+Defaults to <code>Inf</code>.</p></dd>
 
 
 <dt id="arg-na-action">na_action<a class="anchor" aria-label="anchor" href="#arg-na-action"></a></dt>
@@ -141,7 +149,9 @@ Defaults to <code>"na.fail"</code>.</p></dd>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments to be passed to the fitting function. See
-the <code>Details</code> section for more information.</p></dd>
+the <code>Details</code> section for more information. See
+<strong>5. Auxilliary Arguments</strong> and <strong>6. Other Arguments</strong> in the
+<strong>Details</strong> below for more information.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -197,8 +207,10 @@ based on the specific <code>method</code> called.</p>
 for the unlabeled data (<code>unlabeled_data</code>).</p></li>
 </ol><p>For option (1), provide one data argument (<code>data</code>) which contains a
 stacked <code>data.frame</code> with both the unlabeled and labeled data and a
-<code>label</code> argument that specify the column that identifies the labeled
-versus the unlabeled observations in the stacked <code>data.frame</code></p>
+<code>label</code> argument that specifies the column identifying the labeled
+versus the unlabeled observations in the stacked <code>data.frame</code> (e.g.,
+<code>label = "set"</code> if the column "set" in the stacked data denotes which
+set an observation belongs to).</p>
 <p>NOTE: Labeled data identifiers can be:</p>
 <dl><dt>String</dt>
 <dd><p>"l", "lab", "label", "labeled", "labelled", "tst", "test",
@@ -225,12 +237,18 @@ versus the unlabeled observations in the stacked <code>data.frame</code></p>
 
 </dl><p>For option (2), provide separate data arguments for the labeled data set
 (<code>data</code>) and the unlabeled data set (<code>unlabeled_data</code>). If the
-second argument is provided, the function ignores the label identifier and
-assumes the data provided is stacked.</p>
+second argument is provided, the function ignores the <code>label</code> identifier
+and assumes the data provided are not stacked.</p>
+<p>NOTE: Not all columns in <code>data</code> or <code>unlabeled_data</code> may be used
+unless explicitly referenced in the <code>formula</code> argument or in the
+<code>label</code> argument (if the data are passed as one stacked data frame).</p>
 <p><strong>3. Method:</strong></p>
 <p>Use the <code>method</code> argument to specify the fitting method:</p>
-<dl><dt>"postpi"</dt>
-<dd><p>Wang et al. (2020) Post-Prediction Inference (PostPI)</p></dd>
+<dl><dt>"postpi_analytic"</dt>
+<dd><p>Wang et al. (2020) Post-Prediction Inference (PostPI) Analytic Correction</p></dd>
+
+<dt>"postpi_boot"</dt>
+<dd><p>Wang et al. (2020) Post-Prediction Inference (PostPI) Bootstrap Correction</p></dd>
 
 <dt>"ppi"</dt>
 <dd><p>Angelopoulos et al. (2023) Prediction-Powered Inference
@@ -245,21 +263,22 @@ Post-Prediction Inference (PSPA)</p></dd>
 
 
 </dl><p><strong>4. Model:</strong></p>
-<p>Use the <code>model</code> argument to specify the type of model:</p>
+<p>Use the <code>model</code> argument to specify the type of downstream inferential
+model or parameter to be estimated:</p>
 <dl><dt>"mean"</dt>
-<dd><p>Mean value of the outcome</p></dd>
+<dd><p>Mean value of a continuous outcome</p></dd>
 
 <dt>"quantile"</dt>
-<dd><p><code>q</code>th quantile of the outcome</p></dd>
+<dd><p><code>q</code>th quantile of a continuous outcome</p></dd>
 
 <dt>"ols"</dt>
-<dd><p>Linear regression</p></dd>
+<dd><p>Linear regression coefficients for a continuous outcome</p></dd>
 
 <dt>"logistic"</dt>
-<dd><p>Logistic regression</p></dd>
+<dd><p>Logistic regression coefficients for a binary outcome</p></dd>
 
 <dt>"poisson"</dt>
-<dd><p>Poisson regression</p></dd>
+<dd><p>Poisson regression coefficients for a count outcome</p></dd>
 
 
 </dl><p>The <code>ipd</code> wrapper function will concatenate the <code>method</code> and
