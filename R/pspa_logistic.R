@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 # PSPA LOGISTIC REGRESSION
-#===============================================================================
+# ===============================================================================
 
 #' PSPA Logistic Regression
 #'
@@ -36,13 +36,13 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -52,17 +52,15 @@
 #'
 #' @export
 
-pspa_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
-
-  weights = NA, alpha = 0.05) {
-
-  fit <- pspa_y(X_lab = X_l, X_unlab = X_u,
-
+pspa_logistic <- function(
+    X_l, Y_l, f_l, X_u, f_u,
+    weights = NA, alpha = 0.05) {
+  fit <- pspa_y(
+    X_lab = X_l, X_unlab = X_u,
     Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
-
     intercept = T,
-
-    weights = weights, alpha = alpha, method = "logistic")
+    weights = weights, alpha = alpha, method = "logistic"
+  )
 
   fit <- as.data.frame(fit)
 
@@ -73,4 +71,4 @@ pspa_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
   return(list(est = est, se = se))
 }
 
-#=== END =======================================================================
+# === END =======================================================================

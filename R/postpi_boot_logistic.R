@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 #  POSTPI BOOTSTRAP LOGISTIC REGRESSION
-#===============================================================================
+# ===============================================================================
 
 #--- POSTPI BOOTSTRAP LOGISTIC REGRESSION --------------------------------------
 
@@ -42,13 +42,13 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -60,19 +60,19 @@
 #'
 #' @export
 
-postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
-
-  nboot = 100, se_type = "par", seed = NULL) {
-
+postpi_boot_logistic <- function(
+    X_l, Y_l, f_l, X_u, f_u,
+    nboot = 100, se_type = "par", seed = NULL) {
   #-- 1. Estimate Prediction Model (Done in Data Step)
 
   #-- 2. Estimate Relationship Model
 
   fit_rel <- caret::train(
 
-    factor(Y) ~ factor(f), data = data.frame(Y = Y_l, f = f_l),
-
-    method = "knn")
+    factor(Y) ~ factor(f),
+    data = data.frame(Y = Y_l, f = f_l),
+    method = "knn"
+  )
 
   #-- 3. Bootstrap
 
@@ -83,7 +83,6 @@ postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
   N <- nrow(X_u)
 
   ests_b <- sapply(1:nboot, function(b) {
-
     #-   i. Sample Predicted Values and Covariates with Replacement
 
     idx_b <- sample(1:N, N, replace = T)
@@ -94,9 +93,9 @@ postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
     #-  ii. Simulate Values from Relationship Model
 
-    prob_b <- predict(fit_rel, data.frame(f = f_u_b), type = "prob")[,2]
+    prob_b <- predict(fit_rel, data.frame(f = f_u_b), type = "prob")[, 2]
 
-    Y_u_b  <- rbinom(N, 1, prob_b)
+    Y_u_b <- rbinom(N, 1, prob_b)
 
     #- iii. Fit Inference Model on Simulated Outcomes
 
@@ -111,24 +110,19 @@ postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
 
   #-- 4. Estimate Inference Model Coefficient
 
-  est <- apply(ests_b[1:(nrow(ests_b)/2),], 1, median)
+  est <- apply(ests_b[1:(nrow(ests_b) / 2), ], 1, median)
 
   #-- 5. Estimate Inference Model SE
 
   if (se_type == "par") {
-
     #- a. Parametric Bootstrap
 
-    se <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, median)
-
+    se <- apply(ests_b[(nrow(ests_b) / 2 + 1):nrow(ests_b), ], 1, median)
   } else if (se_type == "npar") {
-
     #- b. Nonparametric Bootstrap
 
-    se <- apply(ests_b[1:(nrow(ests_b)/2),], 1, sd)
-
+    se <- apply(ests_b[1:(nrow(ests_b) / 2), ], 1, sd)
   } else {
-
     stop("se_type must be one of 'par' or 'npar'")
   }
 

@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 # PPI ORDINARY LEAST SQUARES
-#===============================================================================
+# ===============================================================================
 
 #--- PPI OLS -------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -62,7 +62,6 @@
 #' @export
 
 ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
-
   n <- NROW(X_l)
 
   p <- NCOL(X_l)
@@ -73,21 +72,21 @@ ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
 
   theta_tilde_f <- solve(crossprod(X_u)) %*% t(X_u) %*% f_u
 
-  delta_hat_f   <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
+  delta_hat_f <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
 
-  theta_hat_pp  <- theta_tilde_f - delta_hat_f
+  theta_hat_pp <- theta_tilde_f - delta_hat_f
 
   #- 2. Meat and Bread for Imputed Estimate
 
   Sigma_tilde <- crossprod(X_u) / N
 
   M_tilde <- sapply(1:N, function(i) {
+    (c(f_u[i] - crossprod(X_u[i, ], theta_tilde_f)))^2 *
 
-    (c(f_u[i] - crossprod(X_u[i,], theta_tilde_f)))^2 *
-
-      tcrossprod(X_u[i,])}) |>
-
-    rowMeans() |> matrix(nrow = p)
+      tcrossprod(X_u[i, ])
+  }) |>
+    rowMeans() |>
+    matrix(nrow = p)
 
   iSigma_tilde <- solve(Sigma_tilde)
 
@@ -100,12 +99,12 @@ ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
   Sigma <- crossprod(X_l) / n
 
   M <- sapply(1:n, function(i) {
+    (c(f_l[i] - Y_l[i] - crossprod(X_l[i, ], delta_hat_f)))^2 *
 
-    (c(f_l[i] - Y_l[i] - crossprod(X_l[i,], delta_hat_f)))^2 *
-
-      tcrossprod(X_l[i,])}) |>
-
-    rowMeans() |> matrix(nrow = p)
+      tcrossprod(X_l[i, ])
+  }) |>
+    rowMeans() |>
+    matrix(nrow = p)
 
   iSigma <- solve(Sigma)
 
@@ -122,4 +121,4 @@ ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
   return(list(est = theta_hat_pp, se = se, rectifier_est = delta_hat_f))
 }
 
-#=== END =======================================================================
+# === END =======================================================================

@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 # PPI QUANTILE ESTIMATION
-#===============================================================================
+# ===============================================================================
 
 #--- PPI QUANTILE ESTIMATION ---------------------------------------------------
 
@@ -47,10 +47,9 @@
 #'
 #' @export
 
-ppi_quantile <- function(Y_l, f_l, f_u, q,
-
-  alpha = 0.05, exact_grid = FALSE) {
-
+ppi_quantile <- function(
+    Y_l, f_l, f_u, q,
+    alpha = 0.05, exact_grid = FALSE) {
   Y_l <- c(Y_l)
 
   f_l <- c(f_l)
@@ -64,11 +63,8 @@ ppi_quantile <- function(Y_l, f_l, f_u, q,
   grid <- c(Y_l, f_l, f_u)
 
   if (exact_grid) {
-
     grid <- sort(unique(grid))
-
   } else {
-
     grid <- seq(min(grid), max(grid), length.out = 5000)
   }
 
@@ -79,14 +75,13 @@ ppi_quantile <- function(Y_l, f_l, f_u, q,
   rec_p_value <- rectified_p_value(
 
     cdf_rectifier[[1]], cdf_rectifier[[2]] / sqrt(n),
-
     cdf_f_u[[1]], cdf_f_u[[2]] / sqrt(N),
-
-    null = q, alternative = "two-sided")
+    null = q, alternative = "two-sided"
+  )
 
   result_grid <- grid[rec_p_value > alpha]
 
   return(c(result_grid[1], result_grid[length(result_grid)]))
 }
 
-#=== END =======================================================================
+# === END =======================================================================

@@ -56,7 +56,7 @@ To install the development version of `ipd` from [GitHub](https://github.com/ipd
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
 
-install.packages("devtools")   
+install.packages("devtools")
 
 #-- Install the ipd package from GitHub
 
@@ -105,113 +105,83 @@ dat_ols <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
-options(digits=2)
+options(digits = 2)
 
-head(dat_ols[dat_ols$set_label == "training",])
+head(dat_ols[dat_ols$set_label == "training", ])
 
-head(dat_ols[dat_ols$set_label == "labeled",])
+head(dat_ols[dat_ols$set_label == "labeled", ])
 
-head(dat_ols[dat_ols$set_label == "unlabeled",])
+head(dat_ols[dat_ols$set_label == "unlabeled", ])
 ```
 
 The `simdat` function provides observed and unobserved outcomes for both the labeled and unlabeled datasets, though in practice the observed outcomes are not in the unlabeled set. We can visualize the relationships between these variables in the labeled data subset:
 
 ```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.height=4, fig.width=7}
-
 library(tidyverse)
 
 library(patchwork)
 
 #-- Plot example labeled data
 
-dat_labeled <- dat_ols[dat_ols$set_label == "labeled",]
+dat_labeled <- dat_ols[dat_ols$set_label == "labeled", ]
 
 p1 <- dat_labeled |>
-
   pivot_longer(Y:f) |>
-
   mutate(
-
-    name = factor(name, levels = c("f", "Y"),
-
-      labels = c("Predicted ", "Observed ")) |> fct_rev()) |>
-
+    name = factor(name,
+      levels = c("f", "Y"),
+      labels = c("Predicted ", "Observed ")
+    ) |> fct_rev()
+  ) |>
   ggplot(aes(x = X1, y = value, group = name, color = name, fill = name)) +
+  theme_bw() +
+  coord_fixed(1 / 3) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm") +
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
+  scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
+  labs(
+    x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
+    title = "Outcomes vs. Covariate"
+  ) +
+  theme(
+    legend.direction = "horizontal",
+    legend.position = "inside",
+    legend.position.inside = c(0.5, 0.91),
+    axis.title = element_text(size = 8),
+    axis.text = element_text(size = 8),
+    title = element_text(size = 8)
+  )
 
-    theme_bw() + coord_fixed(1/3) +
-  
-    geom_abline(slope = 1, intercept = 0) +
-
-    geom_point(alpha = 0.5) +
-
-    geom_smooth(method = "lm") +
-
-    scale_x_continuous(limits = c(-2.5, 2.5)) +
-
-    scale_y_continuous(limits = c(-7.5, 7.5)) +
-
-    scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
-
-    scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
-
-    labs(
-      
-      x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
-       
-      title = "Outcomes vs. Covariate") +
-
-    theme(
-
-      legend.direction = "horizontal",
-
-      legend.position = "inside",
-
-      legend.position.inside = c(0.5, 0.91),
-
-      axis.title = element_text(size = 8),
-
-      axis.text = element_text(size = 8),
-      
-      title = element_text(size = 8))
-
-p2 <- dat_labeled |> 
-  
+p2 <- dat_labeled |>
   ggplot(aes(x = f, y = Y)) +
+  theme_bw() +
+  coord_fixed(1) +
+  geom_abline(slope = 1, intercept = 1) +
+  geom_point(color = "#00C1D5", alpha = 0.5) +
+  geom_smooth(method = "lm", color = "#00C1D5") +
+  scale_x_continuous(limits = c(-7.5, 7.5)) +
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  labs(
+    x = "\nPredicted Outcome", y = "Observed Outcome\n",
+    title = "Predicted vs. Observed Outcomes"
+  ) +
+  theme(
+    axis.title = element_text(size = 8),
+    axis.text = element_text(size = 8),
+    title = element_text(size = 8)
+  )
 
-    theme_bw() + coord_fixed(1) +
-  
-    geom_abline(slope = 1, intercept = 1) +
+fig1 <- (p1 + theme(plot.margin = unit(c(0, 20, 0, 0), "pt"))) +
 
-    geom_point(color = "#00C1D5", alpha = 0.5) +
-
-    geom_smooth(method = "lm", color = "#00C1D5") +
-
-    scale_x_continuous(limits = c(-7.5, 7.5)) +
-
-    scale_y_continuous(limits = c(-7.5, 7.5)) +
-
-    labs(
-      
-      x = "\nPredicted Outcome", y = "Observed Outcome\n",
-       
-      title = "Predicted vs. Observed Outcomes") +
-
-    theme(
-
-      axis.title = element_text(size = 8),
-
-      axis.text = element_text(size = 8),
-      
-      title = element_text(size = 8))
-
-fig1 <- (p1 + theme(plot.margin = unit(c(0,20,0, 0), "pt"))) +
-
-  (p2 + theme(plot.margin = unit(c(0,20,0,20), "pt"))) +
+  (p2 + theme(plot.margin = unit(c(0, 20, 0, 20), "pt"))) +
 
   plot_annotation(tag_levels = "A")
 
 fig1
-
 ```
 
 We can see that:
@@ -228,56 +198,50 @@ As another example, we can generate a binary outcome and relevant predictors for
 
 set.seed(123)
 
-dat_logistic <- simdat(n = n, effect = 3, sigma_Y = 1, 
-                       
-  model = "logistic")
+dat_logistic <- simdat(
+  n = n, effect = 3, sigma_Y = 1,
+  model = "logistic"
+)
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
-head(dat_logistic[dat_logistic$set_label == "training",])
+head(dat_logistic[dat_logistic$set_label == "training", ])
 
-head(dat_logistic[dat_logistic$set_label == "labeled",])
+head(dat_logistic[dat_logistic$set_label == "labeled", ])
 
-head(dat_logistic[dat_logistic$set_label == "unlabeled",])
+head(dat_logistic[dat_logistic$set_label == "unlabeled", ])
 ```
 
 ```{r logsum, echo = F}
-
-dat_logistic_labeled <- dat_logistic[dat_logistic$set_label == "labeled",]
+dat_logistic_labeled <- dat_logistic[dat_logistic$set_label == "labeled", ]
 
 dat_logistic_labeled_summ <- dat_logistic_labeled |>
-  
-  group_by(Y, f) |> count() |> ungroup() |>
-  
-  mutate(Y = factor(Y), f = factor(f), 
-         
+  group_by(Y, f) |>
+  count() |>
+  ungroup() |>
+  mutate(
+    Y = factor(Y), f = factor(f),
     pct = n / sum(n) * 100,
-    
-    fill = if_else(Y == f, 1, 0))
-
+    fill = if_else(Y == f, 1, 0)
+  )
 ```
 
 We can again visualize the relationships between the true and predicted outcome variables in the labeled data subset and see that `r paste0(sprintf("%2.1f", sum(dat_logistic_labeled_summ[dat_logistic_labeled_summ$fill == 1, "pct"])), "%")` observations are correctly predicted:
 
 ```{r plot2, echo = F, fig.width=7}
-
 dat_logistic_labeled_summ |>
-  
-  ggplot(aes(x = f, y = Y, fill = fill)) + 
-  
-    geom_tile() + coord_equal() +
-  
-    geom_text(
-      
-      aes(label = paste0(n, " (", sprintf("%2.1f", pct), "%)")), vjust = 1) +
-  
-    scale_x_discrete(expand = c(0,0), limits = rev) +
-  
-    scale_y_discrete(expand = c(0,0)) +
-  
-    scale_fill_gradient(high = "#00C1D5", low = "#FFB500") + 
-  
-    theme(legend.position = "none")
+  ggplot(aes(x = f, y = Y, fill = fill)) +
+  geom_tile() +
+  coord_equal() +
+  geom_text(
+
+    aes(label = paste0(n, " (", sprintf("%2.1f", pct), "%)")),
+    vjust = 1
+  ) +
+  scale_x_discrete(expand = c(0, 0), limits = rev) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_gradient(high = "#00C1D5", low = "#FFB500") +
+  theme(legend.position = "none")
 ```
 
 ## Model Fitting
@@ -291,8 +255,7 @@ We compare two non-IPD approaches to analyzing the data to methods included in t
 ```{r naive}
 #--- Fit the Naive Regression
 
-lm(f ~ X1, data = dat_ols[dat_ols$set_label == "unlabeled",]) |> 
-  
+lm(f ~ X1, data = dat_ols[dat_ols$set_label == "unlabeled", ]) |>
   summary()
 ```
 
@@ -301,8 +264,7 @@ lm(f ~ X1, data = dat_ols[dat_ols$set_label == "unlabeled",]) |>
 ```{r classic}
 #--- Fit the Classic Regression
 
-lm(Y ~ X1, data = dat_ols[dat_ols$set_label == "labeled",]) |> 
-  
+lm(Y ~ X1, data = dat_ols[dat_ols$set_label == "labeled", ]) |>
   summary()
 ```
 
@@ -319,12 +281,10 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-ipd::ipd(formula, 
-         
-  method = "postpi_boot", model = "ols", data = dat_ols, label = "set_label", 
-  
-  nboot = nboot) |> 
-  
+ipd::ipd(formula,
+  method = "postpi_boot", model = "ols", data = dat_ols, label = "set_label",
+  nboot = nboot
+) |>
   summary()
 ```
 
@@ -333,10 +293,9 @@ ipd::ipd(formula,
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
 
-ipd::ipd(formula, 
-         
-  method = "postpi_analytic", model = "ols", data = dat_ols, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "postpi_analytic", model = "ols", data = dat_ols, label = "set_label"
+) |>
   summary()
 ```
 
@@ -345,10 +304,9 @@ ipd::ipd(formula,
 ```{r ppi_ols}
 #-- Fit the PPI Correction
 
-ipd::ipd(formula, 
-         
-  method = "ppi", model = "ols", data = dat_ols, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi", model = "ols", data = dat_ols, label = "set_label"
+) |>
   summary()
 ```
 
@@ -357,10 +315,9 @@ ipd::ipd(formula,
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
 
-ipd::ipd(formula, 
-         
-  method = "ppi_plusplus", model = "ols", data = dat_ols, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi_plusplus", model = "ols", data = dat_ols, label = "set_label"
+) |>
   summary()
 ```
 
@@ -369,10 +326,9 @@ ipd::ipd(formula,
 ```{r pspa}
 #-- Fit the PSPA Correction
 
-ipd::ipd(formula, 
-         
-  method = "pspa", model = "ols", data = dat_ols, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "pspa", model = "ols", data = dat_ols, label = "set_label"
+) |>
   summary()
 ```
 
@@ -385,10 +341,10 @@ We also show how these methods compare for logistic regression.
 ```{r naive2}
 #--- Fit the Naive Regression
 
-glm(f ~ X1, family = binomial, 
-    
-  data = dat_logistic[dat_logistic$set_label == "unlabeled",]) |> 
-  
+glm(f ~ X1,
+  family = binomial,
+  data = dat_logistic[dat_logistic$set_label == "unlabeled", ]
+) |>
   summary()
 ```
 
@@ -397,10 +353,10 @@ glm(f ~ X1, family = binomial,
 ```{r classic2}
 #--- Fit the Classic Regression
 
-glm(Y ~ X1, family = binomial,
-   
-  data = dat_logistic[dat_logistic$set_label == "labeled",]) |> 
-  
+glm(Y ~ X1,
+  family = binomial,
+  data = dat_logistic[dat_logistic$set_label == "labeled", ]
+) |>
   summary()
 ```
 
@@ -417,10 +373,10 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-ipd::ipd(formula, method = "postpi_boot", model = "logistic", 
-         
-  data = dat_logistic, label = "set_label", nboot = nboot) |> 
-  
+ipd::ipd(formula,
+  method = "postpi_boot", model = "logistic",
+  data = dat_logistic, label = "set_label", nboot = nboot
+) |>
   summary()
 ```
 
@@ -429,10 +385,10 @@ ipd::ipd(formula, method = "postpi_boot", model = "logistic",
 ```{r ppi2}
 #-- Fit the PPI Correction
 
-ipd::ipd(formula, method = "ppi", model = "logistic", 
-         
-  data = dat_logistic, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi", model = "logistic",
+  data = dat_logistic, label = "set_label"
+) |>
   summary()
 ```
 
@@ -441,10 +397,10 @@ ipd::ipd(formula, method = "ppi", model = "logistic",
 ```{r ppi_plusplus2}
 #-- Fit the PPI++ Correction
 
-ipd::ipd(formula, method = "ppi_plusplus", model = "logistic", 
-         
-  data = dat_logistic, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi_plusplus", model = "logistic",
+  data = dat_logistic, label = "set_label"
+) |>
   summary()
 ```
 
@@ -453,10 +409,10 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "logistic",
 ```{r pspa2}
 #-- Fit the PSPA Correction
 
-ipd::ipd(formula, method = "pspa", model = "logistic", 
-         
-  data = dat_logistic, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "pspa", model = "logistic",
+  data = dat_logistic, label = "set_label"
+) |>
   summary()
 ```
 
@@ -469,12 +425,10 @@ The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augm
 
 nboot <- 200
 
-fit_postpi <- ipd::ipd(formula, 
-         
-  method = "postpi_boot", model = "ols", data = dat_ols, label = "set_label", 
-  
-  nboot = nboot)
-
+fit_postpi <- ipd::ipd(formula,
+  method = "postpi_boot", model = "ols", data = dat_ols, label = "set_label",
+  nboot = nboot
+)
 ```
 
 ### Print Method
@@ -485,7 +439,6 @@ The `print` method gives an abbreviated summary of the output from the `ipd` fun
 #-- Print the Model
 
 print(fit_postpi)
-
 ```
 
 ### Summary Method
@@ -496,7 +449,7 @@ The `summary` method gives more detailed information about the estimated coeffic
 #-- Summarize the Model
 
 summ_fit_postpi <- summary(fit_postpi)
-  
+
 #-- Print the Model Summary
 
 print(summ_fit_postpi)

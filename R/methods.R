@@ -1,10 +1,10 @@
-#===============================================================================
+# ==============================================================================
 # METHODS
-#===============================================================================
+# ==============================================================================
 
-#=== STANDARD METHODS ==========================================================
+# === STANDARD METHODS =========================================================
 
-#--- PRINT.IPD -----------------------------------------------------------------
+# --- PRINT.IPD ----------------------------------------------------------------
 
 #' Print IPD Fit
 #'
@@ -30,9 +30,10 @@
 #'
 #' #-- Fit IPD
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
+#' fit <- ipd(formula,
+#'   method = "postpi_analytic", model = "ols", data = dat,
+#'   label = "set_label"
+#' )
 #'
 #' #-- Print Output
 #'
@@ -41,8 +42,9 @@
 #' @export
 
 print.ipd <- function(x, ...) {
-
-  if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
+  if (!inherits(x, "ipd")) {
+    stop("Object is not of class 'ipd'")
+  }
 
   cat("\nCall:\n", deparse(x$formula), "\n\n")
 
@@ -53,7 +55,7 @@ print.ipd <- function(x, ...) {
   invisible(x)
 }
 
-#--- SUMMARY.IPD ---------------------------------------------------------------
+# --- SUMMARY.IPD --------------------------------------------------------------
 
 #' Summarize IPD Fit
 #'
@@ -88,9 +90,10 @@ print.ipd <- function(x, ...) {
 #'
 #' #-- Fit IPD
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
+#' fit <- ipd(formula,
+#'   method = "postpi_analytic", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
 #'
 #' #-- Summarize Output
 #'
@@ -101,30 +104,22 @@ print.ipd <- function(x, ...) {
 #' @export
 
 summary.ipd <- function(object, ...) {
-
-  if (!inherits(object, "ipd")) stop("Object is not of class 'ipd'")
+  if (!inherits(object, "ipd")) {
+    stop("Object is not of class 'ipd'")
+  }
 
   coef_table <- data.frame(
-
     Estimate = object$coefficients,
-
     Std.Error = object$se,
-
     `Lower CI` = object$ci[, 1],
-
     `Upper CI` = object$ci[, 2]
   )
 
   result <- list(
-
     call = object$formula,
-
     coefficients = coef_table,
-
     method = object$method,
-
     model = object$model,
-
     intercept = object$intercept
   )
 
@@ -157,9 +152,10 @@ summary.ipd <- function(object, ...) {
 #'
 #' #-- Fit IPD
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
+#' fit <- ipd(formula,
+#'   method = "postpi_analytic", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
 #'
 #' #-- Summarize Output
 #'
@@ -172,7 +168,6 @@ summary.ipd <- function(object, ...) {
 #' @export
 
 print.summary.ipd <- function(x, ...) {
-
   if (!inherits(x, "summary.ipd")) stop("Object is not of class 'summary.ipd'")
 
   cat("\nCall:\n", deparse(x$call), "\n\n")
@@ -190,7 +185,7 @@ print.summary.ipd <- function(x, ...) {
   invisible(x)
 }
 
-#=== BROOM TIDIER METHODS ======================================================
+# === BROOM TIDIER METHODS ======================================================
 
 #--- TIDY.IPD ------------------------------------------------------------------
 
@@ -222,9 +217,10 @@ generics::tidy
 #'
 #' #-- Fit IPD
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
+#' fit <- ipd(formula,
+#'   method = "postpi_analytic", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
 #'
 #' #-- Tidy Output
 #'
@@ -233,20 +229,15 @@ generics::tidy
 #' @export
 
 tidy.ipd <- function(x, ...) {
-
   if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
   result <- data.frame(
-
     term = names(x$coefficients),
-
     estimate = x$coefficients,
-
     std.error = x$se,
-
     conf.low = x$ci[, 1],
-
-    conf.high = x$ci[, 2])
+    conf.high = x$ci[, 2]
+  )
 
   return(result)
 }
@@ -281,9 +272,10 @@ generics::glance
 #'
 #' #-- Fit IPD
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
+#' fit <- ipd(formula,
+#'   method = "postpi_analytic", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
 #'
 #' #-- Glance Output
 #'
@@ -292,21 +284,14 @@ generics::glance
 #' @export
 
 glance.ipd <- function(x, ...) {
-
   if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
   glance_df <- data.frame(
-
     method = x$method,
-
     model = x$model,
-
     include_intercept = x$intercept,
-
     nobs_labeled = nrow(x$data_l),
-
     nobs_unlabeled = nrow(x$data_u),
-
     call = deparse(x$formula)
   )
 
@@ -348,9 +333,10 @@ generics::augment
 #'
 #' #-- Fit IPD
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
+#' fit <- ipd(formula,
+#'   method = "postpi_analytic", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
 #'
 #' #-- Augment Data
 #'
@@ -361,7 +347,6 @@ generics::augment
 #' @export
 
 augment.ipd <- function(x, data = x$data_u, ...) {
-
   if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
   data_aug <- data
@@ -377,4 +362,4 @@ augment.ipd <- function(x, data = x$data_u, ...) {
   return(data_aug)
 }
 
-#=== END =======================================================================
+# === END =======================================================================

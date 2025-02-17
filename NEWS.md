@@ -27,3 +27,7 @@
 * Updated the documentation for `simdat()` to include a more thorough explanation of how to simulate data with this function. 
 
 * `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
+
+# ipd 0.1.5
+
+* Slight formatting changes to conform to `styler` and `lintr` suggestions.

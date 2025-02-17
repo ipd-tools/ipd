@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 # PPI++ MEAN ESTIMATION
-#===============================================================================
+# ===============================================================================
 
 #--- PPI++ MEAN ESTIMATION - POINT ESTIMATE ------------------------------------
 
@@ -43,9 +43,9 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -55,10 +55,9 @@
 #'
 #' @export
 
-ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
-
-  lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
-
+ppi_plusplus_mean_est <- function(
+    Y_l, f_l, f_u,
+    lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
   n <- nrow(Y_l)
 
   N <- nrow(f_u)
@@ -70,7 +69,6 @@ ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
   if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
   if (is.null(lhat)) {
-
     est <- mean(w_u * f_u) + mean(w_l * (Y_l - f_l))
 
     grads <- w_l * (Y_l - est)
@@ -83,12 +81,12 @@ ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
 
     lhat <- calc_lhat_glm(
 
-      grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord, clip = T)
+      grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord,
+      clip = T
+    )
 
     return(ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
-
   } else {
-
     return(mean(w_u * lhat * f_u) + mean(w_l * (Y_l - lhat * f_l)))
   }
 }
@@ -141,9 +139,9 @@ ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -153,12 +151,10 @@ ppi_plusplus_mean_est <- function(Y_l, f_l, f_u,
 #'
 #' @export
 
-ppi_plusplus_mean <- function(Y_l, f_l, f_u,
-
-  alpha = 0.05, alternative = "two-sided",
-
-  lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
-
+ppi_plusplus_mean <- function(
+    Y_l, f_l, f_u,
+    alpha = 0.05, alternative = "two-sided",
+    lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
   #- Compute Dimensions of Inputs
 
   n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
@@ -172,7 +168,6 @@ ppi_plusplus_mean <- function(Y_l, f_l, f_u,
   if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
   if (is.null(lhat)) {
-
     est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, 1, w_l, w_u)
 
     grads <- w_l * (Y_l - est)
@@ -185,13 +180,16 @@ ppi_plusplus_mean <- function(Y_l, f_l, f_u,
 
     lhat <- calc_lhat_glm(
 
-      grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord, clip = T)
+      grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord,
+      clip = T
+    )
 
     return(
-
-      ppi_plusplus_mean(Y_l, f_l, f_u,
-
-        alpha, alternative,lhat, coord, w_l, w_u))
+      ppi_plusplus_mean(
+        Y_l, f_l, f_u,
+        alpha, alternative, lhat, coord, w_l, w_u
+      )
+    )
   }
 
   est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u)
@@ -201,8 +199,8 @@ ppi_plusplus_mean <- function(Y_l, f_l, f_u,
   rectifier_std <- sd(w_l * (Y_l - lhat * f_l)) * sqrt((n - 1) / n) / sqrt(n)
 
   return(zconfint_generic(
-
-    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative))
+    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative
+  ))
 }
 
-#=== END =======================================================================
+# === END =======================================================================

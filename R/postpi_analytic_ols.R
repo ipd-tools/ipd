@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 # POSTPI ANALYTIC ORDINARY LEAST SQUARES
-#===============================================================================
+# ===============================================================================
 
 #--- POSTPI ANALYTIC OLS -------------------------------------------------------
 
@@ -40,13 +40,13 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -56,10 +56,9 @@
 #'
 #' @export
 
-postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
-
-  scale_se = TRUE, n_t = Inf) {
-
+postpi_analytic_ols <- function(
+    X_l, Y_l, f_l, X_u, f_u,
+    scale_se = TRUE, n_t = Inf) {
   #- 1. Estimate Relationship Model
 
   fit_rel <- lm(Y_l ~ f_l)
@@ -77,15 +76,12 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
   #- 4. SE of Coefficient Estimator
 
   if (scale_se) {
-
     se <- sqrt(diag(solve(crossprod(X_u)) *
 
       (sigma(fit_rel)^2 * nrow(X_u) / min(nrow(X_l), n_t) +
 
-      (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
-
+        (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
   } else {
-
     se <- sqrt(diag(solve(crossprod(X_u)) *
 
       (sigma(fit_rel)^2 + (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
@@ -96,4 +92,4 @@ postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
   return(list(est = as.vector(est), se = as.vector(se)))
 }
 
-#=== END =======================================================================
+# === END =======================================================================

@@ -5,9 +5,10 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
-                      
-  fig.path = "man/figures/README-", out.width = "100%")
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>",
+  fig.path = "man/figures/README-", out.width = "100%"
+)
 ```
 
 # ipd: Inference on Predicted Data
@@ -50,7 +51,7 @@ To install the development version of `ipd` from [GitHub](https://github.com/ipd
 ```{r, eval = F}
 #-- Install devtools if it is not already installed
 
-install.packages("devtools")   
+install.packages("devtools")
 
 #-- Install the ipd package from GitHub
 
@@ -80,114 +81,83 @@ dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
-options(digits=2)
+options(digits = 2)
 
-head(dat[dat$set_label == "training",])
+head(dat[dat$set_label == "training", ])
 
-head(dat[dat$set_label == "labeled",])
+head(dat[dat$set_label == "labeled", ])
 
-head(dat[dat$set_label == "unlabeled",])
-
+head(dat[dat$set_label == "unlabeled", ])
 ```
 
 The `simdat` function provides observed and unobserved outcomes for both the labeled and unlabeled datasets, though in practice the observed outcomes are not in the unlabeled set. We can visualize the relationships between these variables:
 
 ```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.height=4}
-
 library(tidyverse)
 
 library(patchwork)
 
 #-- Plot example labeled data
 
-dat_labeled <- dat[dat$set_label == "labeled",]
+dat_labeled <- dat[dat$set_label == "labeled", ]
 
 p1 <- dat_labeled |>
-
   pivot_longer(Y:f) |>
-
   mutate(
-
-    name = factor(name, levels = c("f", "Y"),
-
-      labels = c("Predicted ", "Observed ")) |> fct_rev()) |>
-
+    name = factor(name,
+      levels = c("f", "Y"),
+      labels = c("Predicted ", "Observed ")
+    ) |> fct_rev()
+  ) |>
   ggplot(aes(x = X1, y = value, group = name, color = name, fill = name)) +
+  theme_bw() +
+  coord_fixed(1 / 3) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm") +
+  scale_x_continuous(limits = c(-2.5, 2.5)) +
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
+  scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
+  labs(
+    x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
+    title = "Outcomes vs. Covariate"
+  ) +
+  theme(
+    legend.direction = "horizontal",
+    legend.position = "inside",
+    legend.position.inside = c(0.5, 0.91),
+    axis.title = element_text(size = 8),
+    axis.text = element_text(size = 8),
+    title = element_text(size = 8)
+  )
 
-    theme_bw() + coord_fixed(1/3) +
-  
-    geom_abline(slope = 1, intercept = 0) +
-
-    geom_point(alpha = 0.5) +
-
-    geom_smooth(method = "lm") +
-
-    scale_x_continuous(limits = c(-2.5, 2.5)) +
-
-    scale_y_continuous(limits = c(-7.5, 7.5)) +
-
-    scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
-
-    scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
-
-    labs(
-      
-      x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
-       
-      title = "Outcomes vs. Covariate") +
-
-    theme(
-
-      legend.direction = "horizontal",
-
-      legend.position = "inside",
-
-      legend.position.inside = c(0.5, 0.91),
-
-      axis.title = element_text(size = 8),
-
-      axis.text = element_text(size = 8),
-      
-      title = element_text(size = 8))
-
-p2 <- dat_labeled |> 
-  
+p2 <- dat_labeled |>
   ggplot(aes(x = f, y = Y)) +
+  theme_bw() +
+  coord_fixed(1) +
+  geom_abline(slope = 1, intercept = 1) +
+  geom_point(color = "#00C1D5", alpha = 0.5) +
+  geom_smooth(method = "lm", color = "#00C1D5") +
+  scale_x_continuous(limits = c(-7.5, 7.5)) +
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  labs(
+    x = "\nPredicted Outcome", y = "Observed Outcome\n",
+    title = "Predicted vs. Observed Outcomes"
+  ) +
+  theme(
+    axis.title = element_text(size = 8),
+    axis.text = element_text(size = 8),
+    title = element_text(size = 8)
+  )
 
-    theme_bw() + coord_fixed(1) +
-  
-    geom_abline(slope = 1, intercept = 1) +
+fig1 <- (p1 + theme(plot.margin = unit(c(0, 20, 0, 0), "pt"))) +
 
-    geom_point(color = "#00C1D5", alpha = 0.5) +
-
-    geom_smooth(method = "lm", color = "#00C1D5") +
-
-    scale_x_continuous(limits = c(-7.5, 7.5)) +
-
-    scale_y_continuous(limits = c(-7.5, 7.5)) +
-
-    labs(
-      
-      x = "\nPredicted Outcome", y = "Observed Outcome\n",
-       
-      title = "Predicted vs. Observed Outcomes") +
-
-    theme(
-
-      axis.title = element_text(size = 8),
-
-      axis.text = element_text(size = 8),
-      
-      title = element_text(size = 8))
-
-fig1 <- (p1 + theme(plot.margin = unit(c(0,20,0, 0), "pt"))) +
-
-  (p2 + theme(plot.margin = unit(c(0,20,0,20), "pt"))) +
+  (p2 + theme(plot.margin = unit(c(0, 20, 0, 20), "pt"))) +
 
   plot_annotation(tag_levels = "A")
 
 fig1
-
 ```
 
 We can see that:
@@ -200,43 +170,53 @@ We can see that:
 We compare two non-IPD approaches to analyzing the data to methods included in the `ipd` package. A summary comparison is provided in the table below, followed by the specific calls for each method:
 
 ```{r overalltab, echo=FALSE}
-
-fit0 <- lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |> summary()
-fit1 <- lm(Y ~ X1, data = dat[dat$set_label == "labeled",])   |> summary()
+fit0 <- lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |> summary()
+fit1 <- lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |> summary()
 
 formula <- Y - f ~ X1
 
 nboot <- 200
 
-fit2 <- ipd::ipd(formula, method = "postpi_boot", model = "ols", 
-                 data = dat, label = "set_label", nboot = nboot) |> summary()
+fit2 <- ipd::ipd(formula,
+  method = "postpi_boot", model = "ols",
+  data = dat, label = "set_label", nboot = nboot
+) |> summary()
 
-fit3 <- ipd::ipd(formula, method = "postpi_analytic", model = "ols", 
-                 data = dat, label = "set_label") |> summary()
+fit3 <- ipd::ipd(formula,
+  method = "postpi_analytic", model = "ols",
+  data = dat, label = "set_label"
+) |> summary()
 
-fit4 <- ipd::ipd(formula, method = "ppi", model = "ols", 
-                 data = dat, label = "set_label") |> summary()
+fit4 <- ipd::ipd(formula,
+  method = "ppi", model = "ols",
+  data = dat, label = "set_label"
+) |> summary()
 
-fit5 <- ipd::ipd(formula, method = "ppi_plusplus", model = "ols", 
-                 data = dat, label = "set_label") |> summary()
+fit5 <- ipd::ipd(formula,
+  method = "ppi_plusplus", model = "ols",
+  data = dat, label = "set_label"
+) |> summary()
 
-fit6 <- ipd::ipd(formula, method = "pspa", model = "ols", 
-                 data = dat, label = "set_label") |> summary()
+fit6 <- ipd::ipd(formula,
+  method = "pspa", model = "ols",
+  data = dat, label = "set_label"
+) |> summary()
 
 sumtab <- rbind(
-  
   fit0$coefficients[2, 1:2],
   fit1$coefficients[2, 1:2],
   fit2$coefficients[2, 1:2],
   fit3$coefficients[2, 1:2],
   fit4$coefficients[2, 1:2],
-  fit5$coefficients[2, 1:2])
+  fit5$coefficients[2, 1:2]
+)
 
-rownames(sumtab) <- c("Naive", "Classic", "PostPI (Bootstrap)", 
-                      "PostPI (Analytic)", "PPI++", "PSPA")
+rownames(sumtab) <- c(
+  "Naive", "Classic", "PostPI (Bootstrap)",
+  "PostPI (Analytic)", "PPI++", "PSPA"
+)
 
 sumtab
-
 ```
 
 We can see that the IPD methods have similar estimates and standard errors, while the 'naive' method has a different estimate and standard errors that are too small.
@@ -246,8 +226,7 @@ We can see that the IPD methods have similar estimates and standard errors, whil
 ```{r naive}
 #--- Fit the Naive Regression
 
-lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |> 
-  
+lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
   summary()
 ```
 
@@ -256,8 +235,7 @@ lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |>
 ```{r classic}
 #--- Fit the Classic Regression
 
-lm(Y ~ X1, data = dat[dat$set_label == "labeled",]) |> 
-  
+lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |>
   summary()
 ```
 
@@ -274,12 +252,10 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-ipd::ipd(formula, 
-         
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label", 
-  
-  nboot = nboot) |> 
-  
+ipd::ipd(formula,
+  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
+  nboot = nboot
+) |>
   summary()
 ```
 
@@ -288,10 +264,9 @@ ipd::ipd(formula,
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
 
-ipd::ipd(formula, 
-         
-  method = "postpi_analytic", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "postpi_analytic", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 ```
 
@@ -300,10 +275,9 @@ ipd::ipd(formula,
 ```{r ppi_ols}
 #-- Fit the PPI Correction
 
-ipd::ipd(formula, 
-         
-  method = "ppi", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 ```
 
@@ -312,10 +286,9 @@ ipd::ipd(formula,
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
 
-ipd::ipd(formula, 
-         
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 ```
 
@@ -324,10 +297,9 @@ ipd::ipd(formula,
 ```{r pspa}
 #-- Fit the PSPA Correction
 
-ipd::ipd(formula, 
-         
-  method = "pspa", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "pspa", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 ```
 
@@ -340,12 +312,11 @@ The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augm
 
 nboot <- 200
 
-fit_postpi <- ipd::ipd(formula, 
-         
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label", 
-  
-  nboot = nboot)
-  
+fit_postpi <- ipd::ipd(formula,
+  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
+  nboot = nboot
+)
+
 #-- Print the Model
 
 print(fit_postpi)
@@ -353,7 +324,7 @@ print(fit_postpi)
 #-- Summarize the Model
 
 summ_fit_postpi <- summary(fit_postpi)
-  
+
 #-- Print the Model Summary
 
 print(summ_fit_postpi)

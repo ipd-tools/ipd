@@ -1,6 +1,6 @@
-#===============================================================================
+# ===============================================================================
 # PPI MEAN ESTIMATION
-#===============================================================================
+# ===============================================================================
 
 #--- PPI MEAN ESTIMATION -------------------------------------------------------
 
@@ -34,9 +34,9 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -47,7 +47,6 @@
 #' @export
 
 ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided") {
-
   #- Compute Dimensions of Inputs
 
   n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
@@ -63,8 +62,8 @@ ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided") {
   rectifier_std <- sd(Y_l - f_l) * sqrt((n - 1) / n) / sqrt(n)
 
   return(zconfint_generic(
-
-    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative))
+    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative
+  ))
 }
 
-#=== END =======================================================================
+# === END =======================================================================

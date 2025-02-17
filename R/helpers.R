@@ -1,8 +1,8 @@
-#===============================================================================
+# ===============================================================================
 # HELPERS
-#===============================================================================
+# ===============================================================================
 
-#=== PPI++ QUANTILE ESTIMATION =================================================
+# === PPI++ QUANTILE ESTIMATION =================================================
 
 #--- EMPIRICAL CDF -------------------------------------------------------------
 
@@ -30,14 +30,13 @@
 #' @export
 
 compute_cdf <- function(Y, grid, w = NULL) {
-
   n <- length(Y)
 
   if (is.null(w)) w <- rep(1, n) else w <- w / sum(w) * n
 
   indicators <- matrix((Y <= rep(grid, each = n)) * w,
-
-                       ncol = length(grid))
+    ncol = length(grid)
+  )
 
   cdf_mn <- apply(indicators, 2, mean)
 
@@ -77,18 +76,17 @@ compute_cdf <- function(Y, grid, w = NULL) {
 #' @export
 
 compute_cdf_diff <- function(Y, f, grid, w = NULL) {
-
   n <- length(Y)
 
   if (is.null(w)) w <- rep(1, n) else w <- w / sum(w) * n
 
   indicators_Y <- matrix((Y <= rep(grid, each = n)) * w,
-
-    ncol = length(grid))
+    ncol = length(grid)
+  )
 
   indicators_f <- matrix((f <= rep(grid, each = length(f))) * w,
-
-    ncol = length(grid))
+    ncol = length(grid)
+  )
 
   diff_mn <- apply(indicators_Y - indicators_f, 2, mean)
 
@@ -132,7 +130,6 @@ compute_cdf_diff <- function(Y, f, grid, w = NULL) {
 #' @export
 
 rectified_cdf <- function(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL) {
-
   n <- length(Y_l)
 
   N <- length(f_u)
@@ -184,22 +181,22 @@ rectified_cdf <- function(Y_l, f_l, f_u, grid, w_l = NULL, w_u = NULL) {
 #'
 #' @export
 
-rectified_p_value <- function(rectifier, rectifier_std,
-
-  imputed_mean, imputed_std, null = 0, alternative = "two-sided") {
-
+rectified_p_value <- function(
+    rectifier, rectifier_std,
+    imputed_mean, imputed_std, null = 0, alternative = "two-sided") {
   rectified_point_estimate <- imputed_mean + rectifier
 
   rectified_std <- pmax(sqrt(imputed_std^2 + rectifier_std^2), 1e-16)
 
-  p_value <- zstat_generic(rectified_point_estimate, 0, rectified_std,
-
-    alternative, null)[[2]]
+  p_value <- zstat_generic(
+    rectified_point_estimate, 0, rectified_std,
+    alternative, null
+  )[[2]]
 
   return(p_value)
 }
 
-#=== PPI++ OLS =================================================================
+# === PPI++ OLS =================================================================
 
 #--- ORDINARY LEAST SQUARES ----------------------------------------------------
 
@@ -237,19 +234,15 @@ rectified_p_value <- function(rectifier, rectifier_std,
 #' @export
 
 ols <- function(X, Y, return_se = FALSE) {
-
   fit <- lm(Y ~ X - 1)
 
   theta <- coef(fit)
 
   if (return_se) {
-
     se <- sqrt(diag(vcov(fit)))
 
     return(list(theta = theta, se = se))
-
   } else {
-
     return(theta)
   }
 }
@@ -294,9 +287,7 @@ ols <- function(X, Y, return_se = FALSE) {
 #' @export
 
 wls <- function(X, Y, w = NULL, return_se = FALSE) {
-
   if (is.null(w) || all(w == 1)) {
-
     return(ols(X, Y, return_se = return_se))
   }
 
@@ -305,13 +296,10 @@ wls <- function(X, Y, w = NULL, return_se = FALSE) {
   theta <- coef(fit)
 
   if (return_se) {
-
     se <- sqrt(diag(vcov(fit)))
 
     return(list(theta = theta, se = se))
-
   } else {
-
     return(theta)
   }
 }
@@ -363,13 +351,13 @@ wls <- function(X, Y, w = NULL, return_se = FALSE) {
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -379,10 +367,9 @@ wls <- function(X, Y, w = NULL, return_se = FALSE) {
 #'
 #' @export
 
-ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
-
-  w_l = NULL, w_u = NULL, use_u = TRUE) {
-
+ols_get_stats <- function(
+    est, X_l, Y_l, f_l, X_u, f_u,
+    w_l = NULL, w_u = NULL, use_u = TRUE) {
   n <- nrow(f_l)
 
   N <- nrow(f_u)
@@ -398,9 +385,7 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
   grads_hat_unlabeled <- matrix(0, nrow = N, ncol = p)
 
   if (use_u) {
-
     for (i in 1:N) {
-
       hessian <- hessian + w_u[i] / (N + n) * tcrossprod(X_u[i, ])
 
       grads_hat_unlabeled[i, ] <- w_u[i] * X_u[i, ] *
@@ -414,13 +399,9 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
   grads_hat <- matrix(0, nrow = n, ncol = p)
 
   for (i in 1:n) {
-
     if (use_u) {
-
       hessian <- hessian + w_l[i] / (N + n) * tcrossprod(X_l[i, ])
-
     } else {
-
       hessian <- hessian + w_l[i] / n * tcrossprod(X_l[i, ])
     }
 
@@ -431,9 +412,10 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 
   inv_hessian <- solve(hessian)
 
-  return(list(grads = grads, grads_hat = grads_hat,
-
-    grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
+  return(list(
+    grads = grads, grads_hat = grads_hat,
+    grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian
+  ))
 }
 
 #--- ESTIMATE POWER TUNING PARAMETER -------------------------------------------
@@ -471,13 +453,13 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -486,29 +468,26 @@ ols_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #' stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
 #'
 #' calc_lhat_glm(stats$grads, stats$grads_hat, stats$grads_hat_unlabeled,
-#'
-#'   stats$inv_hessian, coord = NULL, clip = FALSE)
+#'   stats$inv_hessian,
+#'   coord = NULL, clip = FALSE
+#' )
 #'
 #' @return (float): Optimal value of `lhat` in \[0,1\].
 #'
 #' @export
 
-calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
-
-  coord = NULL, clip = FALSE) {
-
+calc_lhat_glm <- function(
+    grads, grads_hat, grads_hat_unlabeled, inv_hessian,
+    coord = NULL, clip = FALSE) {
   if (is.null(dim(grads))) {
-
     grads <- matrix(grads, ncol = 1)
   }
 
   if (is.null(dim(grads_hat))) {
-
     grads_hat <- matrix(grads_hat, ncol = 1)
   }
 
   if (is.null(dim(grads_hat_unlabeled))) {
-
     grads_hat_unlabeled <- matrix(grads_hat_unlabeled, ncol = 1)
   }
 
@@ -521,50 +500,43 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
   cov_grads <- matrix(0, nrow = p, ncol = p)
 
   for (i in 1:n) {
+    cov_grads <- cov_grads + (1 / n) * (outer(
+      grads[i, ] - colMeans(grads),
+      grads_hat[i, ] - colMeans(grads_hat)
+    ) +
 
-    cov_grads <- cov_grads + (1/n) * (outer(grads[i,] - colMeans(grads),
-
-      grads_hat[i,] - colMeans(grads_hat)) +
-
-        outer(grads_hat[i,] - colMeans(grads_hat),
-
-          grads[i,] - colMeans(grads)))
+      outer(
+        grads_hat[i, ] - colMeans(grads_hat),
+        grads[i, ] - colMeans(grads)
+      ))
   }
 
   var_grads_hat <- cov(rbind(grads_hat, grads_hat_unlabeled))
 
   if (is.null(coord)) {
-
     vhat <- inv_hessian
-
   } else {
-
     vhat <- inv_hessian %*% diag(p)[, coord]
   }
 
   if (p > 1) {
-
     num <- ifelse(is.null(coord),
-
-      sum(diag(vhat %*% cov_grads %*% vhat)), vhat %*% cov_grads %*% vhat)
+      sum(diag(vhat %*% cov_grads %*% vhat)), vhat %*% cov_grads %*% vhat
+    )
 
     denom <- ifelse(is.null(coord),
-
-      2*(1 + n/N) * sum(diag(vhat %*% var_grads_hat %*% vhat)),
-
-      2*(1 + n/N) * vhat %*% var_grads_hat %*% vhat)
-
+      2 * (1 + n / N) * sum(diag(vhat %*% var_grads_hat %*% vhat)),
+      2 * (1 + n / N) * vhat %*% var_grads_hat %*% vhat
+    )
   } else {
-
     num <- vhat * cov_grads * vhat
 
-    denom <- 2*(1 + n/N) * vhat * var_grads_hat * vhat
+    denom <- 2 * (1 + n / N) * vhat * var_grads_hat * vhat
   }
 
   lhat <- num / denom
 
   if (clip) {
-
     lhat <- pmax(0, pmin(lhat, 1))
   }
 
@@ -612,23 +584,15 @@ calc_lhat_glm <- function(grads, grads_hat, grads_hat_unlabeled, inv_hessian,
 #' @export
 
 zstat_generic <- function(value1, value2, std_diff, alternative, diff = 0) {
-
   zstat <- (value1 - value2 - diff) / std_diff
 
   if (alternative %in% c("two-sided", "2-sided", "2s")) {
-
     pvalue <- 2 * (1 - pnorm(abs(zstat)))
-
   } else if (alternative %in% c("larger", "l")) {
-
     pvalue <- 1 - pnorm(zstat)
-
   } else if (alternative %in% c("smaller", "s")) {
-
     pvalue <- pnorm(zstat)
-
   } else {
-
     stop("Invalid alternative")
   }
 
@@ -661,34 +625,26 @@ zstat_generic <- function(value1, value2, std_diff, alternative, diff = 0) {
 #'
 #' Y <- rnorm(n, 1, 1)
 #'
-#' se_Y <-  sd(Y) / sqrt(n)
+#' se_Y <- sd(Y) / sqrt(n)
 #'
 #' zconfint_generic(Y, se_Y, alpha = 0.05, alternative = "two-sided")
 #'
 #' @export
 
 zconfint_generic <- function(mean, std_mean, alpha, alternative) {
-
   if (alternative %in% c("two-sided", "2-sided", "2s")) {
-
     zcrit <- qnorm(1 - alpha / 2)
     lower <- mean - zcrit * std_mean
     upper <- mean + zcrit * std_mean
-
   } else if (alternative %in% c("larger", "l")) {
-
     zcrit <- qnorm(alpha)
     lower <- mean + zcrit * std_mean
     upper <- Inf
-
   } else if (alternative %in% c("smaller", "s")) {
-
     zcrit <- qnorm(1 - alpha)
     lower <- -Inf
     upper <- mean + zcrit * std_mean
-
   } else {
-
     stop("Invalid alternative")
   }
 
@@ -717,7 +673,6 @@ zconfint_generic <- function(mean, std_mean, alpha, alternative) {
 #' @export
 
 log1pexp <- function(x) {
-
   idxs <- x > 10
 
   out <- numeric(length(x))
@@ -729,9 +684,9 @@ log1pexp <- function(x) {
   return(out)
 }
 
-#=== PPI++ LOGISTIC REGRESSION =================================================
+# === PPI++ LOGISTIC REGRESSION =================================================
 
-#=== PPI++ LOGISTIC GRADIENT AND HESSIAN =======================================
+# === PPI++ LOGISTIC GRADIENT AND HESSIAN =======================================
 
 #' Logistic Regression Gradient and Hessian
 #'
@@ -778,13 +733,13 @@ log1pexp <- function(x) {
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
 #' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
 #' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
@@ -794,10 +749,9 @@ log1pexp <- function(x) {
 #'
 #' @export
 
-logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
-
-  w_l = NULL, w_u = NULL, use_u = TRUE) {
-
+logistic_get_stats <- function(
+    est, X_l, Y_l, f_l, X_u, f_u,
+    w_l = NULL, w_u = NULL, use_u = TRUE) {
   n <- nrow(f_l)
 
   N <- nrow(f_u)
@@ -817,9 +771,7 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
   grads_hat_unlabeled <- matrix(0, nrow = N, ncol = p)
 
   if (use_u) {
-
     for (i in 1:N) {
-
       hessian <- hessian + w_u[i] / (N + n) * mu_u[i] * (1 - mu_u[i]) *
 
         tcrossprod(X_u[i, ])
@@ -833,15 +785,11 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
   grads_hat <- matrix(0, nrow = n, ncol = p)
 
   for (i in 1:n) {
-
     if (use_u) {
-
       hessian <- hessian + w_l[i] / (N + n) * mu_l[i] * (1 - mu_l[i]) *
 
         tcrossprod(X_l[i, ])
-
     } else {
-
       hessian <- hessian + w_l[i] / n * mu_l[i] * (1 - mu_l[i]) *
 
         tcrossprod(X_l[i, ])
@@ -855,13 +803,14 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
   inv_hessian <- solve(hessian)
 
   return(
-
-    list(grads = grads, grads_hat = grads_hat,
-
-         grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian))
+    list(
+      grads = grads, grads_hat = grads_hat,
+      grads_hat_unlabeled = grads_hat_unlabeled, inv_hessian = inv_hessian
+    )
+  )
 }
 
-#=== PSPA ======================================================================
+# === PSPA ======================================================================
 
 #-------------------------------------------------------------------------------
 # PSPA: Post-Prediction Adaptive Inference
@@ -921,29 +870,24 @@ logistic_get_stats <- function(est, X_l, Y_l, f_l, X_u, f_u,
 #'
 #' Yhat_unlab <- data$Yhat_unlab
 #'
-#' pspa_y(X_lab = X_lab, X_unlab = X_unlab,
-#'
-#'  Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab,
-#'
-#'  alpha = 0.05, method = "ols")
+#' pspa_y(
+#'   X_lab = X_lab, X_unlab = X_unlab,
+#'   Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab,
+#'   alpha = 0.05, method = "ols"
+#' )
 #'
 #' @export
 
-pspa_y <- function(X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
-
-  alpha = 0.05, weights = NA, quant = NA, intercept = FALSE, method) {
-
+pspa_y <- function(
+    X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
+    alpha = 0.05, weights = NA, quant = NA, intercept = FALSE, method) {
   ## Common Values
 
   if (method %in% c("ols", "logistic", "poisson")) {
-
     if (intercept) {
-
       X_lab <- as.matrix(X_lab)
       X_unlab <- as.matrix(X_unlab)
-
     } else {
-
       X_lab <- cbind(1, as.matrix(X_lab))
       X_unlab <- cbind(1, as.matrix(X_unlab))
     }
@@ -960,11 +904,8 @@ pspa_y <- function(X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
   N <- nrow(Yhat_unlab)
 
   if (method %in% c("mean", "quantile")) {
-
     q <- 1
-
   } else {
-
     q <- ncol(X_lab)
   }
 
@@ -972,29 +913,29 @@ pspa_y <- function(X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
   est <- est_ini(X_lab, Y_lab, quant, method)
 
   if (is.na(sum(weights))) {
-
     current_w <- rep(0, q)
 
-    optimized_weight <- optim_weights(X_lab, X_unlab,
-
-      Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method)
+    optimized_weight <- optim_weights(
+      X_lab, X_unlab,
+      Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method
+    )
 
     current_w <- optimized_weight
-
   } else {
-
     current_w <- weights
   }
 
   ## Calculate Final Coefficients and Standard Errors
 
-  est <- optim_est(X_lab, X_unlab,
+  est <- optim_est(
+    X_lab, X_unlab,
+    Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method
+  )
 
-    Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method)
-
-  final_sigma <- Sigma_cal(X_lab, X_unlab,
-
-    Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method)
+  final_sigma <- Sigma_cal(
+    X_lab, X_unlab,
+    Y_lab, Yhat_lab, Yhat_unlab, current_w, est, quant, method
+  )
 
   standard_errors <- sqrt(diag(final_sigma) / n)
 
@@ -1007,19 +948,19 @@ pspa_y <- function(X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
   upper_ci <- est + qnorm(1 - alpha / 2) * standard_errors
 
   output_table <- data.frame(
-
     Estimate = est, Std.Error = standard_errors,
     Lower.CI = lower_ci, Upper.CI = upper_ci,
-    P.value = p_values, Weight = current_w)
+    P.value = p_values, Weight = current_w
+  )
 
   colnames(output_table) <- c(
-
-    "Estimate", "Std.Error", "Lower.CI", "Upper.CI", "P.value", "Weight")
+    "Estimate", "Std.Error", "Lower.CI", "Upper.CI", "P.value", "Weight"
+  )
 
   return(output_table)
 }
 
-#=== PSPA UTILS ================================================================
+# === PSPA UTILS ================================================================
 
 #-------------------------------------------------------------------------------
 # General functions for M-estimation and Z-estimation
@@ -1047,27 +988,20 @@ pspa_y <- function(X_lab = NA, X_unlab = NA, Y_lab, Yhat_lab, Yhat_unlab,
 #' @export
 
 A <- function(X, Y, quant = NA, theta, method) {
-
   if (method == "ols") {
-
     n <- nrow(X)
 
     A <- (1 / n) * t(X) %*% X
-
   } else if (method == "quantile") {
-
     ## Kernel Density Estimation
 
-    A <- sapply(theta,
-
-      function(a, b) density(b, from = a, to = a, n = 1)$y, unlist(Y))
-
+    A <- sapply(
+      theta,
+      function(a, b) density(b, from = a, to = a, n = 1)$y, unlist(Y)
+    )
   } else if (method == "mean") {
-
     A <- 1
-
   } else if (method %in% c("logistic", "poisson")) {
-
     n <- nrow(X)
 
     mid <- sqrt(diag(as.vector(link_Hessian(X %*% theta, method)))) %*% X
@@ -1098,25 +1032,15 @@ A <- function(X, Y, quant = NA, theta, method) {
 #' @export
 
 est_ini <- function(X, Y, quant = NA, method) {
-
   if (method == "ols") {
-
     est <- lm(Y ~ X - 1)$coef
-
   } else if (method == "quantile") {
-
     est <- quantile(Y, quant)
-
   } else if (method == "mean") {
-
     est <- mean(Y)
-
   } else if (method == "logistic") {
-
     est <- glm(Y ~ X - 1, family = binomial)$coef
-
   } else if (method == "poisson") {
-
     est <- glm(Y ~ X - 1, family = poisson)$coef
   }
 
@@ -1145,17 +1069,11 @@ est_ini <- function(X, Y, quant = NA, method) {
 #' @export
 
 psi <- function(X, Y, theta, quant = NA, method) {
-
   if (method == "quantile") {
-
     psi <- t(as.matrix(-quant + 1 * (as.numeric(Y) <= as.vector(theta))))
-
   } else if (method == "mean") {
-
     psi <- t(as.matrix(as.vector(theta) - as.numeric(Y)))
-
   } else if (method %in% c("ols", "logistic", "poisson")) {
-
     t <- X %*% theta
 
     res <- Y - link_grad(t, method)
@@ -1188,7 +1106,6 @@ psi <- function(X, Y, theta, quant = NA, method) {
 #' @export
 
 mean_psi <- function(X, Y, theta, quant = NA, method) {
-
   psi <- as.matrix(rowMeans(psi(X, Y, theta, quant, method)))
 
   return(psi)
@@ -1227,31 +1144,27 @@ mean_psi <- function(X, Y, theta, quant = NA, method) {
 #'
 #' @export
 
-mean_psi_pop <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-  w, theta, quant = NA, method) {
-
+mean_psi_pop <- function(
+    X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+    w, theta, quant = NA, method) {
   if (method %in% c("ols", "logistic", "poisson")) {
-
     psi_pop <- mean_psi(X_lab, Y_lab, theta, quant, method) + diag(w) %*% (
 
       mean_psi(X_unlab, Yhat_unlab, theta, quant, method) -
 
-      mean_psi(X_lab,   Yhat_lab,   theta, quant, method))
-
+        mean_psi(X_lab, Yhat_lab, theta, quant, method))
   } else if (method %in% c("mean", "quantile")) {
-
     psi_pop <- mean_psi(X_lab, Y_lab, theta, quant, method) + w * (
 
       mean_psi(X_unlab, Yhat_unlab, theta, quant, method) -
 
-      mean_psi(X_lab,   Yhat_lab,   theta, quant, method))
+        mean_psi(X_lab, Yhat_lab, theta, quant, method))
   }
 
   return(psi_pop)
 }
 
-#=== STATISTICS FOR GLMS =======================================================
+# === STATISTICS FOR GLMS =======================================================
 
 #--- GRADIENT OF THE LINK FUNCTION ---------------------------------------------
 
@@ -1269,17 +1182,11 @@ mean_psi_pop <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
 #' @export
 
 link_grad <- function(t, method) {
-
   if (method == "ols") {
-
     grad <- t
-
   } else if (method == "logistic") {
-
     grad <- 1 / (1 + exp(-t))
-
   } else if (method == "poisson") {
-
     grad <- exp(t)
   }
 
@@ -1302,13 +1209,9 @@ link_grad <- function(t, method) {
 #' @export
 
 link_Hessian <- function(t, method) {
-
   if (method == "logistic") {
-
     hes <- exp(t) / (1 + exp(t))^2
-
   } else if (method == "poisson") {
-
     hes <- exp(t)
   }
 
@@ -1349,32 +1252,34 @@ link_Hessian <- function(t, method) {
 #'
 #' @export
 
-Sigma_cal <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-  w, theta, quant = NA, method) {
-
+Sigma_cal <- function(
+    X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+    w, theta, quant = NA, method) {
   psi_y_lab <- psi(
 
-    X_lab, Y_lab, theta, quant = quant, method = method)
+    X_lab, Y_lab, theta,
+    quant = quant, method = method
+  )
 
   psi_yhat_lab <- psi(
 
-    X_lab, Yhat_lab, theta, quant = quant, method = method)
+    X_lab, Yhat_lab, theta,
+    quant = quant, method = method
+  )
 
   psi_yhat_unlab <- psi(
 
-    X_unlab, Yhat_unlab, theta, quant = quant, method = method)
+    X_unlab, Yhat_unlab, theta,
+    quant = quant, method = method
+  )
 
   n <- nrow(Y_lab)
 
   N <- nrow(Yhat_unlab)
 
   if (method %in% c("mean", "quantile")) {
-
     q <- 1
-
   } else {
-
     q <- ncol(X_lab)
   }
 
@@ -1387,19 +1292,14 @@ Sigma_cal <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
   M4 <- cov(t(psi_y_lab), t(psi_yhat_lab))
 
   if (method == "ols") {
-
     A <- A(rbind(X_lab, X_unlab), c(Y_lab, Yhat_unlab), quant, theta, method)
 
     A_inv <- solve(A)
-
   } else if (method %in% c("mean", "quantile")) {
-
     A <- A(X_lab, Y_lab, quant, theta, method)
 
-    A_inv <- 1/A
-
+    A_inv <- 1 / A
   } else {
-
     A_lab <- A(X_lab, Y_lab, quant, theta, method)
 
     Ahat_lab <- A(X_lab, Yhat_lab, quant, theta, method)
@@ -1414,11 +1314,8 @@ Sigma_cal <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
   rho <- n / N
 
   if (method %in% c("mean", "quantile")) {
-
     Sigma <- A_inv * (M1 + w * (M2 + rho * M3) * w - 2 * w * M4) * A_inv
-
   } else {
-
     Sigma <- A_inv %*% (M1 + diag(w) %*%
 
       (M2 + rho * M3) %*% diag(w) - 2 * diag(w) %*% M4) %*% A_inv
@@ -1460,16 +1357,12 @@ Sigma_cal <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
 #'
 #' @export
 
-optim_est <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-  w, theta, quant = NA, method) {
-
+optim_est <- function(
+    X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+    w, theta, quant = NA, method) {
   if (method == "mean") {
-
     theta <- mean(Y_lab) + as.vector(w) * (mean(Yhat_unlab) - mean(Yhat_lab))
-
   } else if (method == "quantile") {
-
     A_lab <- A(X_lab, Y_lab, quant, theta, method)
 
     Ahat_lab <- A(X_lab, Yhat_lab, quant, theta, method)
@@ -1483,11 +1376,10 @@ optim_est <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
     theta <- theta - A_inv * mean_psi_pop(
 
       X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-      w, theta, quant = quant, method = method)
-
+      w, theta,
+      quant = quant, method = method
+    )
   } else if (method == "ols") {
-
     A <- A(rbind(X_lab, X_unlab), c(Y_lab, Yhat_unlab), quant, theta, method)
 
     A_inv <- solve(A)
@@ -1495,11 +1387,10 @@ optim_est <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
     theta <- theta - A_inv %*% mean_psi_pop(
 
       X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-      w, theta, quant = quant, method = method)
-
+      w, theta,
+      quant = quant, method = method
+    )
   } else {
-
     A_lab <- A(X_lab, Y_lab, quant, theta, method)
 
     Ahat_lab <- A(X_lab, Yhat_lab, quant, theta, method)
@@ -1513,8 +1404,9 @@ optim_est <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
     theta <- theta - A_inv %*% mean_psi_pop(
 
       X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-      w, theta, quant = quant, method = method)
+      w, theta,
+      quant = quant, method = method
+    )
   }
 
   return(theta)
@@ -1552,34 +1444,36 @@ optim_est <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
 #'
 #' @export
 
-optim_weights <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
-
-  w, theta, quant = NA, method) {
-
+optim_weights <- function(
+    X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
+    w, theta, quant = NA, method) {
   ## Objective Function
 
   psi_y_lab <- psi(
 
-    X_lab, Y_lab, theta, quant = quant, method = method)
+    X_lab, Y_lab, theta,
+    quant = quant, method = method
+  )
 
   psi_yhat_lab <- psi(
 
-    X_lab, Yhat_lab, theta, quant = quant, method = method)
+    X_lab, Yhat_lab, theta,
+    quant = quant, method = method
+  )
 
   psi_yhat_unlab <- psi(
 
-    X_unlab, Yhat_unlab, theta, quant = quant, method = method)
+    X_unlab, Yhat_unlab, theta,
+    quant = quant, method = method
+  )
 
   n <- nrow(Y_lab)
 
   N <- nrow(Yhat_unlab)
 
   if (method %in% c("mean", "quantile")) {
-
     q <- 1
-
   } else {
-
     q <- ncol(X_lab)
   }
 
@@ -1606,7 +1500,7 @@ optim_weights <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
   return(w)
 }
 
-#=== SIMULATE PSPA DATA ========================================================
+# === SIMULATE PSPA DATA ========================================================
 
 #' Simulate the data for testing the functions
 #'
@@ -1623,7 +1517,6 @@ optim_weights <- function(X_lab, X_unlab, Y_lab, Yhat_lab, Yhat_unlab,
 #' @export
 
 sim_data_y <- function(r = 0.9, binary = FALSE) {
-
   ## Input Parameters
 
   n_train <- 500
@@ -1655,7 +1548,6 @@ sim_data_y <- function(r = 0.9, binary = FALSE) {
     beta_1 + data$X2^2 * beta_1 + data$epsilon
 
   if (binary) {
-
     data$Y <- ifelse(data$Y > median(unlist(data$Y)), 1, 0)
 
     ## Split Data
@@ -1697,13 +1589,10 @@ sim_data_y <- function(r = 0.9, binary = FALSE) {
     colnames(Yhat_unlab) <- "Y_hat"
 
     out <- list(
-
       X_lab = X_lab, X_unlab = X_unlab,
-
-      Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab)
-
+      Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab
+    )
   } else {
-
     ## Split Data
 
     train_data <- data[1:n_train, ]
@@ -1741,13 +1630,12 @@ sim_data_y <- function(r = 0.9, binary = FALSE) {
     colnames(Yhat_unlab) <- "Y_hat"
 
     out <- list(
-
       X_lab = X_lab, X_unlab = X_unlab,
-
-      Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab)
+      Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab
+    )
   }
 
   return(out)
 }
 
-#=== END =======================================================================
+# === END =======================================================================
