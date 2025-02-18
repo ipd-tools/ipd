@@ -1,8 +1,8 @@
-# ==============================================================================
+#===============================================================================
 # DATA GENERATION FUNCTION
-# ==============================================================================
+#===============================================================================
 
-# --- DATA GENERATION FOR VARIOUS MODELS ---------------------------------------
+#--- DATA GENERATION FOR VARIOUS MODELS ----------------------------------------
 
 #' Data generation function for various underlying models
 #'
@@ -58,7 +58,8 @@
 #' with a zero mean vector and identity covariance matrix:
 #'
 #' \deqn{
-#'   \boldsymbol{X_i} = (X_{i1}, X_{i2}, X_{i3}, X_{i4}) \sim \mathcal{N}_4(\boldsymbol{0}, \boldsymbol{I}).
+#'   \boldsymbol{X_i} = (X_{i1}, X_{i2}, X_{i3}, X_{i4}) \sim
+#'   \mathcal{N}_4(\boldsymbol{0}, \boldsymbol{I}).
 #' }
 #'
 #' For \code{"ols"}, a continuous outcome \eqn{Y \in \mathbb{R}} is simulated
@@ -67,7 +68,8 @@
 #' \eqn{\boldsymbol{X} \setminus X_1}, have nonlinear effects:
 #'
 #' \deqn{
-#'   Y_i = effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y,
+#'   Y_i = effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 +
+#'   \frac{1}{4} Z_{i4}^2 + \varepsilon_y,
 #' }
 #'
 #' and \eqn{\varepsilon_y \sim \mathcal{N}(0, sigma_y)}, where the
@@ -76,7 +78,9 @@
 #' For \code{"logistic"}, we simulate:
 #'
 #' \deqn{
-#'   \Pr(Y_i = 1 \mid \boldsymbol{X}) = logit^{-1}(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
+#'   \Pr(Y_i = 1 \mid \boldsymbol{X}) = logit^{-1}(effect \times Z_{i1} +
+#'   \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 +
+#'   \varepsilon_y)
 #' }
 #'
 #' and generate:
@@ -90,7 +94,8 @@
 #' For \code{"poisson"}, we simulate:
 #'
 #' \deqn{
-#'   \lambda_Y = exp(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
+#'   \lambda_Y = exp(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 +
+#'   \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
 #' }
 #'
 #' and generate:
@@ -125,8 +130,10 @@
 #' as:
 #'
 #' \deqn{
-#'  f(\boldsymbol{X}^{\mathcal{L}\cup\mathcal{U}}) = \hat{s}_0 + \hat{s}_1(X_1^{\mathcal{L}\cup\mathcal{U}}) +
-#' \hat{s}_2(X_2^{\mathcal{L}\cup\mathcal{U}}) + \hat{s}_3(X_3^{\mathcal{L}\cup\mathcal{U}}) +
+#'  f(\boldsymbol{X}^{\mathcal{L}\cup\mathcal{U}}) =
+#'  \hat{s}_0 + \hat{s}_1(X_1^{\mathcal{L}\cup\mathcal{U}}) +
+#' \hat{s}_2(X_2^{\mathcal{L}\cup\mathcal{U}}) +
+#' \hat{s}_3(X_3^{\mathcal{L}\cup\mathcal{U}}) +
 #' \hat{s}_4(X_4^{\mathcal{L}\cup\mathcal{U}}),
 #' }
 #'
@@ -160,8 +167,9 @@
 #' function to the simulated \emph{training} dataset. The model is of the form:
 #'
 #' \deqn{
-#'   \log(\mu^{\mathcal{T}}) = \gamma_0 + \gamma_1 X_1^{\mathcal{T}} + \gamma_2 X_2^{\mathcal{T}} +
-#'   \gamma_3 X_3^{\mathcal{T}} + \gamma_4 X_4^{\mathcal{T}},
+#'   \log(\mu^{\mathcal{T}}) = \gamma_0 + \gamma_1 X_1^{\mathcal{T}} +
+#'   \gamma_2 X_2^{\mathcal{T}} + \gamma_3 X_3^{\mathcal{T}} +
+#'   \gamma_4 X_4^{\mathcal{T}},
 #' }
 #'
 #' where \eqn{\mu^{\mathcal{T}}} is the expected count for the response variable
@@ -174,13 +182,16 @@
 #' calculated as:
 #'
 #' \deqn{
-#'   \hat{\mu}^{\mathcal{L} \cup \mathcal{U}} = \exp(\hat{\gamma}_0 + \hat{\gamma}_1 X_1^{\mathcal{L} \cup \mathcal{U}} +
-#'   \hat{\gamma}_2 X_2^{\mathcal{L} \cup \mathcal{U}} + \hat{\gamma}_3 X_3^{\mathcal{L} \cup \mathcal{U}} +
+#'   \hat{\mu}^{\mathcal{L} \cup \mathcal{U}} = \exp(\hat{\gamma}_0 +
+#'   \hat{\gamma}_1 X_1^{\mathcal{L} \cup \mathcal{U}} +
+#'   \hat{\gamma}_2 X_2^{\mathcal{L} \cup \mathcal{U}} +
+#'   \hat{\gamma}_3 X_3^{\mathcal{L} \cup \mathcal{U}} +
 #'   \hat{\gamma}_4 X_4^{\mathcal{L} \cup \mathcal{U}}),
 #' }
 #'
-#' where \eqn{\hat{\gamma}_0}, \eqn{\hat{\gamma}_1}, \eqn{\hat{\gamma}_2}, \eqn{\hat{\gamma}_3},
-#' and \eqn{\hat{\gamma}_4} are the estimated coefficients.
+#' where \eqn{\hat{\gamma}_0}, \eqn{\hat{\gamma}_1}, \eqn{\hat{\gamma}_2},
+#' \eqn{\hat{\gamma}_3}, and \eqn{\hat{\gamma}_4} are the estimated
+#' coefficients.
 #'
 #' @examples
 #'
@@ -227,7 +238,9 @@ simdat <- function(
   } else if (model %in% c("ols", "logistic", "poisson")) {
     X <- matrix(rnorm(sum(n) * 4), ncol = 4, nrow = sum(n))
 
-    mu <- effect * X[, 1] + (1 / 2) * X[, 2]^2 + (1 / 3) * X[, 3]^3 + (1 / 4) * X[, 4]^2
+    mu <- effect * X[, 1] + (1 / 2) * X[, 2]^2 +
+
+      (1 / 3) * X[, 3]^3 + (1 / 4) * X[, 4]^2
   }
 
   #-- GENERATE ERROR COMPONENT
@@ -332,4 +345,4 @@ simdat <- function(
   return(dat)
 }
 
-# === END ======================================================================
+#=== END =======================================================================

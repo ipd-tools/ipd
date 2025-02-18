@@ -1,6 +1,6 @@
-# ===============================================================================
+#===============================================================================
 # PPI MEAN ESTIMATION
-# ===============================================================================
+#===============================================================================
 
 #--- PPI MEAN ESTIMATION -------------------------------------------------------
 
@@ -34,11 +34,14 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' ppi_mean(Y_l, f_l, f_u)
 #'
@@ -53,8 +56,6 @@ ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided") {
 
   N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
 
-  p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
-
   est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat = 1)
 
   imputed_std <- sd(f_u) * sqrt((N - 1) / N) / sqrt(N)
@@ -66,4 +67,4 @@ ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided") {
   ))
 }
 
-# === END =======================================================================
+#=== END =======================================================================

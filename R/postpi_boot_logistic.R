@@ -1,6 +1,6 @@
-# ===============================================================================
+#===============================================================================
 #  POSTPI BOOTSTRAP LOGISTIC REGRESSION
-# ===============================================================================
+#===============================================================================
 
 #--- POSTPI BOOTSTRAP LOGISTIC REGRESSION --------------------------------------
 
@@ -44,13 +44,16 @@
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' postpi_boot_logistic(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 #'
@@ -85,7 +88,7 @@ postpi_boot_logistic <- function(
   ests_b <- sapply(1:nboot, function(b) {
     #-   i. Sample Predicted Values and Covariates with Replacement
 
-    idx_b <- sample(1:N, N, replace = T)
+    idx_b <- sample(1:N, N, replace = TRUE)
 
     f_u_b <- f_u[idx_b, ]
 
@@ -105,7 +108,7 @@ postpi_boot_logistic <- function(
 
     #-   v. Extract SE of Estimator
 
-    return(summary(fit_inf_b)$coefficients[, 1:2])
+    summary(fit_inf_b)$coefficients[, 1:2]
   })
 
   #-- 4. Estimate Inference Model Coefficient

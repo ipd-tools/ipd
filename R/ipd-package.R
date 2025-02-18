@@ -23,13 +23,19 @@
 #' - Comprehensive documentation and examples.
 #'
 #' @section Key Functions:
-#' - \code{\link{ipd}}: Main wrapper function which implements various methods for inference on predicted data for a specified model/outcome type (e.g., mean estimation, linear regression).
-#' - \code{\link{simdat}}: Simulates data for demonstrating the use of the various IPD methods.
-#' - \code{\link{print.ipd}}: Prints a brief summary of the IPD method/model combination.
+#' - \code{\link{ipd}}: Main wrapper function which implements various methods
+#'   for inference on predicted data for a specified model/outcome type
+#'   (e.g., mean estimation, linear regression).
+#' - \code{\link{simdat}}: Simulates data for demonstrating the use of the
+#'   various IPD methods.
+#' - \code{\link{print.ipd}}: Prints a brief summary of the IPD method/model
+#'   combination.
 #' - \code{\link{summary.ipd}}: Summarizes the results of fitted IPD models.
 #' - \code{\link{tidy.ipd}}: Tidies the IPD method/model fit into a data frame.
-#' - \code{\link{glance.ipd}}: Glances at the IPD method/model fit, returning a one-row summary.
-#' - \code{\link{augment.ipd}}: Augments the data used for an IPD method/model fit with additional information about each observation.
+#' - \code{\link{glance.ipd}}: Glances at the IPD method/model fit, returning a
+#'   one-row summary.
+#' - \code{\link{augment.ipd}}: Augments the data used for an IPD method/model
+#'   fit with additional information about each observation.
 #'
 #' @section Documentation:
 #' The package includes detailed documentation for each function, including
@@ -39,10 +45,18 @@
 #' @section References:
 #' For details on the statistical methods implemented in this package, please
 #' refer to the associated manuscripts at the following references:
-#' - \strong{PostPI}: Wang, S., McCormick, T. H., & Leek, J. T. (2020). Methods for correcting inference based on outcomes predicted by machine learning. Proceedings of the National Academy of Sciences, 117(48), 30266-30275.
-#' - \strong{PPI}: Angelopoulos, A. N., Bates, S., Fannjiang, C., Jordan, M. I., & Zrnic, T. (2023). Prediction-powered inference. Science, 382(6671), 669-674.
-#' - \strong{PPI++}: Angelopoulos, A. N., Duchi, J. C., & Zrnic, T. (2023). PPI++: Efficient prediction-powered inference. arXiv preprint arXiv:2311.01453.
-#' - \strong{PSPA}: Miao, J., Miao, X., Wu, Y., Zhao, J., & Lu, Q. (2023). Assumption-lean and data-adaptive post-prediction inference. arXiv preprint arXiv:2311.14220.
+#' - \strong{PostPI}: Wang, S., McCormick, T. H., & Leek, J. T. (2020). Methods
+#'   for correcting inference based on outcomes predicted by machine learning.
+#'   Proceedings of the National Academy of Sciences, 117(48), 30266-30275.
+#' - \strong{PPI}: Angelopoulos, A. N., Bates, S., Fannjiang, C., Jordan,
+#'   M. I., & Zrnic, T. (2023). Prediction-powered inference. Science,
+#'   382(6671), 669-674.
+#' - \strong{PPI++}: Angelopoulos, A. N., Duchi, J. C., & Zrnic, T. (2023).
+#'   PPI++: Efficient prediction-powered inference. arXiv preprint
+#'   arXiv:2311.01453.
+#' - \strong{PSPA}: Miao, J., Miao, X., Wu, Y., Zhao, J., & Lu, Q. (2023).
+#'   Assumption-lean and data-adaptive post-prediction inference. arXiv
+#'   preprint arXiv:2311.14220.
 #'
 #' @name ipd-package
 #'

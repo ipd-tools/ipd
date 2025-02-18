@@ -68,10 +68,10 @@ Yhat_lab <- data$Yhat_lab
 
 Yhat_unlab <- data$Yhat_unlab
 
-pspa_y(X_lab = X_lab, X_unlab = X_unlab,
-
- Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab,
-
- alpha = 0.05, method = "ols")
+pspa_y(
+  X_lab = X_lab, X_unlab = X_unlab,
+  Y_lab = Y_lab, Yhat_lab = Yhat_lab, Yhat_unlab = Yhat_unlab,
+  alpha = 0.05, method = "ols"
+)
 
 }

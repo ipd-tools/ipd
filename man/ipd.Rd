@@ -29,15 +29,15 @@ predicted outcome in both labeled and unlabeled data, and \code{X}
 corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
 See \strong{1. Formula} in the \strong{Details} below for more information.}
 
-\item{method}{The IPD method to be used for fitting the model. Must be one of
-\code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-\code{"ppi_plusplus"}, or \code{"pspa"}.
-See \strong{3. Method} in the \strong{Details} below for more information.}
+\item{method}{The IPD method to be used for fitting the model. Must be one
+of \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
+\code{"ppi_plusplus"}, or \code{"pspa"}. See \strong{3. Method} in the
+\strong{Details} below for more information.}
 
 \item{model}{The type of downstream inferential model to be fitted, or the
-parameter being estimated. Must be one of \code{"mean"},
-\code{"quantile"}, \code{"ols"}, \code{"logistic"}, or \code{"poisson"}.
-See \strong{4. Model} in the \strong{Details} below for more information.}
+parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
+\code{"ols"}, \code{"logistic"}, or \code{"poisson"}. See \strong{4. Model}
+in the \strong{Details} below for more information.}
 
 \item{data}{A \code{data.frame} containing the variables in the model,
 either a stacked data frame with a specific column identifying the labeled
@@ -155,8 +155,8 @@ Unlabeled data identifiers can be:
 
 For option (2), provide separate data arguments for the labeled data set
 (\code{data}) and the unlabeled data set (\code{unlabeled_data}). If the
-second argument is provided, the function ignores the \code{label} identifier
-and assumes the data provided are not stacked.
+second argument is provided, the function ignores the \code{label}
+identifier and assumes the data provided are not stacked.
 
 NOTE: Not all columns in \code{data} or \code{unlabeled_data} may be used
 unless explicitly referenced in the \code{formula} argument or in the
@@ -167,8 +167,10 @@ unless explicitly referenced in the \code{formula} argument or in the
 Use the \code{method} argument to specify the fitting method:
 
 \describe{
-\item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Analytic Correction}
-\item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Bootstrap Correction}
+\item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
+(PostPI) Analytic Correction}
+\item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference
+(PostPI) Bootstrap Correction}
 \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 (PPI)}
 \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
@@ -218,34 +220,39 @@ formula <- Y - f ~ X1
 
 #-- PostPI Analytic Correction (Wang et al., 2020)
 
-ipd(formula, method = "postpi_analytic", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "postpi_analytic", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- PostPI Bootstrap Correction (Wang et al., 2020)
 
 nboot <- 200
 
-ipd(formula, method = "postpi_boot", model = "ols",
-
-    data = dat, label = "set_label", nboot = nboot)
+ipd(formula,
+  method = "postpi_boot", model = "ols",
+  data = dat, label = "set_label", nboot = nboot
+)
 
 #-- PPI (Angelopoulos et al., 2023)
 
-ipd(formula, method = "ppi", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "ppi", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- PPI++ (Angelopoulos et al., 2023)
 
-ipd(formula, method = "ppi_plusplus", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "ppi_plusplus", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- PSPA (Miao et al., 2023)
 
-ipd(formula, method = "pspa", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "pspa", model = "ols",
+  data = dat, label = "set_label"
+)
 
 }

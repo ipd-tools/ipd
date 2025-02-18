@@ -6,7 +6,9 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml)
-
+[![CRAN
+Status](https://www.r-pkg.org/badges/version/ipd)](https://CRAN.R-project.org/package=ipd)
+[![Downloads](https://cranlogs.r-pkg.org/badges/ipd)](https://CRAN.R-project.org/package=ipd)
 <!-- badges: end -->
 
 ## <img src="man/figures/ipd.png" align="right" height="200" style="float:right; height:200px;"/>
@@ -81,7 +83,7 @@ package:
 ``` r
 #-- Install devtools if it is not already installed
 
-install.packages("devtools")   
+install.packages("devtools")
 
 #-- Install the ipd package from GitHub
 
@@ -120,9 +122,9 @@ dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
-options(digits=2)
+options(digits = 2)
 
-head(dat[dat$set_label == "training",])
+head(dat[dat$set_label == "training", ])
 #>       X1    X2    X3     X4     Y  f set_label
 #> 1 -0.560 -0.56  0.82 -0.356 -0.15 NA  training
 #> 2 -0.230  0.13 -1.54  0.040 -4.49 NA  training
@@ -131,7 +133,7 @@ head(dat[dat$set_label == "training",])
 #> 5  0.129 -0.72 -0.71  0.634  2.19 NA  training
 #> 6  1.715  0.58 -0.54 -0.037 -1.42 NA  training
 
-head(dat[dat$set_label == "labeled",])
+head(dat[dat$set_label == "labeled", ])
 #>          X1      X2    X3    X4     Y     f set_label
 #> 10001  2.37 -1.8984  0.20 -0.17  1.40  3.24   labeled
 #> 10002 -0.17  1.7428  0.26 -2.05  3.56  1.03   labeled
@@ -140,7 +142,7 @@ head(dat[dat$set_label == "labeled",])
 #> 10005  0.23  2.0620 -1.35  1.46 -0.82 -0.15   labeled
 #> 10006  1.13 -0.0028  0.23 -0.24  7.30  2.16   labeled
 
-head(dat[dat$set_label == "unlabeled",])
+head(dat[dat$set_label == "unlabeled", ])
 #>          X1     X2    X3    X4    Y     f set_label
 #> 10501  0.99 -3.280 -0.39  0.97  8.4  1.25 unlabeled
 #> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.08 unlabeled
@@ -187,8 +189,7 @@ errors that are too small.
 ``` r
 #--- Fit the Naive Regression
 
-lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |> 
-  
+lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
   summary()
 #> 
 #> Call:
@@ -216,8 +217,7 @@ lm(f ~ X1, data = dat[dat$set_label == "unlabeled",]) |>
 ``` r
 #--- Fit the Classic Regression
 
-lm(Y ~ X1, data = dat[dat$set_label == "labeled",]) |> 
-  
+lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |>
   summary()
 #> 
 #> Call:
@@ -253,12 +253,10 @@ formula <- Y - f ~ X1
 
 nboot <- 200
 
-ipd::ipd(formula, 
-         
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label", 
-  
-  nboot = nboot) |> 
-  
+ipd::ipd(formula,
+  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
+  nboot = nboot
+) |>
   summary()
 #> 
 #> Call:
@@ -279,10 +277,9 @@ ipd::ipd(formula,
 ``` r
 #-- Fit the PostPI Analytic Correction
 
-ipd::ipd(formula, 
-         
-  method = "postpi_analytic", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "postpi_analytic", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 #> 
 #> Call:
@@ -303,10 +300,9 @@ ipd::ipd(formula,
 ``` r
 #-- Fit the PPI Correction
 
-ipd::ipd(formula, 
-         
-  method = "ppi", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 #> 
 #> Call:
@@ -327,10 +323,9 @@ ipd::ipd(formula,
 ``` r
 #-- Fit the PPI++ Correction
 
-ipd::ipd(formula, 
-         
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 #> 
 #> Call:
@@ -351,10 +346,9 @@ ipd::ipd(formula,
 ``` r
 #-- Fit the PSPA Correction
 
-ipd::ipd(formula, 
-         
-  method = "pspa", model = "ols", data = dat, label = "set_label") |> 
-  
+ipd::ipd(formula,
+  method = "pspa", model = "ols", data = dat, label = "set_label"
+) |>
   summary()
 #> 
 #> Call:
@@ -380,12 +374,11 @@ and `augment` methods to facilitate easy model inspection:
 
 nboot <- 200
 
-fit_postpi <- ipd::ipd(formula, 
-         
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label", 
-  
-  nboot = nboot)
-  
+fit_postpi <- ipd::ipd(formula,
+  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
+  nboot = nboot
+)
+
 #-- Print the Model
 
 print(fit_postpi)
@@ -400,7 +393,7 @@ print(fit_postpi)
 #-- Summarize the Model
 
 summ_fit_postpi <- summary(fit_postpi)
-  
+
 #-- Print the Model Summary
 
 print(summ_fit_postpi)

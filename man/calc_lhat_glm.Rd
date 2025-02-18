@@ -48,13 +48,13 @@ dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 
-X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 
 Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 
 f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
-X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 
 f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
 
@@ -63,7 +63,8 @@ est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u)
 stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u)
 
 calc_lhat_glm(stats$grads, stats$grads_hat, stats$grads_hat_unlabeled,
-
-  stats$inv_hessian, coord = NULL, clip = FALSE)
+  stats$inv_hessian,
+  coord = NULL, clip = FALSE
+)
 
 }

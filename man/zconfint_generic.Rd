@@ -29,7 +29,7 @@ n <- 1000
 
 Y <- rnorm(n, 1, 1)
 
-se_Y <-  sd(Y) / sqrt(n)
+se_Y <- sd(Y) / sqrt(n)
 
 zconfint_generic(Y, se_Y, alpha = 0.05, alternative = "two-sided")
 

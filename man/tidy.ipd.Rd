@@ -31,9 +31,10 @@ formula <- Y - f ~ X1
 
 #-- Fit IPD
 
-fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-
-  data = dat, label = "set_label")
+fit <- ipd(formula,
+  method = "postpi_analytic", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- Tidy Output
 

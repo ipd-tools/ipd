@@ -1,6 +1,6 @@
-# ===============================================================================
+#===============================================================================
 # WRAPPER FUNCTION
-# ===============================================================================
+#===============================================================================
 
 #--- MAIN WRAPPER FUNCTION -----------------------------------------------------
 
@@ -17,15 +17,15 @@
 #' corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
 #' See \strong{1. Formula} in the \strong{Details} below for more information.
 #'
-#' @param method The IPD method to be used for fitting the model. Must be one of
-#' \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-#' \code{"ppi_plusplus"}, or \code{"pspa"}.
-#' See \strong{3. Method} in the \strong{Details} below for more information.
+#' @param method The IPD method to be used for fitting the model. Must be one
+#' of \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
+#' \code{"ppi_plusplus"}, or \code{"pspa"}. See \strong{3. Method} in the
+#' \strong{Details} below for more information.
 #'
 #' @param model The type of downstream inferential model to be fitted, or the
-#' parameter being estimated. Must be one of \code{"mean"},
-#' \code{"quantile"}, \code{"ols"}, \code{"logistic"}, or \code{"poisson"}.
-#' See \strong{4. Model} in the \strong{Details} below for more information.
+#' parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
+#' \code{"ols"}, \code{"logistic"}, or \code{"poisson"}. See \strong{4. Model}
+#' in the \strong{Details} below for more information.
 #'
 #' @param data A \code{data.frame} containing the variables in the model,
 #' either a stacked data frame with a specific column identifying the labeled
@@ -122,8 +122,8 @@
 #'
 #' For option (2), provide separate data arguments for the labeled data set
 #' (\code{data}) and the unlabeled data set (\code{unlabeled_data}). If the
-#' second argument is provided, the function ignores the \code{label} identifier
-#' and assumes the data provided are not stacked.
+#' second argument is provided, the function ignores the \code{label}
+#' identifier and assumes the data provided are not stacked.
 #'
 #' NOTE: Not all columns in \code{data} or \code{unlabeled_data} may be used
 #' unless explicitly referenced in the \code{formula} argument or in the
@@ -134,8 +134,10 @@
 #' Use the \code{method} argument to specify the fitting method:
 #'
 #' \describe{
-#'    \item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Analytic Correction}
-#'    \item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Bootstrap Correction}
+#'    \item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
+#'    (PostPI) Analytic Correction}
+#'    \item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference
+#'    (PostPI) Bootstrap Correction}
 #'    \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 #'    (PPI)}
 #'    \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
@@ -238,6 +240,7 @@
 #' )
 #'
 #' @import stats
+#' @import tibble
 #'
 #' @export
 
@@ -250,7 +253,7 @@ ipd <- function(
 
   #-- CHECK ARGUMENTS
 
-  if (na_action != "na.fail" & na_action != "na.omit") {
+  if (na_action != "na.fail" && na_action != "na.omit") {
     stop("na_action should be either 'na.fail' or 'na.omit'")
   }
 
@@ -273,7 +276,7 @@ ipd <- function(
 
   #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE UNSPECIFIED
 
-  if (is.null(label) & is.null(unlabeled_data)) {
+  if (is.null(label) && is.null(unlabeled_data)) {
     stop(paste(
       "at least one of 'label' and 'unlabeled_data' must be",
       "specified.\nSee the help('ipd') documentation for more information."
@@ -282,7 +285,7 @@ ipd <- function(
 
   #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE SPECIFIED
 
-  if (!is.null(label) & !is.null(unlabeled_data)) {
+  if (!is.null(label) && !is.null(unlabeled_data)) {
     stop(paste(
       "specify only one of 'label' and 'unlabeled_data' argument.",
       "\nSee the help('ipd') documentation for more information."
@@ -334,7 +337,7 @@ ipd <- function(
 
   #-- IF STACKED DATA ARE PROVIDED
 
-  if (!is.null(label) & is.null(unlabeled_data)) {
+  if (!is.null(label) && is.null(unlabeled_data)) {
     if (!is.null(factor_vars)) {
       dropped_levels <- sapply(
         data[factor_vars],
@@ -371,9 +374,8 @@ ipd <- function(
       "val", "validation", "false", 0, FALSE
     )
 
-    if (!((sum(unique(data[[label]]) %in% valid_labeled_df_id) == 1) &
-
-      (sum(unique(data[[label]]) %in% valid_unlabeled_df_id) == 1))) {
+    if (!((sum(unique(data[[label]]) %in% valid_labeled_df_id) == 1) &&
+            (sum(unique(data[[label]]) %in% valid_unlabeled_df_id) == 1))) {
       stop(paste(
         label,
         "must have one valid identifier for labeled and unlabeled data set",
@@ -389,7 +391,7 @@ ipd <- function(
 
   #-- IF UNSTACKED DATA ARE PROVIDED
 
-  if (is.null(label) & !is.null(unlabeled_data)) {
+  if (is.null(label) && !is.null(unlabeled_data)) {
     data_l <- data
 
     data_u <- unlabeled_data
@@ -414,7 +416,7 @@ ipd <- function(
       ))
     }
 
-    return(NULL)
+    NULL
   })
 
   differing_levels <- differing_levels[!sapply(differing_levels, is.null)]
@@ -540,4 +542,4 @@ ipd <- function(
   return(result)
 }
 
-# === END =======================================================================
+#=== END =======================================================================

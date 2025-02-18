@@ -1,10 +1,10 @@
-# ==============================================================================
+#===============================================================================
 # METHODS
-# ==============================================================================
+#===============================================================================
 
-# === STANDARD METHODS =========================================================
+#=== STANDARD METHODS ==========================================================
 
-# --- PRINT.IPD ----------------------------------------------------------------
+#--- PRINT.IPD -----------------------------------------------------------------
 
 #' Print IPD Fit
 #'
@@ -55,7 +55,7 @@ print.ipd <- function(x, ...) {
   invisible(x)
 }
 
-# --- SUMMARY.IPD --------------------------------------------------------------
+#--- SUMMARY.IPD ---------------------------------------------------------------
 
 #' Summarize IPD Fit
 #'
@@ -125,7 +125,7 @@ summary.ipd <- function(object, ...) {
 
   class(result) <- "summary.ipd"
 
-  return(result)
+  result
 }
 
 #--- PRINT.SUMMARY.IPD ---------------------------------------------------------
@@ -185,7 +185,7 @@ print.summary.ipd <- function(x, ...) {
   invisible(x)
 }
 
-# === BROOM TIDIER METHODS ======================================================
+#=== BROOM TIDIER METHODS ======================================================
 
 #--- TIDY.IPD ------------------------------------------------------------------
 
@@ -231,15 +231,13 @@ generics::tidy
 tidy.ipd <- function(x, ...) {
   if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
-  result <- data.frame(
+  tibble::tibble(
     term = names(x$coefficients),
     estimate = x$coefficients,
     std.error = x$se,
     conf.low = x$ci[, 1],
     conf.high = x$ci[, 2]
   )
-
-  return(result)
 }
 
 #--- GLANCE.IPD ----------------------------------------------------------------
@@ -286,7 +284,7 @@ generics::glance
 glance.ipd <- function(x, ...) {
   if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
-  glance_df <- data.frame(
+  tibble::tibble(
     method = x$method,
     model = x$model,
     include_intercept = x$intercept,
@@ -294,8 +292,6 @@ glance.ipd <- function(x, ...) {
     nobs_unlabeled = nrow(x$data_u),
     call = deparse(x$formula)
   )
-
-  return(glance_df)
 }
 
 #--- AUGMENT.IPD ---------------------------------------------------------------
@@ -362,4 +358,4 @@ augment.ipd <- function(x, data = x$data_u, ...) {
   return(data_aug)
 }
 
-# === END =======================================================================
+#=== END =======================================================================
