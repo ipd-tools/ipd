@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- PPI OLS -------------------------------------------------------------------
 
 #' PPI OLS
@@ -47,13 +43,19 @@
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -61,64 +63,82 @@
 #'
 #' @export
 
-ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
-  n <- NROW(X_l)
+ppi_ols <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    w_l = NULL,
+    w_u = NULL) {
 
-  p <- NCOL(X_l)
+    n <- NROW(X_l)
+    p <- NCOL(X_l)
+    N <- NROW(X_u)
 
-  N <- NROW(X_u)
+    #- 1. Prediction-Powered Estimator
 
-  #- 1. Prediction-Powered Estimator
+    theta_tilde_f <- solve(crossprod(X_u)) %*% t(X_u) %*% f_u
 
-  theta_tilde_f <- solve(crossprod(X_u)) %*% t(X_u) %*% f_u
+    delta_hat_f <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
 
-  delta_hat_f <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
+    theta_hat_pp <- theta_tilde_f - delta_hat_f
 
-  theta_hat_pp <- theta_tilde_f - delta_hat_f
+    #- 2. Meat and Bread for Imputed Estimate
 
-  #- 2. Meat and Bread for Imputed Estimate
+    Sigma_tilde <- crossprod(X_u) / N
 
-  Sigma_tilde <- crossprod(X_u) / N
+    M_tilde <- vapply(seq_len(N),
 
-  M_tilde <- sapply(1:N, function(i) {
-    (c(f_u[i] - crossprod(X_u[i, ], theta_tilde_f)))^2 *
+        function(i) {
 
-      tcrossprod(X_u[i, ])
-  }) |>
-    rowMeans() |>
-    matrix(nrow = p)
+            (c(f_u[i] - crossprod(X_u[i, ], theta_tilde_f)))^2 *
 
-  iSigma_tilde <- solve(Sigma_tilde)
+                tcrossprod(X_u[i, ])
+        },
 
-  #- 3. Sandwich Variance Estimator for Imputed Estimate
+        FUN.VALUE = matrix(0, nrow = p^2)) |>
 
-  V_tilde <- iSigma_tilde %*% M_tilde %*% iSigma_tilde
+        rowMeans() |>
 
-  #- 4. Meat and Bread for Empirical Rectifier
+        matrix(nrow = p)
 
-  Sigma <- crossprod(X_l) / n
+    iSigma_tilde <- solve(Sigma_tilde)
 
-  M <- sapply(1:n, function(i) {
-    (c(f_l[i] - Y_l[i] - crossprod(X_l[i, ], delta_hat_f)))^2 *
+    #- 3. Sandwich Variance Estimator for Imputed Estimate
 
-      tcrossprod(X_l[i, ])
-  }) |>
-    rowMeans() |>
-    matrix(nrow = p)
+    V_tilde <- iSigma_tilde %*% M_tilde %*% iSigma_tilde
 
-  iSigma <- solve(Sigma)
+    #- 4. Meat and Bread for Empirical Rectifier
 
-  #- 5. Sandwich Variance Estimator for Empirical Rectifier
+    Sigma <- crossprod(X_l) / n
 
-  V <- iSigma %*% M %*% iSigma
+    M <- vapply(seq_len(n),
 
-  #- 6. Standard Error Estimates
+        function(i) {
 
-  se <- sqrt(diag(V) / n + diag(V_tilde) / N)
+            (c(f_l[i] - Y_l[i] - crossprod(X_l[i, ], delta_hat_f)))^2 *
 
-  #- Output
+                tcrossprod(X_l[i, ])
+        },
 
-  return(list(est = theta_hat_pp, se = se, rectifier_est = delta_hat_f))
+        FUN.VALUE = matrix(0, nrow = p^2)) |>
+
+        rowMeans() |>
+
+        matrix(nrow = p)
+
+    iSigma <- solve(Sigma)
+
+    #- 5. Sandwich Variance Estimator for Empirical Rectifier
+
+    V <- iSigma %*% M %*% iSigma
+
+    #- 6. Standard Error Estimates
+
+    se <- sqrt(diag(V) / n + diag(V_tilde) / N)
+
+    #- Output
+
+    return(list(est = theta_hat_pp, se = se, rectifier_est = delta_hat_f))
 }
-
-#=== END =======================================================================

@@ -6,11 +6,11 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE, 
+  collapse = TRUE,
   comment = "#>",
   message = FALSE,
   warning = FALSE,
-  fig.path = "man/figures/README-", 
+  fig.path = "man/figures/README-",
   out.width = "100%"
 )
 ```
@@ -52,7 +52,7 @@ To enable researchers and practitioners interested in these state-of-the-art met
 
 To install the development version of `ipd` from [GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools` package:
 
-```{r, eval = F}
+```{r, eval = FALSE}
 #-- Install devtools if it is not already installed
 
 install.packages("devtools")
@@ -96,7 +96,7 @@ head(dat[dat$set_label == "unlabeled", ])
 
 The `simdat` function provides observed and unobserved outcomes for both the labeled and unlabeled datasets, though in practice the observed outcomes are not in the unlabeled set. We can visualize the relationships between these variables:
 
-```{r plot, echo = F, error = F, warning = F, message = F, comment = NA, fig.height=4}
+```{r plot, echo = FALSE, error = FALSE, warning = FALSE, message = FALSE, comment = NA, fig.height=4}
 library(tidyverse)
 
 library(patchwork)
@@ -207,12 +207,12 @@ fit6 <- ipd::ipd(formula,
 ) |> summary()
 
 sumtab <- rbind(
-  fit0$coefficients[2, 1:2],
-  fit1$coefficients[2, 1:2],
-  fit2$coefficients[2, 1:2],
-  fit3$coefficients[2, 1:2],
-  fit4$coefficients[2, 1:2],
-  fit5$coefficients[2, 1:2]
+  fit0$coefficients[2, seq_len(2)],
+  fit1$coefficients[2, seq_len(2)],
+  fit2$coefficients[2, seq_len(2)],
+  fit3$coefficients[2, seq_len(2)],
+  fit4$coefficients[2, seq_len(2)],
+  fit5$coefficients[2, seq_len(2)]
 )
 
 rownames(sumtab) <- c(
@@ -379,3 +379,9 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 ## License
 
 This package is licensed under the MIT License.
+
+## Session Info
+
+```{r sessionInfo}
+sessionInfo()
+```

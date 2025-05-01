@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI++ QUANTILE ESTIMATION
-#===============================================================================
-
 #--- PPI++ QUANTILE ESTIMATION - POINT ESTIMATE --------------------------------
 
 #' PPI++ Quantile Estimation (Point Estimate)
@@ -39,46 +35,61 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_quantile_est(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
 ppi_plusplus_quantile_est <- function(
-    Y_l, f_l, f_u, q,
-    exact_grid = FALSE, w_l = NULL, w_u = NULL) {
-  Y_l <- c(Y_l)
+    Y_l,
+    f_l,
+    f_u,
+    q,
+    exact_grid = FALSE,
+    w_l = NULL,
+    w_u = NULL) {
 
-  f_l <- c(f_l)
+    Y_l <- c(Y_l)
 
-  f_u <- c(f_u)
+    f_l <- c(f_l)
 
-  n <- length(Y_l)
+    f_u <- c(f_u)
 
-  N <- length(f_u)
+    n <- length(Y_l)
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+    N <- length(f_u)
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  grid <- c(Y_l, f_l, f_u)
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  if (exact_grid) {
-    grid <- sort(unique(grid))
-  } else {
-    grid <- seq(min(grid), max(grid), length.out = 5000)
-  }
+    grid <- c(Y_l, f_l, f_u)
 
-  rect_cdf <- rectified_cdf(Y_l, f_l, f_u, grid, w_l = w_l, w_u = w_u)
+    if (exact_grid) {
 
-  minimizer <- which.min(abs(rect_cdf - q))
+        grid <- sort(unique(grid))
 
-  return(grid[minimizer])
+    } else {
+
+        grid <- seq(min(grid), max(grid), length.out = 5000)
+    }
+
+    rect_cdf <- rectified_cdf(Y_l, f_l, f_u, grid, w_l = w_l, w_u = w_u)
+
+    minimizer <- which.min(abs(rect_cdf - q))
+
+    return(grid[minimizer])
 }
 
 #--- PPI++ QUANTILE ESTIMATION - INFERENCE -------------------------------------
@@ -122,55 +133,67 @@ ppi_plusplus_quantile_est <- function(
 #'
 #' form <- Y - f ~ X1
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_quantile(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
 ppi_plusplus_quantile <- function(
-    Y_l, f_l, f_u, q,
-    alpha = 0.05, exact_grid = FALSE, w_l = NULL, w_u = NULL) {
-  Y_l <- c(Y_l)
+    Y_l,
+    f_l,
+    f_u, q,
+    alpha = 0.05,
+    exact_grid = FALSE,
+    w_l = NULL,
+    w_u = NULL) {
 
-  f_l <- c(f_l)
+    Y_l <- c(Y_l)
 
-  f_u <- c(f_u)
+    f_l <- c(f_l)
 
-  n <- length(Y_l)
+    f_u <- c(f_u)
 
-  N <- length(f_u)
+    n <- length(Y_l)
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+    N <- length(f_u)
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  grid <- c(Y_l, f_l, f_u)
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  if (exact_grid) {
-    grid <- sort(unique(grid))
-  } else {
-    grid <- seq(min(grid), max(grid), length.out = 5000)
-  }
+    grid <- c(Y_l, f_l, f_u)
 
-  cdf_f_u <- compute_cdf(f_u, grid, w_u)
+    if (exact_grid) {
 
-  cdf_rectifier <- compute_cdf_diff(Y_l, f_l, grid, w_l)
+        grid <- sort(unique(grid))
 
-  rec_p_value <- rectified_p_value(
+    } else {
 
-    cdf_rectifier[[1]], cdf_rectifier[[2]] / sqrt(n),
-    cdf_f_u[[1]], cdf_f_u[[2]] / sqrt(N),
-    null = q, alternative = "two-sided"
-  )
+        grid <- seq(min(grid), max(grid), length.out = 5000)
+    }
 
-  result_grid <- grid[rec_p_value > alpha]
+    cdf_f_u <- compute_cdf(f_u, grid, w_u)
 
-  return(c(result_grid[1], result_grid[length(result_grid)]))
+    cdf_rectifier <- compute_cdf_diff(Y_l, f_l, grid, w_l)
+
+    rec_p_value <- rectified_p_value(cdf_rectifier[[1]],
+
+        cdf_rectifier[[2]] / sqrt(n), cdf_f_u[[1]], cdf_f_u[[2]] / sqrt(N),
+
+        null = q, alternative = "two-sided")
+
+    result_grid <- grid[rec_p_value > alpha]
+
+    return(c(result_grid[1], result_grid[length(result_grid)]))
 }
-
-#=== END =======================================================================

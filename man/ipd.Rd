@@ -11,7 +11,6 @@ ipd(
   data,
   label = NULL,
   unlabeled_data = NULL,
-  seed = NULL,
   intercept = TRUE,
   alpha = 0.05,
   alternative = "two-sided",
@@ -60,8 +59,6 @@ specified, must contain columns for the predicted outcomes (\code{f}), and
 the features (\code{X}) needed to specify the \code{formula}. See
 \strong{2. Data} in the \strong{Details} below for more information.}
 
-\item{seed}{(optional) An \code{integer} seed for random number generation.}
-
 \item{intercept}{\code{Logical}. Should an intercept be included in the
 model? Default is \code{TRUE}.}
 
@@ -88,21 +85,30 @@ the \code{Details} section for more information. See
 \value{
 a summary of model output.
 
-A list containing the fitted model components:
-
+An S4 object of class \code{IPD} with the following slots:
 \describe{
-\item{coefficients}{Estimated coefficients of the model}
-\item{se}{Standard errors of the estimated coefficients}
-\item{ci}{Confidence intervals for the estimated coefficients}
-\item{formula}{The formula used to fit the ipd model.}
-\item{data}{The data frame used for model fitting.}
-\item{method}{The method used for model fitting.}
-\item{model}{The type of model fitted.}
-\item{intercept}{Logical. Indicates if an intercept was included in the
-model.}
-\item{fit}{Fitted model object containing estimated coefficients, standard
-errors, confidence intervals, and additional method-specific output.}
-\item{...}{Additional output specific to the method used.}
+\item{\code{coefficients}}{Named \code{\link[base]{numeric}}
+vector of estimated parameters.}
+\item{\code{se}}{Named \code{\link[base]{numeric}}
+vector of standard errors.}
+\item{\code{ci}}{A \code{\link[base]{matrix}} of confidence intervals,
+with columns \code{lower} and \code{upper}.}
+\item{\code{coefTable}}{A \code{\link[base]{data.frame}} summarizing
+Estimate, Std. Error, z-value, and Pr(>|z|) (glm-style).}
+\item{\code{fit}}{The raw output \code{\link[base]{list}} returned by
+the method-specific helper function.}
+\item{\code{formula}}{The \code{\link[stats]{formula}} used for fitting
+the IPD model.}
+\item{\code{data_l}}{The labeled \code{\link[base]{data.frame}} used in
+the analysis.}
+\item{\code{data_u}}{The unlabeled \code{\link[base]{data.frame}} used
+in the analysis.}
+\item{\code{method}}{A \code{\link[base]{character}} string indicating
+which IPD method was applied.}
+\item{\code{model}}{A \code{\link[base]{character}} string indicating
+the downstream inferential model.}
+\item{\code{intercept}}{A \code{\link[base]{logical}} indicating whether
+an intercept was included.}
 }
 }
 \description{
@@ -209,8 +215,6 @@ other method-specific arguments, will have defaults.
 \examples{
 
 #-- Generate Example Data
-
-set.seed(12345)
 
 dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
 

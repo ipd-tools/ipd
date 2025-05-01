@@ -1,7 +1,3 @@
-#===============================================================================
-# DATA GENERATION FUNCTION
-#===============================================================================
-
 #--- DATA GENERATION FOR VARIOUS MODELS ----------------------------------------
 
 #' Data generation function for various underlying models
@@ -218,131 +214,144 @@
 #' @export
 
 simdat <- function(
-    n = c(300, 300, 300), effect = 1, sigma_Y = 1,
-    model = "ols", shift = 0, scale = 1) {
-  #-- CHECK FOR VALID MODEL
+    n = c(300, 300, 300),
+    effect = 1,
+    sigma_Y = 1,
+    model = "ols",
+    shift = 0,
+    scale = 1) {
 
-  if (!(model %in% c("mean", "quantile", "ols", "logistic", "poisson"))) {
-    stop(paste(
-      "'model' must be one of c('mean', 'quantile', 'ols',",
-      "'logistic', 'poisson')."
-    ))
-  }
+    #-- CHECK FOR VALID MODEL
 
-  #-- GENERATE SYSTEMATIC COMPONENT
+    model <- match.arg(model,
 
-  if (model %in% c("mean", "quantile")) {
-    X <- 1
+        c("mean", "quantile", "ols", "logistic", "poisson"))
 
-    mu <- effect * 1
-  } else if (model %in% c("ols", "logistic", "poisson")) {
-    X <- matrix(rnorm(sum(n) * 4), ncol = 4, nrow = sum(n))
+    #-- GENERATE SYSTEMATIC COMPONENT
 
-    mu <- effect * X[, 1] + (1 / 2) * X[, 2]^2 +
+    if (model %in% c("mean", "quantile")) {
 
-      (1 / 3) * X[, 3]^3 + (1 / 4) * X[, 4]^2
-  }
+        X <- 1
 
-  #-- GENERATE ERROR COMPONENT
+        mu <- effect * 1
 
-  eps <- rnorm(sum(n), 0, sigma_Y)
+    } else if (model %in% c("ols", "logistic", "poisson")) {
 
-  #-- GENERATE OUTCOMES
+        X <- matrix(rnorm(sum(n) * 4), ncol = 4, nrow = sum(n))
 
-  if (model %in% c("mean", "quantile", "ols")) {
-    Y <- mu + eps
-  } else if (model == "logistic") {
-    p_Y <- plogis(mu + eps)
+        mu <- effect * X[, 1] + (1 / 2) * X[, 2]^2 +
 
-    Y <- rbinom(sum(n), 1, p_Y)
-  } else if (model == "poisson") {
-    lam_Y <- exp(mu + eps)
+            (1 / 3) * X[, 3]^3 + (1 / 4) * X[, 4]^2
+    }
 
-    Y <- rpois(sum(n), lam_Y)
-  }
+    #-- GENERATE ERROR COMPONENT
 
-  #-- CREATE DATA.FRAME
+    eps <- rnorm(sum(n), 0, sigma_Y)
 
-  set_label <- rep(c("training", "labeled", "unlabeled"), n)
+    #-- GENERATE OUTCOMES
 
-  if (model %in% c("mean", "quantile")) {
-    dat <- data.frame(Y, f = NA, set_label)
-  } else if (model %in% c("ols", "logistic", "poisson")) {
-    dat <- data.frame(X, Y, f = NA, set_label)
-  }
+    if (model %in% c("mean", "quantile", "ols")) {
 
-  #-- GENERATE PREDICTIONS
+        Y <- mu + eps
 
-  if (model %in% c("mean", "quantile")) {
-    dat[set_label == "labeled", "f"] <- (
+    } else if (model == "logistic") {
 
-      mean(dat[set_label == "training", "Y"]) +
+        p_Y <- plogis(mu + eps)
 
-        rnorm(n[2], 0, sigma_Y) - shift) / scale
+        Y <- rbinom(sum(n), 1, p_Y)
 
-    dat[set_label == "unlabeled", "f"] <- (
+    } else if (model == "poisson") {
 
-      mean(dat[set_label == "training", "Y"]) +
+        lam_Y <- exp(mu + eps)
 
-        rnorm(n[3], 0, sigma_Y) - shift) / scale
-  } else if (model == "ols") {
-    fit_gam <- gam::gam(Y ~ gam::s(X1) + gam::s(X2) + gam::s(X3) + gam::s(X4),
-      data = dat[set_label == "training", ]
-    )
+        Y <- rpois(sum(n), lam_Y)
+    }
 
-    dat[set_label == "labeled", "f"] <- (predict(
+    #-- CREATE DATA.FRAME
 
-      fit_gam,
-      newdat = dat[set_label == "labeled", ]
-    ) - shift) / scale
+    set_label <- rep(c("training", "labeled", "unlabeled"), n)
 
-    dat[set_label == "unlabeled", "f"] <- (predict(
+    if (model %in% c("mean", "quantile")) {
 
-      fit_gam,
-      newdat = dat[set_label == "unlabeled", ]
-    ) - shift) / scale
-  } else if (model == "logistic") {
-    knn_tune <- caret::train(
+        dat <- data.frame(Y, f = NA, set_label)
 
-      factor(Y) ~ X1 + X2 + X3 + X4,
-      data = dat[set_label == "training", ],
-      method = "knn", trControl = trainControl(method = "cv"),
-      tuneGrid = data.frame(k = c(1:10))
-    )
+    } else if (model %in% c("ols", "logistic", "poisson")) {
 
-    fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + X3 + X4,
-      data = dat[set_label == "training", ], k = knn_tune$bestTune$k
-    )
+        dat <- data.frame(X, Y, f = NA, set_label)
+    }
 
-    dat[set_label == "labeled", "f"] <- predict(
+    #-- GENERATE PREDICTIONS
 
-      fit_knn, dat[set_label == "labeled", ],
-      type = "class"
-    ) |>
-      as.numeric() - 1
+    if (model %in% c("mean", "quantile")) {
 
-    dat[set_label == "unlabeled", "f"] <- predict(
+        dat[set_label == "labeled", "f"] <- (
 
-      fit_knn, dat[set_label == "unlabeled", ],
-      type = "class"
-    ) |>
-      as.numeric() - 1
-  } else if (model == "poisson") {
-    fit_poisson <- glm(Y ~ X1 + X2 + X3 + X4,
-      family = poisson,
-      data = dat[set_label == "training", ]
-    )
+            mean(dat[set_label == "training", "Y"]) +
 
-    dat[set_label == "labeled", "f"] <- predict(fit_poisson,
-      newdata = dat[set_label == "labeled", ], type = "response"
-    )
+                rnorm(n[2], 0, sigma_Y) - shift) / scale
 
-    dat[set_label == "unlabeled", "f"] <- predict(fit_poisson,
-      newdata = dat[set_label == "unlabeled", ], type = "response"
-    )
-  }
+        dat[set_label == "unlabeled", "f"] <- (
 
-  return(dat)
+            mean(dat[set_label == "training", "Y"]) +
+
+                rnorm(n[3], 0, sigma_Y) - shift) / scale
+
+    } else if (model == "ols") {
+
+        fit_gam <- gam::gam(
+
+            Y ~ gam::s(X1) + gam::s(X2) + gam::s(X3) + gam::s(X4),
+
+            data = dat[set_label == "training", ])
+
+        dat[set_label == "labeled", "f"] <- (predict(fit_gam,
+
+            newdat = dat[set_label == "labeled", ]) - shift) / scale
+
+        dat[set_label == "unlabeled", "f"] <- (predict(fit_gam,
+
+            newdat = dat[set_label == "unlabeled", ]) - shift) / scale
+
+    } else if (model == "logistic") {
+
+        knn_tune <- caret::train(factor(Y) ~ X1 + X2 + X3 + X4,
+
+            data = dat[set_label == "training", ],
+
+            method = "knn", trControl = trainControl(method = "cv"),
+
+            tuneGrid = data.frame(k = seq_len(10)))
+
+        fit_knn <- caret::knn3(factor(Y) ~ X1 + X2 + X3 + X4,
+
+            data = dat[set_label == "training", ], k = knn_tune$bestTune$k)
+
+        dat[set_label == "labeled", "f"] <- predict(fit_knn,
+
+            dat[set_label == "labeled", ], type = "class") |>
+
+            as.numeric() - 1
+
+        dat[set_label == "unlabeled", "f"] <- predict(fit_knn,
+
+            dat[set_label == "unlabeled", ], type = "class") |>
+
+            as.numeric() - 1
+
+    } else if (model == "poisson") {
+
+        fit_poisson <- glm(Y ~ X1 + X2 + X3 + X4, family = poisson,
+
+            data = dat[set_label == "training", ])
+
+        dat[set_label == "labeled", "f"] <- predict(fit_poisson,
+
+            newdata = dat[set_label == "labeled", ], type = "response")
+
+        dat[set_label == "unlabeled", "f"] <- predict(fit_poisson,
+
+            newdata = dat[set_label == "unlabeled", ], type = "response")
+    }
+
+    return(dat)
 }
-
-#=== END =======================================================================

@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI MEAN ESTIMATION
-#===============================================================================
-
 #--- PPI MEAN ESTIMATION -------------------------------------------------------
 
 #' PPI Mean Estimation
@@ -49,22 +45,23 @@
 #'
 #' @export
 
-ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided") {
-  #- Compute Dimensions of Inputs
+ppi_mean <- function(
+    Y_l,
+    f_l,
+    f_u,
+    alpha = 0.05,
+    alternative = "two-sided") {
 
-  n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
+    n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
+    N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
 
-  N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
+    est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat = 1)
 
-  est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat = 1)
+    imputed_std <- sd(f_u) * sqrt((N - 1) / N) / sqrt(N)
 
-  imputed_std <- sd(f_u) * sqrt((N - 1) / N) / sqrt(N)
+    rectifier_std <- sd(Y_l - f_l) * sqrt((n - 1) / n) / sqrt(n)
 
-  rectifier_std <- sd(Y_l - f_l) * sqrt((n - 1) / n) / sqrt(n)
+    return(zconfint_generic(est, sqrt(imputed_std^2 + rectifier_std^2),
 
-  return(zconfint_generic(
-    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative
-  ))
+        alpha, alternative))
 }
-
-#=== END =======================================================================

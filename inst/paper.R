@@ -160,11 +160,11 @@ fig2_dat <- cbind(mthds,
 
   rbind(
 
-    c(summary(fit0)$coefficients[2, 1:2], confint(fit0)[2,]),
+    c(summary(fit0)$coefficients[2, seq_len(2)], confint(fit0)[2,]),
 
-    c(summary(fit1)$coefficients[2, 1:2], confint(fit1)[2,]),
+    c(summary(fit1)$coefficients[2, seq_len(2)], confint(fit1)[2,]),
 
-    c(summary(fit2)$coefficients[2, 1:2], confint(fit2)[2,]),
+    c(summary(fit2)$coefficients[2, seq_len(2)], confint(fit2)[2,]),
 
     summary(fit3)$coefficients[2,],
 
@@ -256,7 +256,7 @@ sim_func <- function(nsims = 1000, n_t = 100, n_l = 100, n_u = 1000,
 
      err_plusplus <- err_pspa <- rep(NA, nsims)
 
-  for(sim in 1:nsims) {
+  for(sim in seq_len(nsims)) {
 
     if (sim %% 100 == 0) cat("sim:", sim, "of", nsims, "\n")
 
@@ -489,7 +489,7 @@ cov_text <- coverages |>
 
 results_long <- results |>
 
-  mutate(id = 1:nsims) |>
+  mutate(id = seq_len(nsims)) |>
 
   pivot_longer(-id) |>
 
@@ -509,7 +509,7 @@ results_long <- results |>
 
   arrange(method, est) |>
 
-  mutate(y = rep(1:nsims, 7))
+  mutate(y = rep(seq_len(nsims), 7))
 
 p1 <- results_long |>
 

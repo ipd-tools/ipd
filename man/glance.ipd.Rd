@@ -2,41 +2,28 @@
 % Please edit documentation in R/methods.R
 \name{glance.ipd}
 \alias{glance.ipd}
-\title{Glance at an IPD Fit}
+\title{Glance at an ipd fit}
 \usage{
 \method{glance}{ipd}(x, ...)
 }
 \arguments{
 \item{x}{An object of class \code{ipd}.}
 
-\item{...}{Additional arguments to be passed to the glance function.}
+\item{...}{Ignored.}
 }
 \value{
-A one-row data frame summarizing the IPD method/model fit.
+A one-row \code{\link[tibble]{tibble}} summarizing the fit.
 }
 \description{
-Glances at the IPD method/model fit, returning a one-row summary.
+Glance at an ipd fit
 }
 \examples{
 
-#-- Generate Example Data
+dat <- simdat()
 
-set.seed(2023)
+fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
 
-dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-
-head(dat)
-
-formula <- Y - f ~ X1
-
-#-- Fit IPD
-
-fit <- ipd(formula,
-  method = "postpi_analytic", model = "ols",
-  data = dat, label = "set_label"
-)
-
-#-- Glance Output
+    data = dat, label = "set_label")
 
 glance(fit)
 

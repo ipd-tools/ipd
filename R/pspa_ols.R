@@ -1,6 +1,4 @@
-#===============================================================================
-# PSPA ORDINARY LEAST SQUARES
-#===============================================================================
+#--- PSPA ORDINARY LEAST SQUARES -----------------------------------------------
 
 #' PSPA OLS Estimation
 #'
@@ -56,22 +54,23 @@
 #' @export
 
 pspa_ols <- function(
-    X_l, Y_l, f_l, X_u, f_u,
-    weights = NA, alpha = 0.05) {
-  fit <- pspa_y(
-    X_lab = X_l, X_unlab = X_u,
-    Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
-    intercept = TRUE,
-    weights = weights, alpha = alpha, method = "ols"
-  )
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    weights = NA,
+    alpha = 0.05) {
 
-  fit <- as.data.frame(fit)
+    fit <- pspa_y(X_l = X_l, X_u = X_u, Y_l = Y_l, f_l = f_l, f_u = f_u,
 
-  est <- fit$Estimate
+        intercept = TRUE, weights = weights, alpha = alpha, method = "ols")
 
-  se <- fit$Std.Error
+    fit <- as.data.frame(fit)
 
-  return(list(est = est, se = se))
+    est <- fit$Estimate
+
+    se <- fit$Std.Error
+
+    return(list(est = est, se = se))
 }
-
-#=== END =======================================================================

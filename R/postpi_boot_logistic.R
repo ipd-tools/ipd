@@ -1,7 +1,3 @@
-#===============================================================================
-#  POSTPI BOOTSTRAP LOGISTIC REGRESSION
-#===============================================================================
-
 #--- POSTPI BOOTSTRAP LOGISTIC REGRESSION --------------------------------------
 
 #' PostPI Logistic Regression (Bootstrap Correction)
@@ -29,8 +25,6 @@
 #' @param se_type (string): Which method to calculate the standard errors.
 #' Options include "par" (parametric) or "npar" (nonparametric).
 #' Defaults to "par".
-#'
-#' @param seed (optional) An \code{integer} seed for random number generation.
 #'
 #' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
@@ -64,72 +58,56 @@
 #' @export
 
 postpi_boot_logistic <- function(
-    X_l, Y_l, f_l, X_u, f_u,
-    nboot = 100, se_type = "par", seed = NULL) {
-  #-- 1. Estimate Prediction Model (Done in Data Step)
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    nboot = 100,
+    se_type = "par") {
 
-  #-- 2. Estimate Relationship Model
+    fit_rel <- caret::train(factor(Y) ~ factor(f),
 
-  fit_rel <- caret::train(
+        data = data.frame(Y = Y_l, f = f_l), method = "knn")
 
-    factor(Y) ~ factor(f),
-    data = data.frame(Y = Y_l, f = f_l),
-    method = "knn"
-  )
+    N <- nrow(X_u)
+    p <- ncol(X_u)
 
-  #-- 3. Bootstrap
+    boot_mat <- matrix(NA_real_, nrow = 2*p, ncol = nboot)
 
-  if (!is.null(seed)) set.seed(seed)
+    for (b in seq_len(nboot)) {
 
-  n <- nrow(X_l)
+        idx   <- sample.int(N, N, replace = TRUE)
+        f_u_b <- f_u[idx]
+        X_u_b <- X_u[idx, , drop = FALSE]
 
-  N <- nrow(X_u)
+        prob_b <- predict(fit_rel,
 
-  ests_b <- sapply(1:nboot, function(b) {
-    #-   i. Sample Predicted Values and Covariates with Replacement
+            newdata = data.frame(f = as.numeric(f_u_b)), type = "prob")[,2]
 
-    idx_b <- sample(1:N, N, replace = TRUE)
+        Y_u_b <- rbinom(N, 1, prob_b)
 
-    f_u_b <- f_u[idx_b, ]
+        fit_inf <- glm(Y_u_b ~ X_u_b - 1, family = binomial)
 
-    X_u_b <- X_u[idx_b, ]
+        cm <- summary(fit_inf)$coefficients[, seq_len(2)]
 
-    #-  ii. Simulate Values from Relationship Model
+        boot_mat[, b] <- c(cm[,1], cm[,2])
+    }
 
-    prob_b <- predict(fit_rel, data.frame(f = f_u_b), type = "prob")[, 2]
+    est_vec <- apply(boot_mat[seq_len(p), ], 1, median)
 
-    Y_u_b <- rbinom(N, 1, prob_b)
+    if (se_type == "par") {
 
-    #- iii. Fit Inference Model on Simulated Outcomes
+        se_vec <- apply(boot_mat[(p+1):(2*p), ], 1, median)
 
-    fit_inf_b <- glm(Y_u_b ~ X_u_b - 1, family = binomial)
+    } else if (se_type == "npar") {
 
-    #-  iv. Extract Coefficient Estimator
+        se_vec <- apply(boot_mat[      seq_len(p), ], 1, sd)
 
-    #-   v. Extract SE of Estimator
+    } else {
 
-    summary(fit_inf_b)$coefficients[, 1:2]
-  })
+        stop("`se_type` must be either 'par' or 'npar'")
+    }
 
-  #-- 4. Estimate Inference Model Coefficient
-
-  est <- apply(ests_b[1:(nrow(ests_b) / 2), ], 1, median)
-
-  #-- 5. Estimate Inference Model SE
-
-  if (se_type == "par") {
-    #- a. Parametric Bootstrap
-
-    se <- apply(ests_b[(nrow(ests_b) / 2 + 1):nrow(ests_b), ], 1, median)
-  } else if (se_type == "npar") {
-    #- b. Nonparametric Bootstrap
-
-    se <- apply(ests_b[1:(nrow(ests_b) / 2), ], 1, sd)
-  } else {
-    stop("se_type must be one of 'par' or 'npar'")
-  }
-
-  #-- Output
-
-  return(list(est = est, se = se))
+    list(est = est_vec, se = se_vec)
 }

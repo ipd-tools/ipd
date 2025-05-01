@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI++ ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- PPI++ OLS - POINT ESTIMATE ------------------------------------------------
 
 #' PPI++ OLS (Point Estimate)
@@ -50,13 +46,19 @@
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -65,46 +67,54 @@
 #' @export
 
 ppi_plusplus_ols_est <- function(
-    X_l, Y_l, f_l, X_u, f_u,
-    lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
-  n <- nrow(f_l)
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    lhat = NULL,
+    coord = NULL,
+    w_l = NULL,
+    w_u = NULL) {
 
-  N <- nrow(f_u)
+    n <- nrow(f_l)
+    N <- nrow(f_u)
+    p <- ncol(X_u)
 
-  p <- ncol(X_u)
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+    use_u <- is.null(lhat) || lhat != 0
 
-  use_u <- is.null(lhat) || lhat != 0
+    if (is.null(lhat)) {
 
-  if (is.null(lhat)) {
-    theta_hat <- wls(X_u, f_u, w = w_u)
+        theta_hat <- wls(X_u, f_u, w = w_u)
 
-    delta_hat <- wls(X_l, Y_l - f_l, w = w_l)
+        delta_hat <- wls(X_l, Y_l - f_l, w = w_l)
 
-    est <- theta_hat + delta_hat
+        est <- theta_hat + delta_hat
 
-    stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
+        stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
 
-    lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
-      stats$grads_hat_unlabeled, stats$inv_hessian, coord,
-      clip = TRUE
-    )
+        lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-    return(ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u,
-      lhat = lhat, coord = coord, w_l = w_l, w_u = w_u
-    ))
-  } else {
-    theta_hat <- wls(X_u, lhat * f_u, w = w_u)
+            stats$grads_hat_unlabeled, stats$inv_hessian, coord, clip = TRUE)
 
-    delta_hat <- wls(X_l, Y_l - lhat * f_l, w = w_l)
+        return(ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u,
 
-    est <- theta_hat + delta_hat
+            lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
 
-    return(est)
-  }
+    } else {
+
+        theta_hat <- wls(X_u, lhat * f_u, w = w_u)
+
+        delta_hat <- wls(X_l, Y_l - lhat * f_l, w = w_l)
+
+        est <- theta_hat + delta_hat
+
+        return(est)
+    }
 }
 
 #--- PPI++ OLS - INFERENCE -----------------------------------------------------
@@ -174,13 +184,19 @@ ppi_plusplus_ols_est <- function(
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -189,49 +205,60 @@ ppi_plusplus_ols_est <- function(
 #' @export
 
 ppi_plusplus_ols <- function(
-    X_l, Y_l, f_l, X_u, f_u,
-    lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
-  n <- NROW(f_l)
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    lhat = NULL,
+    coord = NULL,
+    w_l = NULL,
+    w_u = NULL) {
 
-  N <- NROW(f_u)
+    n <- NROW(f_l)
+    N <- NROW(f_u)
+    p <- NCOL(X_u)
 
-  p <- NCOL(X_u)
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+    use_u <- is.null(lhat) || lhat != 0
 
-  use_u <- is.null(lhat) || lhat != 0
+    delta_hat <- wls(X_l, Y_l - f_l, w = w_l)
 
-  delta_hat <- wls(X_l, Y_l - f_l, w = w_l)
+    est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u, lhat, coord, w_l, w_u)
 
-  est <- ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u, lhat, coord, w_l, w_u)
+    stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
 
-  stats <- ols_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u, use_u)
+    if (is.null(lhat)) {
 
-  if (is.null(lhat)) {
-    lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
-      stats$grads_hat_unlabeled, stats$inv_hessian, coord,
-      clip = TRUE
-    )
+        lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-    return(ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u,
-      lhat = lhat, coord = coord, w_l = w_l, w_u = w_u
+            stats$grads_hat_unlabeled, stats$inv_hessian, coord, clip = TRUE)
+
+        return(ppi_plusplus_ols(X_l, Y_l, f_l, X_u, f_u,
+
+            lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
+    }
+
+    var_u <- cov(lhat * stats$grads_hat_unlabeled)
+
+    var_l <- cov(stats$grads - lhat * stats$grads_hat)
+
+    Sigma_hat <- stats$inv_hessian %*%
+
+        (n / N * var_u + var_l) %*% stats$inv_hessian
+
+    return(list(
+        est = est,
+        se = sqrt(diag(Sigma_hat) / n),
+        lambda = lhat,
+        rectifier_est = delta_hat,
+        var_u = var_u, var_l = var_l,
+        grads = stats$grads,
+        grads_hat_unlabeled = stats$grads_hat_unlabeled,
+        grads_hat = stats$grads_hat,
+        inv_hessian = stats$inv_hessian
     ))
-  }
-
-  var_u <- cov(lhat * stats$grads_hat_unlabeled)
-
-  var_l <- cov(stats$grads - lhat * stats$grads_hat)
-
-  Sigma_hat <- stats$inv_hessian %*% (n / N * var_u + var_l) %*% stats$inv_hessian
-
-  return(list(
-    est = est, se = sqrt(diag(Sigma_hat) / n), lambda = lhat,
-    rectifier_est = delta_hat, var_u = var_u, var_l = var_l,
-    grads = stats$grads, grads_hat_unlabeled = stats$grads_hat_unlabeled,
-    grads_hat = stats$grads_hat, inv_hessian = stats$inv_hessian
-  ))
 }
-
-#=== END =======================================================================

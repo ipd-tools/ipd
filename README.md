@@ -472,3 +472,59 @@ method/model combinations are currently implemented:
 ## License
 
 This package is licensed under the MIT License.
+
+## Session Info
+
+``` r
+sessionInfo()
+#> R version 4.4.1 (2024-06-14 ucrt)
+#> Platform: x86_64-w64-mingw32/x64
+#> Running under: Windows 11 x64 (build 22631)
+#> 
+#> Matrix products: default
+#> 
+#> 
+#> locale:
+#> [1] LC_COLLATE=English_United States.utf8 
+#> [2] LC_CTYPE=English_United States.utf8   
+#> [3] LC_MONETARY=English_United States.utf8
+#> [4] LC_NUMERIC=C                          
+#> [5] LC_TIME=English_United States.utf8    
+#> 
+#> time zone: America/New_York
+#> tzcode source: internal
+#> 
+#> attached base packages:
+#> [1] stats     graphics  grDevices utils     datasets  methods   base     
+#> 
+#> other attached packages:
+#>  [1] patchwork_1.3.0 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  
+#>  [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
+#>  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.1.4      
+#> 
+#> loaded via a namespace (and not attached):
+#>  [1] gtable_0.3.6         xfun_0.52            recipes_1.2.1       
+#>  [4] lattice_0.22-6       tzdb_0.5.0           vctrs_0.6.5         
+#>  [7] tools_4.4.1          generics_0.1.3       stats4_4.4.1        
+#> [10] parallel_4.4.1       pkgconfig_2.0.3      ModelMetrics_1.2.2.2
+#> [13] Matrix_1.7-0         data.table_1.17.0    lifecycle_1.0.4     
+#> [16] farver_2.1.2         compiler_4.4.1       munsell_0.5.1       
+#> [19] codetools_0.2-20     htmltools_0.5.8.1    class_7.3-22        
+#> [22] yaml_2.3.10          prodlim_2024.06.25   pillar_1.10.2       
+#> [25] MASS_7.3-60.2        gower_1.0.2          iterators_1.0.14    
+#> [28] rpart_4.1.23         foreach_1.5.2        nlme_3.1-164        
+#> [31] parallelly_1.43.0    lava_1.8.1           tidyselect_1.2.1    
+#> [34] digest_0.6.37        stringi_1.8.7        future_1.40.0       
+#> [37] reshape2_1.4.4       listenv_0.9.1        labeling_0.4.3      
+#> [40] splines_4.4.1        fastmap_1.2.0        grid_4.4.1          
+#> [43] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
+#> [46] randomForest_4.7-1.2 survival_3.8-3       future.apply_1.11.3 
+#> [49] withr_3.0.2          scales_1.3.0         timechange_0.3.0    
+#> [52] rmarkdown_2.29       globals_0.16.3       nnet_7.3-19         
+#> [55] timeDate_4041.110    ranger_0.17.0        hms_1.1.3           
+#> [58] gam_1.22-5           evaluate_1.0.3       knitr_1.50          
+#> [61] hardhat_1.4.1        caret_7.0-1          mgcv_1.9-1          
+#> [64] rlang_1.1.4          Rcpp_1.0.13-1        glue_1.8.0          
+#> [67] pROC_1.18.5          ipred_0.9-15         rstudioapi_0.17.1   
+#> [70] R6_2.6.1             plyr_1.8.9
+```

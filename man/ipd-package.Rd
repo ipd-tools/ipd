@@ -5,7 +5,7 @@
 \alias{ipd-package}
 \title{ipd: Inference on Predicted Data}
 \description{
-Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2024) \doi{10.48550/arXiv.2410.09665}.
+Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2025) \doi{10.1093/bioinformatics/btaf055}.
 
 The \code{ipd} package provides tools for statistical modeling and inference when
 a significant portion of the outcome data is predicted by AI/ML algorithms.

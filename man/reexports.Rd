@@ -6,7 +6,55 @@
 \alias{tidy}
 \alias{glance}
 \alias{augment}
-\title{Objects exported from other packages}
+\title{tidy re-exported from generics packages}
+\value{
+A wrapper for the \code{tidy} generic.
+See \code{\link[generics]{tidy}} for details.
+
+A wrapper for the \code{glance} generic.
+See \code{\link[generics]{glance}} for details.
+
+A wrapper for the \code{augment} generic.
+See \code{\link[generics]{augment}} for details.
+}
+\examples{
+
+dat <- simdat()
+
+fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
+
+    data = dat, label = "set_label")
+
+tidy(fit)
+
+
+dat <- simdat()
+
+fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
+
+    data = dat, label = "set_label")
+
+glance(fit)
+
+
+dat <- simdat()
+
+fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
+
+    data = dat, label = "set_label")
+
+augmented_df <- augment(fit)
+
+head(augmented_df)
+
+}
+\seealso{
+\code{\link[generics]{tidy}}
+
+\code{\link[generics]{glance}}
+
+\code{\link[generics]{augment}}
+}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links

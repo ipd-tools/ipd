@@ -1,7 +1,3 @@
-#===============================================================================
-#  POSTPI BOOTSTRAP ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- POSTPI BOOTSTRAP OLS ------------------------------------------------------
 
 #' PostPI OLS (Bootstrap Correction)
@@ -41,8 +37,6 @@
 #' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
 #' Defaults to \code{Inf}.
 #'
-#' @param seed (optional) An \code{integer} seed for random number generation.
-#'
 #' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
 #' bootstrap methods.
@@ -55,13 +49,19 @@
 #'
 #' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' postpi_boot_ols(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 #'
@@ -76,120 +76,161 @@
 #' @export
 
 postpi_boot_ols <- function(
-    X_l, Y_l, f_l, X_u, f_u,
-    nboot = 100, se_type = "par", rel_func = "lm", scale_se = TRUE, n_t = Inf,
-    seed = NULL) {
-  #-- 1. Estimate Prediction Model (Done in Data Step)
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    nboot = 100,
+    se_type = "par",
+    rel_func = "lm",
+    scale_se = TRUE,
+    n_t = Inf) {
 
-  #-- 2. Estimate Relationship Model
+    #-- 1. Estimate Prediction Model (Done in Data Step)
 
-  if (rel_func == "lm") {
-    fit_rel <- lm(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
-  } else if (rel_func == "rf") {
-    fit_rel <- ranger(Y ~ f,
-      data = data.frame(Y = Y_l, f = f_l),
-      keep.inbag = T
-    )
-  } else if (rel_func == "gam") {
-    fit_rel <- lm(Y ~ splines::ns(f, df = 3),
-      data = data.frame(Y = Y_l, f = f_l)
-    )
-  } else {
-    stop("Currently only 'lm', 'rf', and 'gam' are supported")
-  }
-
-  #-- 3. Bootstrap
-
-  if (!is.null(seed)) set.seed(seed)
-
-  n <- nrow(X_l)
-
-  N <- nrow(X_u)
-
-  est_b <- se_b <- matrix(nrow = nboot, ncol = ncol(X_u))
-
-  for (b in 1:nboot) {
-    #-   i. Sample Predicted Values and Covariates with Replacement
-
-    idx_b <- sample(1:N, N, replace = T)
-
-    f_u_b <- f_u[idx_b, ]
-
-    X_u_b <- X_u[idx_b, ]
-
-    #-  ii. Simulate Values from Relationship Model
+    #-- 2. Estimate Relationship Model
 
     if (rel_func == "lm") {
-      if (scale_se) {
-        Y_u_b <- rnorm(
-          N, predict(fit_rel, data.frame(f = f_u_b)),
-          sigma(fit_rel) * sqrt(N / min(n, n_t))
-        )
-      } else {
-        Y_u_b <- rnorm(
-          N, predict(fit_rel, data.frame(f = f_u_b)),
-          sigma(fit_rel)
-        )
-      }
-    } else if (rel_func == "rf") {
-      rel_preds <- predict(fit_rel, data = data.frame(f = f_u_b), type = "se")
 
-      if (scale_se) {
-        Y_u_b <- rnorm(
-          N, rel_preds$predictions,
-          rel_preds$se * sqrt(N / min(n, n_t))
+        fit_rel <- lm(Y ~ f, data = data.frame(Y = Y_l, f = f_l))
+
+    } else if (rel_func == "rf") {
+
+        fit_rel <- ranger(Y ~ f,
+
+            data = data.frame(Y = Y_l, f = f_l),
+            keep.inbag = TRUE
         )
-      } else {
-        Y_u_b <- rnorm(N, rel_preds$predictions, rel_preds$se)
-      }
+
     } else if (rel_func == "gam") {
-      if (scale_se) {
-        Y_u_b <- rnorm(
-          N, predict(fit_rel, data.frame(f = f_u_b)),
-          sigma(fit_rel) * sqrt(N / min(n, n_t))
+
+        fit_rel <- lm(Y ~ splines::ns(f, df = 3),
+
+            data = data.frame(Y = Y_l, f = f_l)
         )
-      } else {
-        Y_u_b <- rnorm(
-          N, predict(fit_rel, data.frame(f = f_u_b)),
-          sigma(fit_rel)
-        )
-      }
+
     } else {
-      stop("Currently only 'lm', 'rf', and 'gam' are supported")
+
+        stop("Currently only 'lm', 'rf', and 'gam' are supported")
     }
 
-    #- iii. Fit Inference Model on Simulated Outcomes
+    #-- 3. Bootstrap
 
-    fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
+    n <- nrow(X_l)
 
-    #-  iv. Extract Coefficient Estimator
+    N <- nrow(X_u)
 
-    est_b[b, ] <- summary(fit_inf_b)$coefficients[, 1]
+    est_b <- se_b <- matrix(nrow = nboot, ncol = ncol(X_u))
 
-    #-   v. Extract SE of Estimator
+    for (b in seq_len(nboot)) {
 
-    se_b[b, ] <- summary(fit_inf_b)$coefficients[, 2]
-  }
+        #-   i. Sample Predicted Values and Covariates with Replacement
 
-  #-- 4. Estimate Inference Model Coefficient
+        idx_b <- sample(seq_len(N), N, replace = TRUE)
 
-  est <- apply(est_b, 2, mean)
+        f_u_b <- f_u[idx_b, ]
 
-  #-- 5. Estimate Inference Model SE
+        X_u_b <- X_u[idx_b, ]
 
-  if (se_type == "par") {
-    #- a. Parametric Bootstrap
+        #-  ii. Simulate Values from Relationship Model
 
-    se <- apply(se_b, 2, mean)
-  } else if (se_type == "npar") {
-    #- b. Nonparametric Bootstrap
+        if (rel_func == "lm") {
 
-    se <- apply(est_b, 2, sd)
-  } else {
-    stop("se_type must be one of 'par' or 'npar'")
-  }
+            if (scale_se) {
 
-  #-- Output
+                Y_u_b <- rnorm(
 
-  return(list(est = est, se = se))
+                    N, predict(fit_rel, data.frame(f = f_u_b)),
+                    sigma(fit_rel) * sqrt(N / min(n, n_t))
+                )
+
+            } else {
+
+                Y_u_b <- rnorm(
+
+                    N, predict(fit_rel, data.frame(f = f_u_b)),
+                    sigma(fit_rel)
+                )
+            }
+
+        } else if (rel_func == "rf") {
+
+            rel_preds <- predict(fit_rel,
+
+                data = data.frame(f = f_u_b), type = "se")
+
+            if (scale_se) {
+
+                Y_u_b <- rnorm(
+                    N, rel_preds$predictions,
+                    rel_preds$se * sqrt(N / min(n, n_t))
+                )
+
+            } else {
+
+                Y_u_b <- rnorm(N, rel_preds$predictions, rel_preds$se)
+            }
+
+        } else if (rel_func == "gam") {
+
+            if (scale_se) {
+
+                Y_u_b <- rnorm(
+                    N, predict(fit_rel, data.frame(f = f_u_b)),
+                    sigma(fit_rel) * sqrt(N / min(n, n_t))
+                )
+
+            } else {
+
+                Y_u_b <- rnorm(
+                    N, predict(fit_rel, data.frame(f = f_u_b)),
+                    sigma(fit_rel)
+                )
+            }
+
+        } else {
+
+            stop("Currently only 'lm', 'rf', and 'gam' are supported")
+        }
+
+        #- iii. Fit Inference Model on Simulated Outcomes
+
+        fit_inf_b <- lm(Y_u_b ~ X_u_b - 1)
+
+        #-  iv. Extract Coefficient Estimator
+
+        est_b[b, ] <- summary(fit_inf_b)$coefficients[, 1]
+
+        #-   v. Extract SE of Estimator
+
+        se_b[b, ] <- summary(fit_inf_b)$coefficients[, 2]
+    }
+
+    #-- 4. Estimate Inference Model Coefficient
+
+    est <- apply(est_b, 2, mean)
+
+    #-- 5. Estimate Inference Model SE
+
+    if (se_type == "par") {
+
+        #- a. Parametric Bootstrap
+
+        se <- apply(se_b, 2, mean)
+
+    } else if (se_type == "npar") {
+
+        #- b. Nonparametric Bootstrap
+
+        se <- apply(est_b, 2, sd)
+
+    } else {
+
+        stop("se_type must be one of 'par' or 'npar'")
+    }
+
+    #-- Output
+
+    return(list(est = est, se = se))
 }

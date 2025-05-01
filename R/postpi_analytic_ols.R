@@ -59,42 +59,49 @@
 #'
 #' @export
 
-postpi_analytic_ols <- function(
-    X_l, Y_l, f_l, X_u, f_u,
-    scale_se = TRUE, n_t = Inf) {
-  #- 1. Estimate Relationship Model
+postpi_analytic_ols <- function(X_l,
+                                Y_l,
+                                f_l,
+                                X_u,
+                                f_u,
+                                scale_se = TRUE,
+                                n_t = Inf) {
 
-  fit_rel <- lm(Y_l ~ f_l)
+    #- 1. Estimate Relationship Model
 
-  #- 2. Estimate Inference Model
+    fit_rel <- lm(Y_l ~ f_l)
 
-  fit_inf <- lm(f_u ~ X_u - 1)
+    #- 2. Estimate Inference Model
 
-  #- 3. Coefficient Estimator
+    fit_inf <- lm(f_u ~ X_u - 1)
 
-  est <- solve(crossprod(X_u)) %*% t(X_u) %*%
+    #- 3. Coefficient Estimator
 
-    (coef(fit_rel)[1] + coef(fit_rel)[2] * X_u %*% coef(fit_inf))
+    est <- solve(crossprod(X_u)) %*% t(X_u) %*%
 
-  #- 4. SE of Coefficient Estimator
+        (coef(fit_rel)[1] + coef(fit_rel)[2] * X_u %*% coef(fit_inf))
 
-  if (scale_se) {
-    se <- sqrt(diag(solve(crossprod(X_u)) *
+    #- 4. SE of Coefficient Estimator
 
-                      (sigma(fit_rel)^2 * nrow(X_u) / min(nrow(X_l), n_t) +
+    if (scale_se) {
 
-                         (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
-  } else {
-    se <- sqrt(diag(solve(crossprod(X_u)) *
+        se <- sqrt(diag(solve(crossprod(X_u)) *
 
-                      (sigma(fit_rel)^2 +
+            (sigma(fit_rel)^2 * nrow(X_u) / min(nrow(X_l), n_t) +
 
-                         (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
-  }
+                (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+    } else {
 
-  #- Output
+        se <- sqrt(diag(solve(crossprod(X_u)) *
 
-  return(list(est = as.vector(est), se = as.vector(se)))
+            (sigma(fit_rel)^2 +
+
+                (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+    }
+
+    #- Output
+
+    return(list(est = as.vector(est), se = as.vector(se)))
 }
 
 #=== END =======================================================================

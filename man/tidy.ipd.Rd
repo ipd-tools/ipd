@@ -2,41 +2,29 @@
 % Please edit documentation in R/methods.R
 \name{tidy.ipd}
 \alias{tidy.ipd}
-\title{Tidy an IPD Fit}
+\title{Tidy an ipd fit}
 \usage{
 \method{tidy}{ipd}(x, ...)
 }
 \arguments{
 \item{x}{An object of class \code{ipd}.}
 
-\item{...}{Additional arguments to be passed to the tidy function.}
+\item{...}{Ignored.}
 }
 \value{
-A tidy data frame of the model's coefficients.
+A \code{\link[tibble]{tibble}} with columns
+\code{term, estimate, std.error, conf.low, conf.high}.
 }
 \description{
-Tidies the IPD method/model fit into a data frame.
+Tidy an ipd fit
 }
 \examples{
 
-#-- Generate Example Data
+dat <- simdat()
 
-set.seed(2023)
+fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
 
-dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-
-head(dat)
-
-formula <- Y - f ~ X1
-
-#-- Fit IPD
-
-fit <- ipd(formula,
-  method = "postpi_analytic", model = "ols",
-  data = dat, label = "set_label"
-)
-
-#-- Tidy Output
+    data = dat, label = "set_label")
 
 tidy(fit)
 

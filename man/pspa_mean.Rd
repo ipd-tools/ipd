@@ -45,6 +45,6 @@ f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
 f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
   matrix(ncol = 1)
 
-pspa_mean(Y_l, f_l, f_u)
+pspa_mean(Y_l = Y_l, f_l = f_l, f_u = f_u)
 
 }

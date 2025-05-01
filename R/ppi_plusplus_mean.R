@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI++ MEAN ESTIMATION
-#===============================================================================
-
 #--- PPI++ MEAN ESTIMATION - POINT ESTIMATE ------------------------------------
 
 #' PPI++ Mean Estimation (Point Estimate)
@@ -43,11 +39,17 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_mean_est(Y_l, f_l, f_u)
 #'
@@ -56,39 +58,44 @@
 #' @export
 
 ppi_plusplus_mean_est <- function(
-    Y_l, f_l, f_u,
-    lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
-  n <- nrow(Y_l)
+    Y_l,
+    f_l,
+    f_u,
+    lhat = NULL,
+    coord = NULL,
+    w_l = NULL,
+    w_u = NULL) {
 
-  N <- nrow(f_u)
+    n <- nrow(Y_l)
+    N <- nrow(f_u)
+    p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
 
-  p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+    if (is.null(lhat)) {
 
-  if (is.null(lhat)) {
-    est <- mean(w_u * f_u) + mean(w_l * (Y_l - f_l))
+        est <- mean(w_u * f_u) + mean(w_l * (Y_l - f_l))
 
-    grads <- w_l * (Y_l - est)
+        grads <- w_l * (Y_l - est)
 
-    grads_hat <- w_l * (f_l - est)
+        grads_hat <- w_l * (f_l - est)
 
-    grads_hat_unlabeled <- w_u * (f_u - est)
+        grads_hat_unlabeled <- w_u * (f_u - est)
 
-    inv_hessian <- diag(p)
+        inv_hessian <- diag(p)
 
-    lhat <- calc_lhat_glm(
+        lhat <- calc_lhat_glm(grads, grads_hat, grads_hat_unlabeled,
 
-      grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord,
-      clip = T
-    )
+            inv_hessian, coord, clip = TRUE)
 
-    return(ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
-  } else {
-    return(mean(w_u * lhat * f_u) + mean(w_l * (Y_l - lhat * f_l)))
-  }
+        return(ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u))
+
+    } else {
+
+        return(mean(w_u * lhat * f_u) + mean(w_l * (Y_l - lhat * f_l)))
+    }
 }
 
 #--- PPI++ MEAN ESTIMATION - INFERENCE -----------------------------------------
@@ -139,11 +146,17 @@ ppi_plusplus_mean_est <- function(
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_mean(Y_l, f_l, f_u)
 #'
@@ -152,55 +165,52 @@ ppi_plusplus_mean_est <- function(
 #' @export
 
 ppi_plusplus_mean <- function(
-    Y_l, f_l, f_u,
-    alpha = 0.05, alternative = "two-sided",
-    lhat = NULL, coord = NULL, w_l = NULL, w_u = NULL) {
-  #- Compute Dimensions of Inputs
+    Y_l,
+    f_l,
+    f_u,
+    alpha = 0.05,
+    alternative = "two-sided",
+    lhat = NULL,
+    coord = NULL,
+    w_l = NULL,
+    w_u = NULL) {
 
-  n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
+    n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
+    N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
+    p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
 
-  N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+    if (is.null(lhat)) {
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+        est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, 1, w_l, w_u)
 
-  if (is.null(lhat)) {
-    est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, 1, w_l, w_u)
+        grads <- w_l * (Y_l - est)
 
-    grads <- w_l * (Y_l - est)
+        grads_hat <- w_l * (f_l - est)
 
-    grads_hat <- w_l * (f_l - est)
+        grads_hat_unlabeled <- w_u * (f_u - est)
 
-    grads_hat_unlabeled <- w_u * (f_u - est)
+        inv_hessian <- diag(p)
 
-    inv_hessian <- diag(p)
+        lhat <- calc_lhat_glm(grads, grads_hat, grads_hat_unlabeled,
 
-    lhat <- calc_lhat_glm(
+            inv_hessian, coord, clip = TRUE)
 
-      grads, grads_hat, grads_hat_unlabeled, inv_hessian, coord,
-      clip = T
-    )
+        return(ppi_plusplus_mean(Y_l, f_l, f_u,
 
-    return(
-      ppi_plusplus_mean(
-        Y_l, f_l, f_u,
-        alpha, alternative, lhat, coord, w_l, w_u
-      )
-    )
-  }
+            alpha, alternative, lhat, coord, w_l, w_u))
+    }
 
-  est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u)
+    est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat, coord, w_l, w_u)
 
-  imputed_std <- sd(w_u * (lhat * f_u)) * sqrt((N - 1) / N) / sqrt(N)
+    imputed_std <- sd(w_u * (lhat * f_u)) * sqrt((N - 1) / N) / sqrt(N)
 
-  rectifier_std <- sd(w_l * (Y_l - lhat * f_l)) * sqrt((n - 1) / n) / sqrt(n)
+    rectifier_std <- sd(w_l * (Y_l - lhat * f_l)) * sqrt((n - 1) / n) / sqrt(n)
 
-  return(zconfint_generic(
-    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative
-  ))
+    return(zconfint_generic(est, sqrt(imputed_std^2 + rectifier_std^2),
+
+        alpha, alternative))
 }
-
-#=== END =======================================================================

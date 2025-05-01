@@ -28,6 +28,56 @@
 
 * `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
 
-# ipd 0.1.5
+# ipd 0.99.0
+
+## Summary:
+
+* Preparations to archive on CRAN and move to Bioconductor.
 
 * Slight formatting changes to conform to `styler` and `lintr` suggestions.
+
+* Added PPIa, Chen and Chen methods from Gronsbell et al. (2024) "Another look at inference after prediction."
+
+## Specific Changes: 
+
+- **Version bump**  
+  - Pre‑release version set to **0.99.0** for Bioconductor devel.
+
+- **DESCRIPTION updates**  
+  - `Depends: R (>= 4.4.0)`  
+  - Added `biocViews: Software`  
+  - Added `Suggests: BiocStyle, BiocManager`
+
+- **Vignettes**  
+  - Converted existing R Markdown vignettes to Bioconductor style with `BiocStyle::html_document` and proper `VignetteIndexEntry` headers.
+
+- **NEWS & CITATION**  
+  - Added `NEWS.md` entry (this file) and a `CITATION` file for package citation metadata.
+
+- **Testing & QA**  
+  - Passed `BiocCheck` with no errors or warnings.  
+  - Updated `testthat` suite as needed for Bioc compliance.
+
+- **Continuous Integration**  
+  - Added GitHub Actions via `usethis::use_github_action("bioc-workflow")` to run Bioconductor checks on Linux, macOS, and Windows.
+
+- **README**  
+  - Installation instructions updated to:
+    ```r
+    if (!requireNamespace("BiocManager", quietly=TRUE))
+      install.packages("BiocManager")
+    BiocManager::install("ipd")
+    ```
+  - Replaced CRAN build badge with:
+    ```markdown
+    [![Bioc build status](https://bioconductor.org/shields/build/release/bioc/ipd.svg)](https://bioconductor.org/packages/ipd)
+    ```
+
+- **New functions**  
+  - `ipd_ppia()` — implements the PPIa estimator for prediction‑powered inference.  
+  - `ipd_chenchen()` — implements the Chen & Chen estimator for inference on predicted data.
+
+- **Bioconductor submission prep**  
+  - Branch `RELEASE_3_18` created, tag `v0.99.0` applied.  
+  - Will request CRAN archiving of the CRAN version upon successful Bioconductor acceptance.
+

@@ -1,7 +1,3 @@
-#===============================================================================
-# PSPA QUANTILE ESTIMATION
-#===============================================================================
-
 #--- PSPA QUANTILE ESTIMATION --------------------------------------------------
 
 #' PSPA Quantile Estimation
@@ -43,29 +39,29 @@
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 #'   matrix(ncol = 1)
 #'
-#' pspa_quantile(Y_l, f_l, f_u, q = 0.5)
+#' pspa_quantile(Y_l = Y_l, f_l = f_l, f_u = f_u, q = 0.5)
 #'
 #' @import stats
 #'
 #' @export
 
 pspa_quantile <- function(
-    Y_l, f_l, f_u, q,
-    weights = NA, alpha = 0.05) {
-  fit <- pspa_y(
-    Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
-    quant = q, intercept = TRUE,
-    weights = weights,
-    alpha = alpha, method = "quantile"
-  )
+    Y_l,
+    f_l,
+    f_u,
+    q,
+    weights = NA,
+    alpha = 0.05) {
 
-  fit <- as.data.frame(fit)
+    fit <- pspa_y(Y_l = Y_l, f_l = f_l, f_u = f_u, quant = q, intercept = TRUE,
 
-  est <- fit$Estimate
+        weights = weights, alpha = alpha, method = "quantile")
 
-  se <- fit$Std.Error
+    fit <- as.data.frame(fit)
 
-  return(list(est = est, se = se))
+    est <- fit$Estimate
+
+    se <- fit$Std.Error
+
+    return(list(est = est, se = se))
 }
-
-#=== END =======================================================================

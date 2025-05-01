@@ -1,6 +1,6 @@
 Package: ipd
 Title: Inference on Predicted Data
-Version: 0.1.4
+Version: 0.99.0
 Authors@R: c(
       person(given = "Stephen", family = "Salerno",
         email = "ssalerno@fredhutch.org", role = c("aut", "cre", "cph"),
@@ -19,18 +19,19 @@ Authors@R: c(
         email = "tylermc@uw.edu", role = c("aut")),
       person(given = "Jeffrey T", family = "Leek",
         email = "jtleek@fredhutch.org", role = c("aut")))
-Maintainer: Stephen Salerno <ssalerno@fredhutch.org>
-Description: Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2024) <doi:10.48550/arXiv.2410.09665>.
+Description: Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2025) <doi:10.1093/bioinformatics/btaf055>.
 License: MIT + file LICENSE
-LazyData: true
+LazyData: false
 URL: https://github.com/ipd-tools/ipd, https://ipd-tools.github.io/ipd/
 BugReports: https://github.com/ipd-tools/ipd/issues
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.4.0)
 Imports: 
+    methods,
+    generics,
+    BiocGenerics,
     caret,
     gam,
-    generics,
     ranger,
     splines,
     stats,
@@ -43,9 +44,15 @@ Suggests:
     rmarkdown,
     spelling,
     testthat (>= 3.0.0),
-    tidyverse
+    tidyverse,
+    xfun (>= 0.51),
+    BiocStyle,
+    BiocManager
 VignetteBuilder: 
     knitr
+biocViews: 
+    Software, 
+    StatisticalMethod
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

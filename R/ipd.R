@@ -1,8 +1,4 @@
-#===============================================================================
-# WRAPPER FUNCTION
-#===============================================================================
-
-#--- MAIN WRAPPER FUNCTION -----------------------------------------------------
+#--- IPD WRAPPER FUNCTION -----------------------------------------------------
 
 #' Inference on Predicted Data (ipd)
 #'
@@ -47,8 +43,6 @@
 #' specified, must contain columns for the predicted outcomes (\code{f}), and
 #' the features (\code{X}) needed to specify the \code{formula}. See
 #' \strong{2. Data} in the \strong{Details} below for more information.
-#'
-#' @param seed (optional) An \code{integer} seed for random number generation.
 #'
 #' @param intercept \code{Logical}. Should an intercept be included in the
 #' model? Default is \code{TRUE}.
@@ -173,28 +167,36 @@
 #' All other arguments that relate to all methods (e.g., alpha, ci.type), or
 #' other method-specific arguments, will have defaults.
 #'
-#' @return A list containing the fitted model components:
-#'
+#' @return
+#' An S4 object of class \code{IPD} with the following slots:
 #' \describe{
-#'   \item{coefficients}{Estimated coefficients of the model}
-#'   \item{se}{Standard errors of the estimated coefficients}
-#'   \item{ci}{Confidence intervals for the estimated coefficients}
-#'   \item{formula}{The formula used to fit the ipd model.}
-#'   \item{data}{The data frame used for model fitting.}
-#'   \item{method}{The method used for model fitting.}
-#'   \item{model}{The type of model fitted.}
-#'   \item{intercept}{Logical. Indicates if an intercept was included in the
-#'   model.}
-#'   \item{fit}{Fitted model object containing estimated coefficients, standard
-#'   errors, confidence intervals, and additional method-specific output.}
-#'   \item{...}{Additional output specific to the method used.}
+#'   \item{\code{coefficients}}{Named \code{\link[base]{numeric}}
+#'   vector of estimated parameters.}
+#'   \item{\code{se}}{Named \code{\link[base]{numeric}}
+#'   vector of standard errors.}
+#'   \item{\code{ci}}{A \code{\link[base]{matrix}} of confidence intervals,
+#'   with columns \code{lower} and \code{upper}.}
+#'   \item{\code{coefTable}}{A \code{\link[base]{data.frame}} summarizing
+#'   Estimate, Std. Error, z-value, and Pr(>|z|) (glm-style).}
+#'   \item{\code{fit}}{The raw output \code{\link[base]{list}} returned by
+#'   the method-specific helper function.}
+#'   \item{\code{formula}}{The \code{\link[stats]{formula}} used for fitting
+#'   the IPD model.}
+#'   \item{\code{data_l}}{The labeled \code{\link[base]{data.frame}} used in
+#'   the analysis.}
+#'   \item{\code{data_u}}{The unlabeled \code{\link[base]{data.frame}} used
+#'   in the analysis.}
+#'   \item{\code{method}}{A \code{\link[base]{character}} string indicating
+#'   which IPD method was applied.}
+#'   \item{\code{model}}{A \code{\link[base]{character}} string indicating
+#'   the downstream inferential model.}
+#'   \item{\code{intercept}}{A \code{\link[base]{logical}} indicating whether
+#'   an intercept was included.}
 #' }
 #'
 #' @examples
 #'
 #' #-- Generate Example Data
-#'
-#' set.seed(12345)
 #'
 #' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
 #'
@@ -244,302 +246,107 @@
 #'
 #' @export
 
-ipd <- function(
-    formula, method, model, data,
-    label = NULL, unlabeled_data = NULL, seed = NULL, intercept = TRUE,
-    alpha = 0.05, alternative = "two-sided", n_t = Inf, na_action = "na.fail",
-    ...) {
-  #--- CHECKS & ASSERTIONS -----------------------------------------------------
+ipd <- function(formula,
+                method,
+                model,
+                data,
+                label = NULL,
+                unlabeled_data = NULL,
+                intercept = TRUE,
+                alpha = 0.05,
+                alternative = "two-sided",
+                n_t = Inf,
+                na_action = "na.fail",
+                ...) {
 
-  #-- CHECK ARGUMENTS
+    #- Implemented Methods and Models
 
-  if (na_action != "na.fail" && na_action != "na.omit") {
-    stop("na_action should be either 'na.fail' or 'na.omit'")
-  }
+    valid_methods <- c("postpi_analytic", "postpi_boot", "ppi",
 
-  #-- CHECK FOR DATA
+        "ppi_plusplus", "ppi_a", "pspa", "chen")
 
-  if (missing(data)) data <- environment(formula)
+    valid_models <- c("mean", "quantile", "ols", "logistic", "poisson")
 
-  #-- CHECK DATA CLASS
+    #- Identify Factor Variables in the Formula
 
-  if (!inherits(data, "data.frame")) {
-    data <- try(as.data.frame(data), silent = TRUE)
+    all_vars    <- all.vars(formula)
+    preds       <- all_vars[-c(1,2)]
+    factor_vars <- intersect(preds, names(Filter(is.factor, data)))
 
-    if (inherits(data, "try-error")) {
-      stop(paste(
-        "'data' cannot be coerced to a data.frame.",
-        "Please provide a valid data.frame."
-      ))
-    }
-  }
+    #- Drop Unused Levels if Stacked Data
 
-  #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE UNSPECIFIED
+    if (!is.null(label) && is.null(unlabeled_data)) {
 
-  if (is.null(label) && is.null(unlabeled_data)) {
-    stop(paste(
-      "at least one of 'label' and 'unlabeled_data' must be",
-      "specified.\nSee the help('ipd') documentation for more information."
-    ))
-  }
-
-  #-- CHECK IF BOTH 'label' AND 'unlabeled_data' ARE SPECIFIED
-
-  if (!is.null(label) && !is.null(unlabeled_data)) {
-    stop(paste(
-      "specify only one of 'label' and 'unlabeled_data' argument.",
-      "\nSee the help('ipd') documentation for more information."
-    ))
-  }
-
-  #-- CHECK IF SPECIFIED 'label' EXISTS IN DATA
-
-  if (!is.null(label)) {
-    if (!exists(label, where = data)) {
-      stop(paste(
-        label, "does not exist in the data set.\nSee the",
-        "help('ipd') documentation for more information."
-      ))
-    }
-  }
-
-  #-- CHECK FOR VALID METHOD
-
-  if (!(method %in% c(
-    "postpi_analytic", "postpi_boot", "ppi", "pspa",
-    "ppi_plusplus"
-  ))) {
-    stop(paste(
-      "'method' must be one of c('postpi_analytic', 'postpi_boot',",
-      "'ppi', 'pspa', 'ppi_plusplus').\nSee the 'Details' section of the",
-      "documentation for more information."
-    ))
-  }
-
-  #-- CHECK FOR VALID MODEL
-
-  if (!(model %in% c("mean", "quantile", "ols", "logistic", "poisson"))) {
-    stop(paste(
-      "'model' must be one of c('mean', 'quantile', 'ols',",
-      "'logistic', 'poisson').\nSee the 'Details' for more information."
-    ))
-  }
-
-  #--- SET SEED ----------------------------------------------------------------
-
-  if (!is.null(seed)) set.seed(seed)
-
-  #--- PREPARE DATA ------------------------------------------------------------
-
-  #-- DROP UNUSED FACTOR LEVELS IN DATA AND REPORT DROPPED LEVELS
-
-  factor_vars <- names(Filter(is.factor, data))
-
-  #-- IF STACKED DATA ARE PROVIDED
-
-  if (!is.null(label) && is.null(unlabeled_data)) {
-    if (!is.null(factor_vars)) {
-      dropped_levels <- sapply(
-        data[factor_vars],
-        function(x) setdiff(levels(x), levels(droplevels(x)))
-      )
-
-      if (any(lengths(dropped_levels) > 0)) {
-        message(
-          "Dropped unused factor levels in the following variables:\n",
-          paste(names(dropped_levels)[lengths(dropped_levels) > 0],
-            ":", sapply(dropped_levels[lengths(dropped_levels) > 0],
-              paste,
-              collapse = ", "
-            ),
-            collapse = "\n"
-          )
-        )
-      }
-
-      data <- droplevels(data)
+        data <- .drop_unused_levels(data, factor_vars)
     }
 
-    #- DEFINE VALID 'label' IDENTIFERS
+    #- Validate and Split
 
-    # CHECK ONE OF EACH 'labeled' AND 'unlabeled' IDENTIFIERS EXIST
+    inp <- .parse_inputs(data, label, unlabeled_data, na_action)
 
-    valid_labeled_df_id <- c(
-      "l", "lab", "label", "labeled", "labelled",
-      "tst", "test", "true", 1, TRUE
-    )
+    #- Warn on Mismatched Levels
 
-    valid_unlabeled_df_id <- c(
-      "u", "unlab", "unlabeled", "unlabelled",
-      "val", "validation", "false", 0, FALSE
-    )
+    .warn_differing_levels(inp$data_l, inp$data_u, factor_vars)
 
-    if (!((sum(unique(data[[label]]) %in% valid_labeled_df_id) == 1) &&
-            (sum(unique(data[[label]]) %in% valid_unlabeled_df_id) == 1))) {
-      stop(paste(
-        label,
-        "must have one valid identifier for labeled and unlabeled data set",
-        "each. See the 'Details' section of the documentation for more",
-        "information."
-      ))
+    #- Build Design Matrices
+
+    mats <- .build_design(formula, inp$data_l, inp$data_u, intercept, na_action)
+
+    #- Fit Model Using Method
+
+    method <- match.arg(method, valid_methods)
+
+    model  <- match.arg(model,  valid_models)
+
+    helper <- get(paste(method, model, sep = "_"))
+
+    fit <- if (grepl("^postpi", method) && model == "ols") {
+
+        helper(mats$X_l, mats$Y_l, mats$f_l, mats$X_u, mats$f_u, n_t = n_t, ...)
+
+    } else {
+
+        helper(mats$X_l, mats$Y_l, mats$f_l, mats$X_u, mats$f_u, ...)
     }
 
-    data_l <- data[data[[label]] %in% valid_labeled_df_id, ]
+    #- Results
 
-    data_u <- data[data[[label]] %in% valid_unlabeled_df_id, ]
-  }
+    est <- as.numeric(fit$est)
+    se  <- as.numeric(fit$se)
+    nm  <- colnames(mats$X_u)
 
-  #-- IF UNSTACKED DATA ARE PROVIDED
+    names(est) <- names(se) <- nm
 
-  if (is.null(label) && !is.null(unlabeled_data)) {
-    data_l <- data
+    ci_mat <- zconfint_generic(est, se, alpha, alternative)
 
-    data_u <- unlabeled_data
-  }
+    rownames(ci_mat) <- nm
+    colnames(ci_mat) <- c("lower", "upper")
 
-  #-- CHECK FOR UNUSED FACTOR LEVELS AFTER SPLITTING
+    zval <- est / se
+    pval <- 2 * pnorm(-abs(zval))
 
-  data_l <- droplevels(data_l)
-
-  data_u <- droplevels(data_u)
-
-  differing_levels <- sapply(factor_vars, function(var) {
-    levels_l <- levels(data_l[[var]])
-
-    levels_u <- levels(data_u[[var]])
-
-    if (!identical(levels_l, levels_u)) {
-      return(paste("Differing levels in '", var, "': labeled = [",
-        paste(levels_l, collapse = ", "), "], unlabeled = [",
-        paste(levels_u, collapse = ", "), "]",
-        sep = ""
-      ))
-    }
-
-    NULL
-  })
-
-  differing_levels <- differing_levels[!sapply(differing_levels, is.null)]
-
-  if (length(differing_levels) > 0) {
-    stop(paste0(
-      "The following variables have differing factor levels ",
-      "between the labeled and unlabeled data:\n",
-      paste(differing_levels, collapse = "\n")
-    ))
-  }
-
-  #-- LABELED DATA
-
-  #- CHECK FOR MISSING COVARIATE DATA
-
-  missing_covs_l <- apply(
-    data_l[, all.vars(formula)[-(1:2)], drop = FALSE], 2,
-    function(x) any(is.na(x))
-  )
-
-  if (any(missing_covs_l)) {
-    missing_vars_l <- names(missing_covs_l[missing_covs_l])
-
-    stop(paste0(
-      "Missing values detected in the following labeled covariate data: ",
-      paste(missing_vars_l, collapse = ", "),
-      ". Please ensure there are no missing values in these covariates."
-    ))
-  }
-
-  if (intercept) {
-    X_l <- model.matrix(
-      formula,
-      model.frame(formula, data = data_l, na.action = na_action)
+    coef_tab <- data.frame(
+        Estimate     = est,
+        `Std. Error` = se,
+        `z value`    = zval,
+        `Pr(>|z|)`   = pval,
+        row.names    = nm,
+        check.names  = FALSE
     )
-  } else {
-    X_l <- model.matrix(
-      update(formula, . ~ . - 1),
-      model.frame(update(formula, . ~ . - 1),
-        data = data_l, na.action = na_action
-      )
+
+    #- Return
+
+    new("ipd",
+        coefficients = est,
+        se           = se,
+        ci           = ci_mat,
+        coefTable    = coef_tab,
+        fit          = fit,
+        formula      = formula,
+        data_l       = inp$data_l,
+        data_u       = inp$data_u,
+        method       = method,
+        model        = model,
+        intercept    = intercept
     )
-  }
-
-  Y_l <- data_l[, all.vars(formula)[1]] |> matrix(ncol = 1)
-
-  f_l <- data_l[, all.vars(formula)[2]] |> matrix(ncol = 1)
-
-  #-- UNLABELED DATA
-
-  formula_u <- as.formula(paste(
-    all.vars(formula)[2], "~",
-    paste(all.vars(formula)[-c(1, 2)], collapse = " + ")
-  ))
-
-
-  #- CHECK FOR MISSING COVARIATE DATA
-
-  missing_covs_u <- apply(
-    data_u[, all.vars(formula_u)[-1], drop = FALSE], 2,
-    function(x) any(is.na(x))
-  )
-
-  if (any(missing_covs_u)) {
-    missing_vars_u <- names(missing_covs_u[missing_covs_u])
-
-    stop(paste0(
-      "Missing values detected in the following unlabeled covariate data: ",
-      paste(missing_vars_u, collapse = ", "),
-      ". Please ensure there are no missing values in these covariates."
-    ))
-  }
-
-  if (intercept) {
-    X_u <- model.matrix(
-      formula_u,
-      model.frame(formula_u, data = data_u, na.action = na_action)
-    )
-  } else {
-    X_u <- model.matrix(
-      update(formula_u, . ~ . - 1),
-      model.frame(update(formula_u, . ~ . - 1),
-        data = data_u, na.action = na_action
-      )
-    )
-  }
-
-  f_u <- data_u[, all.vars(formula)[2]] |> matrix(ncol = 1)
-
-  #--- METHOD ------------------------------------------------------------------
-
-  func <- get(paste(method, model, sep = "_"))
-
-  if (grepl("postpi", method) && model == "ols") {
-    fit <- func(X_l, Y_l, f_l, X_u, f_u, n_t = n_t, ...)
-  } else {
-    fit <- func(X_l, Y_l, f_l, X_u, f_u, ...)
-  }
-
-  names(fit$est) <- colnames(X_u)
-
-  ci <- zconfint_generic(fit$est, fit$se, alpha, alternative)
-
-  #--- RETURN ------------------------------------------------------------------
-
-  result <- list(
-    coefficients = fit$est,
-    se = fit$se,
-    ci = ci,
-    formula = formula,
-    data_l = data_l,
-    data_u = data_u,
-    method = method,
-    model = model,
-    intercept = intercept,
-    fit = fit,
-    ...
-  )
-
-  class(result) <- c("ipd")
-
-  return(result)
 }
-
-#=== END =======================================================================
