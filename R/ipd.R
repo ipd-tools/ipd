@@ -14,9 +14,9 @@
 #' See \strong{1. Formula} in the \strong{Details} below for more information.
 #'
 #' @param method The IPD method to be used for fitting the model. Must be one
-#' of \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-#' \code{"ppi_plusplus"}, or \code{"pspa"}. See \strong{3. Method} in the
-#' \strong{Details} below for more information.
+#' of \code{"chen"}, \code{"postpi_analytic"}, \code{"postpi_boot"},
+#' \code{"ppi"}, \code{"ppi_a"}, \code{"ppi_plusplus"}, or \code{"pspa"}.
+#' See \strong{3. Method} in the \strong{Details} below for more information.
 #'
 #' @param model The type of downstream inferential model to be fitted, or the
 #' parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
@@ -128,12 +128,14 @@
 #' Use the \code{method} argument to specify the fitting method:
 #'
 #' \describe{
+#'    \item{"chen"}{Gronsbell et al. (2025) Chen and Chen Correction}
 #'    \item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
 #'    (PostPI) Analytic Correction}
 #'    \item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference
 #'    (PostPI) Bootstrap Correction}
 #'    \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 #'    (PPI)}
+#'    \item{"ppi_a"}{Gronsbell et al. (2025) PPI "All" Correction}
 #'    \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
 #'    \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
 #'    Post-Prediction Inference (PSPA)}
@@ -204,6 +206,13 @@
 #'
 #' formula <- Y - f ~ X1
 #'
+#' #-- Chen and Chen Correction (Gronsbell et al., 2025)
+#'
+#' ipd(formula,
+#'   method = "chen", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
+#'
 #' #-- PostPI Analytic Correction (Wang et al., 2020)
 #'
 #' ipd(formula,
@@ -227,6 +236,13 @@
 #'   data = dat, label = "set_label"
 #' )
 #'
+#' #-- PPI "All" (Gronsbell et al., 2025)
+#'
+#' ipd(formula,
+#'   method = "ppi_a", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
+#'
 #' #-- PPI++ (Angelopoulos et al., 2023)
 #'
 #' ipd(formula,
@@ -246,24 +262,25 @@
 #'
 #' @export
 
-ipd <- function(formula,
-                method,
-                model,
-                data,
-                label = NULL,
-                unlabeled_data = NULL,
-                intercept = TRUE,
-                alpha = 0.05,
-                alternative = "two-sided",
-                n_t = Inf,
-                na_action = "na.fail",
-                ...) {
+ipd <- function(
+    formula,
+    method,
+    model,
+    data,
+    label = NULL,
+    unlabeled_data = NULL,
+    intercept = TRUE,
+    alpha = 0.05,
+    alternative = "two-sided",
+    n_t = Inf,
+    na_action = "na.fail",
+    ...) {
 
     #- Implemented Methods and Models
 
-    valid_methods <- c("postpi_analytic", "postpi_boot", "ppi",
+    valid_methods <- c("chen", "postpi_analytic", "postpi_boot", "ppi",
 
-        "ppi_plusplus", "ppi_a", "pspa", "chen")
+        "ppi_a", "ppi_plusplus", "pspa")
 
     valid_models <- c("mean", "quantile", "ols", "logistic", "poisson")
 

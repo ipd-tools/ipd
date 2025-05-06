@@ -29,9 +29,9 @@ corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
 See \strong{1. Formula} in the \strong{Details} below for more information.}
 
 \item{method}{The IPD method to be used for fitting the model. Must be one
-of \code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-\code{"ppi_plusplus"}, or \code{"pspa"}. See \strong{3. Method} in the
-\strong{Details} below for more information.}
+of \code{"chen"}, \code{"postpi_analytic"}, \code{"postpi_boot"},
+\code{"ppi"}, \code{"ppi_a"}, \code{"ppi_plusplus"}, or \code{"pspa"}.
+See \strong{3. Method} in the \strong{Details} below for more information.}
 
 \item{model}{The type of downstream inferential model to be fitted, or the
 parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
@@ -173,12 +173,14 @@ unless explicitly referenced in the \code{formula} argument or in the
 Use the \code{method} argument to specify the fitting method:
 
 \describe{
+\item{"chen"}{Gronsbell et al. (2025) Chen and Chen Correction}
 \item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
 (PostPI) Analytic Correction}
 \item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference
 (PostPI) Bootstrap Correction}
 \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 (PPI)}
+\item{"ppi_a"}{Gronsbell et al. (2025) PPI "All" Correction}
 \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
 \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
 Post-Prediction Inference (PSPA)}
@@ -222,6 +224,13 @@ head(dat)
 
 formula <- Y - f ~ X1
 
+#-- Chen and Chen Correction (Gronsbell et al., 2025)
+
+ipd(formula,
+  method = "chen", model = "ols",
+  data = dat, label = "set_label"
+)
+
 #-- PostPI Analytic Correction (Wang et al., 2020)
 
 ipd(formula,
@@ -242,6 +251,13 @@ ipd(formula,
 
 ipd(formula,
   method = "ppi", model = "ols",
+  data = dat, label = "set_label"
+)
+
+#-- PPI "All" (Gronsbell et al., 2025)
+
+ipd(formula,
+  method = "ppi_a", model = "ols",
   data = dat, label = "set_label"
 )
 

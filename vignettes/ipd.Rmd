@@ -47,12 +47,14 @@ inference (PostPI) by
 [Wang et al., 2020](www.pnas.org/doi/suppl/10.1073/pnas.2001238117), 
 prediction-powered inference (PPI) and PPI++ by 
 [Angelopoulos et al., 2023a](www.science.org/doi/10.1126/science.adi6000) and 
-[Angelopoulos et al., 2023b](arxiv.org/abs/2311.01453), and post-prediction 
+[Angelopoulos et al., 2023b](arxiv.org/abs/2311.01453), post-prediction 
 adaptive inference (PSPA) by 
-[Miao et al., 2023](https://arxiv.org/abs/2311.14220). To enable researchers 
-and practitioners interested in these state-of-the-art methods, we have 
-developed `ipd`, a open-source `R` package that implements these methods under 
-the umbrella of IPD.
+[Miao et al., 2023](https://arxiv.org/abs/2311.14220), and a correction based 
+on the Chen and Chen method and alternate PPI "All" by 
+[Gronsbell et al., 2025](https://arxiv.org/pdf/2411.19908). To enable 
+researchers and practitioners interested in these state-of-the-art methods, we 
+have developed `ipd`, a open-source `R` package that implements these methods 
+under the umbrella of IPD.
 
 This vignette provides a guide to using the `ipd` package, including 
 installation instructions, examples of data generation, model fitting, and 
@@ -364,12 +366,27 @@ lm(Y ~ X1, data = dat_ols[dat_ols$set_label == "labeled", ]) |>
 You can fit the various IPD methods to your data and obtain summaries using the 
 provided wrapper function, `ipd()`:
 
-#### 1.1 PostPI Bootstrap Correction (Wang et al., 2020)
+#### 1. Chen and Chen Correction (Gronsbell et al., 2025)
 
-```{r postpi_boot_ols}
+```{r chen_ols}
+
 #-- Specify the Formula
 
 formula <- Y - f ~ X1
+
+#-- Fit the Chen and Chen Correction
+
+ipd::ipd(formula, method = "chen", model = "ols", 
+
+    data = dat_ols, label = "set_label") |>
+
+    summary()
+
+```
+
+#### 2.1 PostPI Bootstrap Correction (Wang et al., 2020)
+
+```{r postpi_boot_ols}
 
 #-- Fit the PostPI Bootstrap Correction
 
@@ -382,7 +399,7 @@ ipd::ipd(formula, method = "postpi_boot", model = "ols",
     summary()
 ```
 
-#### 1.2 PostPI Analytic Correction (Wang et al., 2020)
+#### 2.2 PostPI Analytic Correction (Wang et al., 2020)
 
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
@@ -394,7 +411,7 @@ ipd::ipd(formula, method = "postpi_analytic", model = "ols",
     summary()
 ```
 
-#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+#### 3. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ```{r ppi_ols}
 #-- Fit the PPI Correction
@@ -406,7 +423,21 @@ ipd::ipd(formula, method = "ppi", model = "ols",
     summary()
 ```
 
-#### 3. PPI++ (Angelopoulos et al., 2023)
+#### 4. PPI "All" (Gronsbell et al., 2025)
+
+
+```{r ppi_a_ols}
+#-- Fit the PPI Correction
+
+ipd::ipd(formula, method = "ppi_a", model = "ols", 
+
+    data = dat_ols, label = "set_label") |>
+
+    summary()
+```
+
+
+#### 5. PPI++ (Angelopoulos et al., 2023)
 
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
@@ -418,7 +449,7 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "ols",
     summary()
 ```
 
-#### 4. post-prediction adaptive inference (PSPA; Miao et al., 2023)
+#### 6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ```{r pspa}
 #-- Fit the PSPA Correction

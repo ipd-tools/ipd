@@ -167,6 +167,9 @@ Authors:
   \item Jiacheng Miao \email{jmiao24@wisc.edu}
   \item Awan Afiaz \email{aafiaz@uw.edu}
   \item Kentaro Hoffman \email{khoffm3@uw.edu}
+  \item Jesse Gronsbell \email{j.gronsbell@utoronto.ca}
+  \item Jianhui Gao \email{jianhui.gao@mail.utoronto.ca}
+  \item David Cheng \email{dcheng@mgh.harvard.edu}
   \item Anna Neufeld \email{acn2@williams.edu}
   \item Qiongshi Lu \email{qlu@biostat.wisc.edu}
   \item Tyler H McCormick \email{tylermc@uw.edu}

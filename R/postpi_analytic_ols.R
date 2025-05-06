@@ -1,7 +1,3 @@
-#===============================================================================
-# POSTPI ANALYTIC ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- POSTPI ANALYTIC OLS -------------------------------------------------------
 
 #' PostPI OLS (Analytic Correction)
@@ -59,13 +55,14 @@
 #'
 #' @export
 
-postpi_analytic_ols <- function(X_l,
-                                Y_l,
-                                f_l,
-                                X_u,
-                                f_u,
-                                scale_se = TRUE,
-                                n_t = Inf) {
+postpi_analytic_ols <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    scale_se = TRUE,
+    n_t = Inf) {
 
     #- 1. Estimate Relationship Model
 
@@ -103,5 +100,3 @@ postpi_analytic_ols <- function(X_l,
 
     return(list(est = as.vector(est), se = as.vector(se)))
 }
-
-#=== END =======================================================================

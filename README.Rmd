@@ -37,7 +37,7 @@ Using predictions from pre-trained algorithms as outcomes in downstream statisti
 2.  Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data.
 3.  Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks.
 
-Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and post-prediction adaptive inference (PSPA) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220). Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:
+Several works have proposed methods for IPD, including post-prediction inference (PostPI) by [Wang et al., 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117), prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al., 2023a](https://www.science.org/doi/10.1126/science.adi6000) and [Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), post-prediction adaptive inference (PSPA) by [Miao et al., 2023](https://arxiv.org/abs/2311.14220), and a correction based on the Chen and Chen method and alternate PPI "All" by [Gronsbell et al., 2025](https://arxiv.org/pdf/2411.19908). Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:
 
 1.  A dataset consisting of our outcome and features of interst, where the outcome is only observed for a small 'labeled' subset and missing for a, typically larger, 'unlabeled' subset.
 2.  Access to an algorithm to predict the missing outcome in the entire dataset using the fully observed features.
@@ -70,11 +70,13 @@ We provide a simple example to demonstrate the basic use of the functions includ
 
 You can generate synthetic datasets for different types of regression models using the provided `simdat` function by specifying the sizes of the datasets, the effect size, residual variance, and the type of model. The function currently supports "mean", "quantile", "ols", "logistic", and "poisson" models. The `simdat` function generate a data.frame with three subsets: (1) an independent "training" set with additional observations used to fit a prediction model, and "labeled" and "unlabeled" sets which contain the observed and predicted outcomes and the simulated features of interest. 
 
-```{r example}
+```{r library}
 #-- Load the ipd Library
 
 library(ipd)
+```
 
+```{r example}
 #-- Generate Example Data for Linear Regression
 
 set.seed(123)
@@ -106,60 +108,88 @@ library(patchwork)
 dat_labeled <- dat[dat$set_label == "labeled", ]
 
 p1 <- dat_labeled |>
-  pivot_longer(Y:f) |>
-  mutate(
-    name = factor(name,
-      levels = c("f", "Y"),
-      labels = c("Predicted ", "Observed ")
-    ) |> fct_rev()
-  ) |>
-  ggplot(aes(x = X1, y = value, group = name, color = name, fill = name)) +
-  theme_bw() +
-  coord_fixed(1 / 3) +
-  geom_abline(slope = 1, intercept = 0) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm") +
-  scale_x_continuous(limits = c(-2.5, 2.5)) +
-  scale_y_continuous(limits = c(-7.5, 7.5)) +
-  scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
-  scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
-  labs(
-    x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
-    title = "Outcomes vs. Covariate"
-  ) +
-  theme(
-    legend.direction = "horizontal",
-    legend.position = "inside",
-    legend.position.inside = c(0.5, 0.91),
-    axis.title = element_text(size = 8),
-    axis.text = element_text(size = 8),
-    title = element_text(size = 8)
-  )
+  
+    pivot_longer(Y:f) |>
+    
+    mutate(
+      
+        name = factor(name, c("f", "Y"), c("Predicted ", "Observed ")) |> 
+          
+            fct_rev()) |>
+  
+    ggplot(aes(x = X1, y = value, group = name, color = name, fill = name)) +
+      
+        theme_bw() + coord_fixed(1 / 3) +
+      
+        geom_abline(slope = 1, intercept = 0) +
+      
+        geom_point(alpha = 0.5) +
+      
+        geom_smooth(method = "lm") +
+      
+        scale_x_continuous(limits = c(-2.5, 2.5)) +
+      
+        scale_y_continuous(limits = c(-7.5, 7.5)) +
+      
+        scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
+      
+        scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
+      
+        labs(
+          
+            x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
+          
+            title = "Outcomes vs. Covariate") +
+        
+        theme(
+          
+            legend.direction = "horizontal",
+            
+            legend.position = "inside",
+            
+            legend.position.inside = c(0.5, 0.91),
+            
+            axis.title = element_text(size = 8),
+            
+            axis.text = element_text(size = 8),
+            
+            title = element_text(size = 8))
 
 p2 <- dat_labeled |>
-  ggplot(aes(x = f, y = Y)) +
-  theme_bw() +
-  coord_fixed(1) +
-  geom_abline(slope = 1, intercept = 1) +
-  geom_point(color = "#00C1D5", alpha = 0.5) +
-  geom_smooth(method = "lm", color = "#00C1D5") +
-  scale_x_continuous(limits = c(-7.5, 7.5)) +
-  scale_y_continuous(limits = c(-7.5, 7.5)) +
-  labs(
-    x = "\nPredicted Outcome", y = "Observed Outcome\n",
-    title = "Predicted vs. Observed Outcomes"
-  ) +
-  theme(
-    axis.title = element_text(size = 8),
-    axis.text = element_text(size = 8),
-    title = element_text(size = 8)
-  )
+    
+    ggplot(aes(x = f, y = Y)) +
+    
+    theme_bw() + coord_fixed(1) +
+    
+    geom_abline(slope = 1, intercept = 1) +
+    
+    geom_point(color = "#00C1D5", alpha = 0.5) +
+    
+    geom_smooth(method = "lm", color = "#00C1D5") +
+    
+    scale_x_continuous(limits = c(-7.5, 7.5)) +
+    
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+    
+    labs(
+      
+        x = "\nPredicted Outcome", y = "Observed Outcome\n",
+        
+        title = "Predicted vs. Observed Outcomes") +
+    
+    theme(
+      
+        axis.title = element_text(size = 8),
+        
+        axis.text = element_text(size = 8),
+        
+        title = element_text(size = 8))
 
 fig1 <- (p1 + theme(plot.margin = unit(c(0, 20, 0, 0), "pt"))) +
 
-  (p2 + theme(plot.margin = unit(c(0, 20, 0, 20), "pt"))) +
-
-  plot_annotation(tag_levels = "A")
+    (p2 + theme(plot.margin = unit(c(0, 20, 0, 20), "pt"))) +
+  
+    plot_annotation(tag_levels = "A")
 
 fig1
 ```
@@ -174,56 +204,81 @@ We can see that:
 We compare two non-IPD approaches to analyzing the data to methods included in the `ipd` package. A summary comparison is provided in the table below, followed by the specific calls for each method:
 
 ```{r overalltab, echo=FALSE}
-fit0 <- lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |> summary()
-fit1 <- lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |> summary()
+fit0 <- lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |> 
+  
+    summary()
+
+fit1 <- lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |> 
+  
+    summary()
 
 formula <- Y - f ~ X1
 
 nboot <- 200
 
-fit2 <- ipd::ipd(formula,
-  method = "postpi_boot", model = "ols",
-  data = dat, label = "set_label", nboot = nboot
-) |> summary()
+fit2 <- ipd::ipd(formula, method = "chen", model = "ols",
+  
+    data = dat, label = "set_label") |> 
+  
+    summary()
 
-fit3 <- ipd::ipd(formula,
-  method = "postpi_analytic", model = "ols",
-  data = dat, label = "set_label"
-) |> summary()
+fit3 <- ipd::ipd(formula, method = "postpi_boot", model = "ols",
+  
+    data = dat, label = "set_label", nboot = nboot) |> 
+  
+    summary()
 
-fit4 <- ipd::ipd(formula,
-  method = "ppi", model = "ols",
-  data = dat, label = "set_label"
-) |> summary()
+fit4 <- ipd::ipd(formula, method = "postpi_analytic", model = "ols",
+  
+    data = dat, label = "set_label") |> 
+  
+    summary()
 
-fit5 <- ipd::ipd(formula,
-  method = "ppi_plusplus", model = "ols",
-  data = dat, label = "set_label"
-) |> summary()
+fit5 <- ipd::ipd(formula, method = "ppi", model = "ols",
+                 
+    data = dat, label = "set_label") |> 
+  
+    summary()
 
-fit6 <- ipd::ipd(formula,
-  method = "pspa", model = "ols",
-  data = dat, label = "set_label"
-) |> summary()
+fit6 <- ipd::ipd(formula, method = "ppi_a", model = "ols",
+                 
+    data = dat, label = "set_label") |> 
+  
+    summary()
+
+fit7 <- ipd::ipd(formula, method = "ppi_plusplus", model = "ols",
+  
+    data = dat, label = "set_label") |> 
+  
+    summary()
+
+fit8 <- ipd::ipd(formula, method = "pspa", model = "ols",
+                 
+    data = dat, label = "set_label") |> 
+  
+    summary()
 
 sumtab <- rbind(
-  fit0$coefficients[2, seq_len(2)],
-  fit1$coefficients[2, seq_len(2)],
-  fit2$coefficients[2, seq_len(2)],
-  fit3$coefficients[2, seq_len(2)],
-  fit4$coefficients[2, seq_len(2)],
-  fit5$coefficients[2, seq_len(2)]
-)
+  
+    fit0$coefficients[2, seq_len(2)],
+    fit1$coefficients[2, seq_len(2)],
+    fit2$coefficients[2, seq_len(2)],
+    fit3$coefficients[2, seq_len(2)],
+    fit4$coefficients[2, seq_len(2)],
+    fit5$coefficients[2, seq_len(2)],
+    fit6$coefficients[2, seq_len(2)],
+    fit7$coefficients[2, seq_len(2)],
+    fit8$coefficients[2, seq_len(2)])
 
-rownames(sumtab) <- c(
-  "Naive", "Classic", "PostPI (Bootstrap)",
-  "PostPI (Analytic)", "PPI++", "PSPA"
-)
+rownames(sumtab) <- c("Naive", "Classic", "Chen and Chen", "PostPI (Bootstrap)",
+                      
+    "PostPI (Analytic)", "PPI", "PPI All", "PPI++", "PSPA")
 
 sumtab
 ```
 
-We can see that the IPD methods have similar estimates and standard errors, while the 'naive' method has a different estimate and standard errors that are too small.
+We can see that the IPD methods have similar estimates and standard errors, while the 'naive' method has a different estimate and standard errors that are too small. We compare two non-IPD approaches to analyzing the data to methods included in 
+the `ipd` package in more detail below.
 
 #### 0.1 'Naive' Regression Using the Predicted Outcomes
 
@@ -231,7 +286,8 @@ We can see that the IPD methods have similar estimates and standard errors, whil
 #--- Fit the Naive Regression
 
 lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
-  summary()
+
+    summary()
 ```
 
 #### 0.2 'Classic' Regression Using only the Labeled Data
@@ -240,71 +296,106 @@ lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
 #--- Fit the Classic Regression
 
 lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |>
-  summary()
+
+    summary()
 ```
 
-You can fit the various IPD methods to your data and obtain summaries using the provided wrapper function, `ipd()`:
+You can fit the various IPD methods to your data and obtain summaries using the 
+provided wrapper function, `ipd()`:
 
-#### 1.1 PostPI Bootstrap Correction (Wang et al., 2020)
+#### 1. Chen and Chen Correction (Gronsbell et al., 2025)
 
-```{r postpi_boot_ols}
+```{r chen_ols}
+
 #-- Specify the Formula
 
 formula <- Y - f ~ X1
+
+#-- Fit the Chen and Chen Correction
+
+ipd::ipd(formula, method = "chen", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
+
+```
+
+#### 2.1 PostPI Bootstrap Correction (Wang et al., 2020)
+
+```{r postpi_boot_ols}
 
 #-- Fit the PostPI Bootstrap Correction
 
 nboot <- 200
 
-ipd::ipd(formula,
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
-  nboot = nboot
-) |>
-  summary()
+ipd::ipd(formula, method = "postpi_boot", model = "ols", 
+
+    data = dat, label = "set_label", nboot = nboot) |>
+
+    summary()
 ```
 
-#### 1.2 PostPI Analytic Correction (Wang et al., 2020)
+#### 2.2 PostPI Analytic Correction (Wang et al., 2020)
 
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
 
-ipd::ipd(formula,
-  method = "postpi_analytic", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "postpi_analytic", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 ```
 
-#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+#### 3. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ```{r ppi_ols}
 #-- Fit the PPI Correction
 
-ipd::ipd(formula,
-  method = "ppi", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "ppi", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 ```
 
-#### 3. PPI++ (Angelopoulos et al., 2023)
+#### 4. PPI "All" (Gronsbell et al., 2025)
+
+
+```{r ppi_a_ols}
+#-- Fit the PPI Correction
+
+ipd::ipd(formula, method = "ppi_a", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
+```
+
+
+#### 5. PPI++ (Angelopoulos et al., 2023)
 
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
 
-ipd::ipd(formula,
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "ppi_plusplus", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 ```
 
-#### 4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
+#### 6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ```{r pspa}
 #-- Fit the PSPA Correction
 
-ipd::ipd(formula,
-  method = "pspa", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "pspa", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 ```
 
 ### Printing and Tidying
@@ -316,10 +407,9 @@ The package also provides custom `print`, `summary`, `tidy`, `glance`, and `augm
 
 nboot <- 200
 
-fit_postpi <- ipd::ipd(formula,
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
-  nboot = nboot
-)
+fit_postpi <- ipd::ipd(formula, method = "postpi_boot", model = "ols", 
+                       
+    data = dat, label = "set_label", nboot = nboot)
 
 #-- Print the Model
 

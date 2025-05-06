@@ -1,7 +1,3 @@
-#===============================================================================
-# CHEN & CHEN ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- CHEN & CHEN OLS -----------------------------------------------------------
 
 #' Chen & Chen OLS
@@ -22,6 +18,9 @@
 #' @param X_u (matrix): N x p matrix of covariates in the unlabeled data.
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
+#'
+#' @param intercept (Logical): Do the design matrices include intercept
+#' columns? Default is \code{TRUE}.
 #'
 #' @return (list): A list containing the following:
 #'
@@ -50,114 +49,68 @@
 #' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 #'   matrix(ncol = 1)
 #'
-#' #chen_ols(X_l, Y_l, f_l, X_u, f_u)
+#' chen_ols(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 #'
 #' @import stats
 #'
 #' @export
 
 chen_ols <- function(
-    Y_l,
     X_l,
+    Y_l,
     f_l,
+    X_u,
     f_u,
-    X_u) {
+    intercept = TRUE) {
 
-    f_a <- c(f_l, f_u)
-
+    f_a <- rbind(f_l, f_u)
     X_a <- rbind(X_l, X_u)
 
-    #-- Sample Sizes
+    n_l <- nrow(Y_l)
+    n_a <- nrow(f_a)
 
-    n_l <- length(Y_l)
+    if (intercept){
 
-    n_total <- length(f_a)
+        fit_beta_l  <- lm(Y_l ~ X_l - 1)
+        fit_gamma_l <- lm(f_l ~ X_l - 1)
+        fit_gamma_a <- lm(f_a ~ X_a - 1)
 
-    #-- Fit Models
+    } else {
 
-    #- Model for Observed Outcomes
+        fit_beta_l  <- lm(Y_l ~ X_l)
+        fit_gamma_l <- lm(f_l ~ X_l)
+        fit_gamma_a <- lm(f_a ~ X_a)
+    }
 
-    beta_model <- lm(Y_l ~ ., data = cbind(Y_l, X_l))
+    coef_beta_l  <- coef(fit_beta_l)
+    coef_gamma_l <- coef(fit_gamma_l)
+    coef_gamma_a <- coef(fit_gamma_a)
 
-    #- Model for Predictions in Labeled Set
+    D1 <- -crossprod(X_l, X_l) / n_l
+    D2 <- -crossprod(X_l, X_l) / n_l
 
-    gamma_labeled_model <- lm(f_l ~ ., data = cbind(f_l, X_l))
+    score_beta  <- X_l * residuals(fit_beta_l)
+    score_gamma <- X_l * residuals(fit_gamma_l)
 
-    #- Model for Predictions in All Data
-
-    gamma_all_model <- lm(f_a ~ ., data = cbind(f_a, X_a))
-
-    #-- Extract Coefficients
-
-    #- Coefficients for Observed Outcomes
-
-    beta_coeff <- coef(beta_model)
-
-    #- Coefficients for Predictions in Labeled Data
-
-    gamma_labeled_coeff <- coef(gamma_labeled_model)
-
-    #- Coefficients for Predictions in All Data
-
-    gamma_all_coeff <- coef(gamma_all_model)
-
-
-    ########### HOW TO HANDLE THIS WITH CURRENT WRAPPER FUNCTION? ##############
-
-    # Add intercept for labeled covariates
-    X_l_int <- cbind(1, as.matrix(X_l))
-
-    #-- Compute Derivative Matrices
-
-    D1 <- -crossprod(X_l_int, X_l_int) / n_l
-
-    D2 <- -crossprod(X_l_int, X_l_int) / n_l
-
-    #-- Compute Score Matrices
-
-    score_beta <- X_l_int * residuals(beta_model)
-
-    score_gamma <- X_l_int * residuals(gamma_labeled_model)
-
-    #-- Covariance Matrices
-
-    C11 <- crossprod(score_beta, score_beta) / n_l
-
-    C12 <- crossprod(score_beta, score_gamma) / n_l
-
+    C11 <- crossprod(score_beta,  score_beta)  / n_l
+    C12 <- crossprod(score_beta,  score_gamma) / n_l
     C22 <- crossprod(score_gamma, score_gamma) / n_l
 
-    #-- Matrix Inverses
-
-    D1_inv <- solve(D1)
-
+    D1_inv  <- solve(D1)
     C22_inv <- solve(C22)
 
-    #-- Compute Correction Terms
-
-    D1_C12 <- D1_inv %*% C12
-
+    D1_C12     <- D1_inv %*% C12
     D1_C12_C22 <- D1_C12 %*% C22_inv
 
-    #-- Calculate Adjusted Coefficient Estimates
-
-    theta_hat <- beta_coeff -
-
-        D1_C12_C22 %*% D2 %*% (gamma_labeled_coeff - gamma_all_coeff)
-
-    #-- Compute Variance-Covariance Matrix for the Adjusted Estimates
+    theta_hat <- coef_beta_l -
+        D1_C12_C22 %*% D2 %*% (coef_gamma_l - coef_gamma_a)
 
     Omega <- (D1_inv %*% C11 %*% D1_inv -
-
-        (1 - n_l / n_total) * D1_C12_C22 %*% t(D1_C12)) / n_l
-
-    #-- Standard Errors for the Adjusted Estimates
+        (1 - n_l / n_a) * D1_C12_C22 %*% t(D1_C12)) / n_l
 
     se_beta <- sqrt(diag(Omega))
 
     #-- Return Results
 
-    return(c(est = theta_hat, se = se_beta))
+    return(list(est = theta_hat, se = se_beta))
 }
-
-#=== END =======================================================================

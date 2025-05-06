@@ -43,9 +43,11 @@ inference (PostPI) by [Wang et al.,
 2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117),
 prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al.,
 2023a](https://www.science.org/doi/10.1126/science.adi6000) and
-[Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453), and
+[Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453),
 post-prediction adaptive inference (PSPA) by [Miao et al.,
-2023](https://arxiv.org/abs/2311.14220). Each method was developed to
+2023](https://arxiv.org/abs/2311.14220), and a correction based on the
+Chen and Chen method and alternate PPI “All” by [Gronsbell et al.,
+2025](https://arxiv.org/pdf/2411.19908). Each method was developed to
 perform inference on a quantity such as the outcome mean or quantile, or
 a regression coefficient, when we have:
 
@@ -111,7 +113,9 @@ the simulated features of interest.
 #-- Load the ipd Library
 
 library(ipd)
+```
 
+``` r
 #-- Generate Example Data for Linear Regression
 
 set.seed(123)
@@ -172,17 +176,22 @@ We compare two non-IPD approaches to analyzing the data to methods
 included in the `ipd` package. A summary comparison is provided in the
 table below, followed by the specific calls for each method:
 
-    #>                    Estimate Std.Error
-    #> Naive                  0.98      0.03
-    #> Classic                1.10      0.19
-    #> PostPI (Bootstrap)     1.16      0.18
-    #> PostPI (Analytic)      1.15      0.18
-    #> PPI++                  1.12      0.19
-    #> PSPA                   1.12      0.19
+    #>                    Estimate Std. Error
+    #> Naive                  0.98       0.03
+    #> Classic                1.10       0.19
+    #> Chen and Chen          1.11       0.19
+    #> PostPI (Bootstrap)     1.16       0.18
+    #> PostPI (Analytic)      1.15       0.18
+    #> PPI                    1.12       0.19
+    #> PPI All                1.11       0.19
+    #> PPI++                  1.12       0.19
+    #> PSPA                   1.11       0.19
 
 We can see that the IPD methods have similar estimates and standard
 errors, while the ‘naive’ method has a different estimate and standard
-errors that are too small.
+errors that are too small. We compare two non-IPD approaches to
+analyzing the data to methods included in the `ipd` package in more
+detail below.
 
 #### 0.1 ‘Naive’ Regression Using the Predicted Outcomes
 
@@ -190,7 +199,8 @@ errors that are too small.
 #--- Fit the Naive Regression
 
 lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
-  summary()
+
+    summary()
 #> 
 #> Call:
 #> lm(formula = f ~ X1, data = dat[dat$set_label == "unlabeled", 
@@ -218,7 +228,8 @@ lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
 #--- Fit the Classic Regression
 
 lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |>
-  summary()
+
+    summary()
 #> 
 #> Call:
 #> lm(formula = Y ~ X1, data = dat[dat$set_label == "labeled", ])
@@ -242,126 +253,194 @@ lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |>
 You can fit the various IPD methods to your data and obtain summaries
 using the provided wrapper function, `ipd()`:
 
-#### 1.1 PostPI Bootstrap Correction (Wang et al., 2020)
+#### 1. Chen and Chen Correction (Gronsbell et al., 2025)
 
 ``` r
+
 #-- Specify the Formula
 
 formula <- Y - f ~ X1
+
+#-- Fit the Chen and Chen Correction
+
+ipd::ipd(formula, method = "chen", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
+#> 
+#> Call:
+#>   Y - f ~ X1 
+#> 
+#> Method:    chen 
+#> Model:     ols 
+#> Intercept: Yes 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.880      0.182    4.83  1.4e-06 ***
+#> X1             1.114      0.195    5.72  1.1e-08 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+#### 2.1 PostPI Bootstrap Correction (Wang et al., 2020)
+
+``` r
 
 #-- Fit the PostPI Bootstrap Correction
 
 nboot <- 200
 
-ipd::ipd(formula,
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
-  nboot = nboot
-) |>
-  summary()
+ipd::ipd(formula, method = "postpi_boot", model = "ols", 
+
+    data = dat, label = "set_label", nboot = nboot) |>
+
+    summary()
 #> 
 #> Call:
-#>  Y - f ~ X1 
+#>   Y - f ~ X1 
 #> 
-#> Method: postpi_boot 
-#> Model: ols 
+#> Method:    postpi_boot 
+#> Model:     ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)    0.866     0.183    0.507     1.22
-#> X1             1.164     0.183    0.806     1.52
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.866      0.183    4.73  2.2e-06 ***
+#> X1             1.164      0.183    6.38  1.8e-10 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 1.2 PostPI Analytic Correction (Wang et al., 2020)
+#### 2.2 PostPI Analytic Correction (Wang et al., 2020)
 
 ``` r
 #-- Fit the PostPI Analytic Correction
 
-ipd::ipd(formula,
-  method = "postpi_analytic", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "postpi_analytic", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 #> 
 #> Call:
-#>  Y - f ~ X1 
+#>   Y - f ~ X1 
 #> 
-#> Method: postpi_analytic 
-#> Model: ols 
+#> Method:    postpi_analytic 
+#> Model:     ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)    0.865     0.183    0.505     1.22
-#> X1             1.145     0.182    0.788     1.50
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.865      0.183    4.72  2.4e-06 ***
+#> X1             1.145      0.182    6.28  3.5e-10 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+#### 3. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ``` r
 #-- Fit the PPI Correction
 
-ipd::ipd(formula,
-  method = "ppi", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "ppi", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 #> 
 #> Call:
-#>  Y - f ~ X1 
+#>   Y - f ~ X1 
 #> 
-#> Method: ppi 
-#> Model: ols 
+#> Method:    ppi 
+#> Model:     ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)    0.871     0.182    0.514     1.23
-#> X1             1.122     0.195    0.740     1.50
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.871      0.182    4.78  1.8e-06 ***
+#> X1             1.122      0.195    5.76  8.6e-09 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 3. PPI++ (Angelopoulos et al., 2023)
+#### 4. PPI “All” (Gronsbell et al., 2025)
+
+``` r
+#-- Fit the PPI Correction
+
+ipd::ipd(formula, method = "ppi_a", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
+#> 
+#> Call:
+#>   Y - f ~ X1 
+#> 
+#> Method:    ppi_a 
+#> Model:     ols 
+#> Intercept: Yes 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.883      0.182    4.86  1.2e-06 ***
+#> X1             1.114      0.194    5.73  9.9e-09 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+#### 5. PPI++ (Angelopoulos et al., 2023)
 
 ``` r
 #-- Fit the PPI++ Correction
 
-ipd::ipd(formula,
-  method = "ppi_plusplus", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "ppi_plusplus", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 #> 
 #> Call:
-#>  Y - f ~ X1 
+#>   Y - f ~ X1 
 #> 
-#> Method: ppi_plusplus 
-#> Model: ols 
+#> Method:    ppi_plusplus 
+#> Model:     ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)    0.881     0.182    0.524     1.24
-#> X1             1.116     0.187    0.750     1.48
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.881      0.182    4.83  1.3e-06 ***
+#> X1             1.116      0.187    5.98  2.2e-09 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
+#### 6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ``` r
 #-- Fit the PSPA Correction
 
-ipd::ipd(formula,
-  method = "pspa", model = "ols", data = dat, label = "set_label"
-) |>
-  summary()
+ipd::ipd(formula, method = "pspa", model = "ols", 
+
+    data = dat, label = "set_label") |>
+
+    summary()
 #> 
 #> Call:
-#>  Y - f ~ X1 
+#>   Y - f ~ X1 
 #> 
-#> Method: pspa 
-#> Model: ols 
+#> Method:    pspa 
+#> Model:     ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)    0.881     0.182    0.524     1.24
-#> X1             1.109     0.187    0.743     1.47
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.881      0.182    4.83  1.3e-06 ***
+#> X1             1.109      0.187    5.94  2.8e-09 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ### Printing and Tidying
@@ -374,21 +453,24 @@ and `augment` methods to facilitate easy model inspection:
 
 nboot <- 200
 
-fit_postpi <- ipd::ipd(formula,
-  method = "postpi_boot", model = "ols", data = dat, label = "set_label",
-  nboot = nboot
-)
+fit_postpi <- ipd::ipd(formula, method = "postpi_boot", model = "ols", 
+                       
+    data = dat, label = "set_label", nboot = nboot)
 
 #-- Print the Model
 
 print(fit_postpi)
-#> 
-#> Call:
-#>  Y - f ~ X1 
+#> IPD inference summary
+#>   Method:   postpi_boot 
+#>   Model:    ols 
+#>   Formula:  Y - f ~ X1 
 #> 
 #> Coefficients:
-#> (Intercept)          X1 
-#>        0.86        1.15
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.860      0.183    4.71  2.5e-06 ***
+#> X1             1.148      0.182    6.30  3.1e-10 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 #-- Summarize the Model
 
@@ -399,29 +481,35 @@ summ_fit_postpi <- summary(fit_postpi)
 print(summ_fit_postpi)
 #> 
 #> Call:
-#>  Y - f ~ X1 
+#>   Y - f ~ X1 
 #> 
-#> Method: postpi_boot 
-#> Model: ols 
+#> Method:    postpi_boot 
+#> Model:     ols 
 #> Intercept: Yes 
 #> 
 #> Coefficients:
-#>             Estimate Std.Error Lower.CI Upper.CI
-#> (Intercept)    0.860     0.183    0.502     1.22
-#> X1             1.148     0.182    0.790     1.50
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.860      0.183    4.71  2.5e-06 ***
+#> X1             1.148      0.182    6.30  3.1e-10 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 #-- Tidy the Model Output
 
 tidy(fit_postpi)
-#>                    term estimate std.error conf.low conf.high
-#> (Intercept) (Intercept)     0.86      0.18     0.50       1.2
-#> X1                   X1     1.15      0.18     0.79       1.5
+#> # A tibble: 2 × 5
+#>   term        estimate std.error conf.low conf.high
+#>   <chr>          <dbl>     <dbl>    <dbl>     <dbl>
+#> 1 (Intercept)    0.860     0.183    0.502      1.22
+#> 2 X1             1.15      0.182    0.790      1.50
 
 #-- Get a One-Row Summary of the Model
 
 glance(fit_postpi)
-#>        method model include_intercept nobs_labeled nobs_unlabeled       call
-#> 1 postpi_boot   ols              TRUE          500           1000 Y - f ~ X1
+#> # A tibble: 1 × 6
+#>   method      model intercept nobs_labeled nobs_unlabeled call      
+#>   <chr>       <chr> <lgl>            <int>          <int> <chr>     
+#> 1 postpi_boot ols   TRUE               500           1000 Y - f ~ X1
 
 #-- Augment the Original Data with Fitted Values and Residuals
 
@@ -500,7 +588,7 @@ sessionInfo()
 #> other attached packages:
 #>  [1] patchwork_1.3.0 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  
 #>  [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
-#>  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.1.4      
+#>  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.99.0     
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] gtable_0.3.6         xfun_0.52            recipes_1.2.1       
@@ -518,13 +606,14 @@ sessionInfo()
 #> [37] reshape2_1.4.4       listenv_0.9.1        labeling_0.4.3      
 #> [40] splines_4.4.1        fastmap_1.2.0        grid_4.4.1          
 #> [43] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
-#> [46] randomForest_4.7-1.2 survival_3.8-3       future.apply_1.11.3 
-#> [49] withr_3.0.2          scales_1.3.0         timechange_0.3.0    
-#> [52] rmarkdown_2.29       globals_0.16.3       nnet_7.3-19         
-#> [55] timeDate_4041.110    ranger_0.17.0        hms_1.1.3           
-#> [58] gam_1.22-5           evaluate_1.0.3       knitr_1.50          
-#> [61] hardhat_1.4.1        caret_7.0-1          mgcv_1.9-1          
-#> [64] rlang_1.1.4          Rcpp_1.0.13-1        glue_1.8.0          
-#> [67] pROC_1.18.5          ipred_0.9-15         rstudioapi_0.17.1   
-#> [70] R6_2.6.1             plyr_1.8.9
+#> [46] utf8_1.2.4           randomForest_4.7-1.2 survival_3.8-3      
+#> [49] future.apply_1.11.3  withr_3.0.2          scales_1.3.0        
+#> [52] timechange_0.3.0     rmarkdown_2.29       globals_0.16.3      
+#> [55] nnet_7.3-19          timeDate_4041.110    ranger_0.17.0       
+#> [58] hms_1.1.3            gam_1.22-5           evaluate_1.0.3      
+#> [61] knitr_1.50           hardhat_1.4.1        caret_7.0-1         
+#> [64] mgcv_1.9-1           rlang_1.1.4          Rcpp_1.0.13-1       
+#> [67] glue_1.8.0           BiocGenerics_0.50.0  pROC_1.18.5         
+#> [70] ipred_0.9-15         rstudioapi_0.17.1    R6_2.6.1            
+#> [73] plyr_1.8.9
 ```
