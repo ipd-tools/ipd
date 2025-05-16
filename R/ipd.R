@@ -53,11 +53,6 @@
 #' @param alternative A string specifying the alternative hypothesis. Must be
 #' one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.
 #'
-#' @param n_t (integer, optional) Size of the dataset used to train the
-#' prediction function (necessary for the \code{"postpi_analytic"} and
-#' \code{"postpi_boot"} methods if \code{n_t} < \code{nrow(X_l)}.
-#' Defaults to \code{Inf}.
-#'
 #' @param na_action (string, optional) How missing covariate data should be
 #' handled. Currently \code{"na.fail"} and \code{"na.omit"} are accommodated.
 #' Defaults to \code{"na.fail"}.
@@ -272,7 +267,6 @@ ipd <- function(
     intercept = TRUE,
     alpha = 0.05,
     alternative = "two-sided",
-    n_t = Inf,
     na_action = "na.fail",
     ...) {
 
@@ -317,14 +311,7 @@ ipd <- function(
 
     helper <- get(paste(method, model, sep = "_"))
 
-    fit <- if (grepl("^postpi", method) && model == "ols") {
-
-        helper(mats$X_l, mats$Y_l, mats$f_l, mats$X_u, mats$f_u, n_t = n_t, ...)
-
-    } else {
-
-        helper(mats$X_l, mats$Y_l, mats$f_l, mats$X_u, mats$f_u, ...)
-    }
+    fit <- helper(mats$X_l, mats$Y_l, mats$f_l, mats$X_u, mats$f_u, ...)
 
     #- Results
 

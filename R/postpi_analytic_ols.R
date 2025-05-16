@@ -20,12 +20,8 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param scale_se (boolean): Logical argument to scale relationship model
-#' error variance. Defaults to TRUE; FALSE option is retained for posterity.
-#'
-#' @param n_t (integer, optional) Size of the dataset used to train the
-#' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
-#' Defaults to \code{Inf}.
+#' @param original (boolean): Logical argument to use original method from
+#' Wang et al. (2020). Defaults to FALSE; TRUE retained for posterity.
 #'
 #' @return A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
@@ -61,42 +57,73 @@ postpi_analytic_ols <- function(
     f_l,
     X_u,
     f_u,
-    scale_se = TRUE,
-    n_t = Inf) {
+    original = FALSE) {
 
-    #- 1. Estimate Relationship Model
+    n_l <- nrow(X_l)
+
+    n_u <- nrow(X_u)
+
+    #-- 1. Relationship Model
 
     fit_rel <- lm(Y_l ~ f_l)
 
-    #- 2. Estimate Inference Model
+    eta_hat <- residuals(fit_rel)
 
-    fit_inf <- lm(f_u ~ X_u - 1)
+    gamma0_hat <- coef(fit_rel)[1]
 
-    #- 3. Coefficient Estimator
+    gamma1_hat <- coef(fit_rel)[2]
 
-    est <- solve(crossprod(X_u)) %*% t(X_u) %*%
+    #-- 2. Point Estimates
 
-        (coef(fit_rel)[1] + coef(fit_rel)[2] * X_u %*% coef(fit_inf))
+    if (original) {
 
-    #- 4. SE of Coefficient Estimator
+        #- a. Naive Inference Model
 
-    if (scale_se) {
+        fit_inf <- lm(f_u ~ X_u - 1)
 
-        se <- sqrt(diag(solve(crossprod(X_u)) *
+        #- b. Estimator
 
-            (sigma(fit_rel)^2 * nrow(X_u) / min(nrow(X_l), n_t) +
+        est <- solve(crossprod(X_u)) %*% t(X_u) %*%
 
-                (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+            (gamma0_hat + gamma1_hat * X_u %*% coef(fit_inf))
+
     } else {
 
-        se <- sqrt(diag(solve(crossprod(X_u)) *
+        #- a. Means-Based Covariances
 
-            (sigma(fit_rel)^2 +
+        C_Xf_u <- crossprod(X_u, f_u) / n_u
 
-                (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+        C_Xe_l <- crossprod(X_l, eta_hat) / n_l
+
+        M_XX_u <- crossprod(X_u) / n_u
+
+        #- b. Estimator
+
+        est <- solve(M_XX_u) %*% (gamma1_hat * C_Xf_u + C_Xe_l)
     }
 
-    #- Output
+    #-- 3. Standard Errors
+
+    if (original) {
+
+        var_hat <- solve(crossprod(X_u)) *
+
+            (sigma(fit_rel)^2 + (gamma1_hat^2) * sigma(fit_inf)^2)
+
+    } else {
+
+        S1 <- crossprod(X_u * c(f_u))  / n_u  -  C_Xf_u %*% t(C_Xf_u)
+
+        S2 <- crossprod(X_l * eta_hat) / n_l  -  C_Xe_l %*% t(C_Xe_l)
+
+        Gamma <- gamma1_hat^2 * S1 + (n_u / n_l) * S2
+
+        var_hat <- solve(M_XX_u) %*% Gamma %*% solve(M_XX_u) / n_u
+    }
+
+    se <- sqrt(diag(var_hat))
+
+    #-- 4. Output
 
     return(list(est = as.vector(est), se = as.vector(se)))
 }
