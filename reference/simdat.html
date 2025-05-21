@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,20 +113,24 @@ data, \(\boldsymbol{X} \in \mathbb{R}^4\) are simulated such that the
 \(i\)th observation follows a standard multivariate normal distribution
 with a zero mean vector and identity covariance matrix:</p>
 <p>$$
-  \boldsymbol{X_i} = (X_{i1}, X_{i2}, X_{i3}, X_{i4}) \sim \mathcal{N}_4(\boldsymbol{0}, \boldsymbol{I}).
+  \boldsymbol{X_i} = (X_{i1}, X_{i2}, X_{i3}, X_{i4}) \sim
+  \mathcal{N}_4(\boldsymbol{0}, \boldsymbol{I}).
 $$</p>
 <p>For <code>"ols"</code>, a continuous outcome \(Y \in \mathbb{R}\) is simulated
 to depend on \(X_1\) through a linear term with the effect size specified
 by the <code>effect</code> argument, while the other predictors,
 \(\boldsymbol{X} \setminus X_1\), have nonlinear effects:</p>
 <p>$$
-  Y_i = effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y,
+  Y_i = effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 +
+  \frac{1}{4} Z_{i4}^2 + \varepsilon_y,
 $$</p>
 <p>and \(\varepsilon_y \sim \mathcal{N}(0, sigma_y)\), where the
 <code>sigma_y</code> argument specifies the error variance.</p>
 <p>For <code>"logistic"</code>, we simulate:</p>
 <p>$$
-  \Pr(Y_i = 1 \mid \boldsymbol{X}) = logit^{-1}(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
+  \Pr(Y_i = 1 \mid \boldsymbol{X}) = logit^{-1}(effect \times Z_{i1} +
+  \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 +
+  \varepsilon_y)
 $$</p>
 <p>and generate:</p>
 <p>$$
@@ -135,7 +139,8 @@ $$</p>
 <p>where \(\varepsilon_y \sim \mathcal{N}(0, sigma\_y)\).</p>
 <p>For <code>"poisson"</code>, we simulate:</p>
 <p>$$
-  \lambda_Y = exp(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 + \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
+  \lambda_Y = exp(effect \times Z_{i1} + \frac{1}{2} Z_{i2}^2 +
+  \frac{1}{3} Z_{i3}^3 + \frac{1}{4} Z_{i4}^2 + \varepsilon_y)
 $$</p>
 <p>and generate:</p>
 <p>$$
@@ -161,8 +166,10 @@ of freedom. Residual error is modeled as \(\varepsilon_p\).</p>
 <p>Predictions for <em>labeled</em> and <em>unlabeled</em> datasets are calculated
 as:</p>
 <p>$$
- f(\boldsymbol{X}^{\mathcal{L}\cup\mathcal{U}}) = \hat{s}_0 + \hat{s}_1(X_1^{\mathcal{L}\cup\mathcal{U}}) +
-\hat{s}_2(X_2^{\mathcal{L}\cup\mathcal{U}}) + \hat{s}_3(X_3^{\mathcal{L}\cup\mathcal{U}}) +
+ f(\boldsymbol{X}^{\mathcal{L}\cup\mathcal{U}}) =
+ \hat{s}_0 + \hat{s}_1(X_1^{\mathcal{L}\cup\mathcal{U}}) +
+\hat{s}_2(X_2^{\mathcal{L}\cup\mathcal{U}}) +
+\hat{s}_3(X_3^{\mathcal{L}\cup\mathcal{U}}) +
 \hat{s}_4(X_4^{\mathcal{L}\cup\mathcal{U}}),
 $$</p>
 <p>where \(\hat{s}_0, \hat{s}_1, \hat{s}_2, \hat{s}_3\), and \(\hat{s}_4\)
@@ -188,8 +195,9 @@ the training dataset, \(c\) indexes the possible classes (0 or 1), and
 <p>For <code>"poisson"</code>, we fit a generalized linear model (GLM) with a log link
 function to the simulated <em>training</em> dataset. The model is of the form:</p>
 <p>$$
-  \log(\mu^{\mathcal{T}}) = \gamma_0 + \gamma_1 X_1^{\mathcal{T}} + \gamma_2 X_2^{\mathcal{T}} +
-  \gamma_3 X_3^{\mathcal{T}} + \gamma_4 X_4^{\mathcal{T}},
+  \log(\mu^{\mathcal{T}}) = \gamma_0 + \gamma_1 X_1^{\mathcal{T}} +
+  \gamma_2 X_2^{\mathcal{T}} + \gamma_3 X_3^{\mathcal{T}} +
+  \gamma_4 X_4^{\mathcal{T}},
 $$</p>
 <p>where \(\mu^{\mathcal{T}}\) is the expected count for the response variable
 in the <em>training</em> dataset, \(\gamma_0\) is the intercept, and
@@ -199,12 +207,15 @@ and \(X_4\), respectively.</p>
 <p>Predictions for the <em>labeled</em> and <em>unlabeled</em> datasets are
 calculated as:</p>
 <p>$$
-  \hat{\mu}^{\mathcal{L} \cup \mathcal{U}} = \exp(\hat{\gamma}_0 + \hat{\gamma}_1 X_1^{\mathcal{L} \cup \mathcal{U}} +
-  \hat{\gamma}_2 X_2^{\mathcal{L} \cup \mathcal{U}} + \hat{\gamma}_3 X_3^{\mathcal{L} \cup \mathcal{U}} +
+  \hat{\mu}^{\mathcal{L} \cup \mathcal{U}} = \exp(\hat{\gamma}_0 +
+  \hat{\gamma}_1 X_1^{\mathcal{L} \cup \mathcal{U}} +
+  \hat{\gamma}_2 X_2^{\mathcal{L} \cup \mathcal{U}} +
+  \hat{\gamma}_3 X_3^{\mathcal{L} \cup \mathcal{U}} +
   \hat{\gamma}_4 X_4^{\mathcal{L} \cup \mathcal{U}}),
 $$</p>
-<p>where \(\hat{\gamma}_0\), \(\hat{\gamma}_1\), \(\hat{\gamma}_2\), \(\hat{\gamma}_3\),
-and \(\hat{\gamma}_4\) are the estimated coefficients.</p>
+<p>where \(\hat{\gamma}_0\), \(\hat{\gamma}_1\), \(\hat{\gamma}_2\),
+\(\hat{\gamma}_3\), and \(\hat{\gamma}_4\) are the estimated
+coefficients.</p>
     </div>
 
     <div class="section level2">
@@ -212,33 +223,35 @@ and \(\hat{\gamma}_4\) are the estimated coefficients.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- Mean</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">dat_mean</span> <span class="op">&lt;-</span> <span class="fu">simdat</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">100</span><span class="op">)</span>, effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span>  model <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_mean</span> <span class="op">&lt;-</span> <span class="fu">simdat</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  model <span class="op">=</span> <span class="st">"mean"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat_mean</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Y  f set_label</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1.2358347 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.3104177 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2.2010616 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.5780407 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2.2034014 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.3235828 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2.3123025 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1.6797212 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.8057629 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.9426763 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2.2976721 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 1.5641992 NA  training</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#-- Linear Regression</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">dat_ols</span> <span class="op">&lt;-</span> <span class="fu">simdat</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">100</span><span class="op">)</span>, effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span>  model <span class="op">=</span> <span class="st">"ols"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat_ols</span> <span class="op">&lt;-</span> <span class="fu">simdat</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  model <span class="op">=</span> <span class="st">"ols"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat_ols</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            X1         X2          X3           X4          Y  f set_label</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.01987176 -0.1397668  1.13837121 -0.318232616  1.2596350 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.38072091  0.6508478 -1.36065237 -0.083392001  0.7739356 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.16047478  0.8209136 -0.45652812 -0.027092071  0.6575092 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.29612624 -1.1946885 -0.28393557 -0.989618989  2.5554902 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.86328948 -0.7039109 -0.01353596 -0.639295088 -1.3541555 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.78215060 -0.1660609 -0.26126609  0.005894084  1.7686558 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          X1          X2          X3         X4        Y  f set_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1.4766580  0.94761022 -0.18564137  0.8637002 1.628462 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.1396610 -1.78438490  0.23590410 -1.6363443 2.287123 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.7469694  0.86713095  0.06843502  0.6707585 1.794597 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.0065186 -0.93285366  0.56852152  0.2254238 1.819812 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.8157331 -0.01941014  0.59448236 -1.8430057 1.222568 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 1.9256205  1.44902178 -0.32900314 -0.9556044 4.428360 NA  training</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -247,7 +260,7 @@ and \(\hat{\gamma}_4\) are the estimated coefficients.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Stephen Salerno, Jiacheng Miao, Awan Afiaz, Kentaro Hoffman, Anna Neufeld, Qiongshi Lu, Tyler H McCormick, Jeffrey T Leek.</p>
+  <p>Developed by Stephen Salerno, Jiacheng Miao, Awan Afiaz, Kentaro Hoffman, Jesse Gronsbell, Jianhui Gao, David Cheng, Anna Neufeld, Qiongshi Lu, Tyler H McCormick, Jeffrey T Leek.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Inference on Predicted Data">
-<meta name="description" content="Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2024) &lt;doi:10.48550/arXiv.2410.09665&gt;.">
-<meta property="og:description" content="Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2024) &lt;doi:10.48550/arXiv.2410.09665&gt;.">
+<meta name="description" content="Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2025) &lt;doi:10.1093/bioinformatics/btaf055&gt;.">
+<meta property="og:description" content="Performs valid statistical inference on predicted data (IPD) using recent methods, where for a subset of the data, the outcomes have been predicted by an algorithm. Provides a wrapper function with specified defaults for the type of model and method to be used for estimation and inference. Further provides methods for tidying and summarizing results. Salerno et al., (2025) &lt;doi:10.1093/bioinformatics/btaf055&gt;.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,6 @@
 </h1></div>
 <!-- badges: start -->
 
-<!-- badges: end -->
 <div class="section level2">
 <h2 id="section">
 <img src="reference/figures/ipd.png" align="right" height="200" style="float:right; height:200px;"><a class="anchor" aria-label="anchor" href="#section"></a>
@@ -71,7 +70,7 @@
 <li>Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data.</li>
 <li>Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks.</li>
 </ol>
-<p>Several works have proposed methods for IPD, including post-prediction inference (PostPI) by <a href="https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117" class="external-link">Wang et al., 2020</a>, prediction-powered inference (PPI) and PPI++ by <a href="https://www.science.org/doi/10.1126/science.adi6000" class="external-link">Angelopoulos et al., 2023a</a> and <a href="https://arxiv.org/abs/2311.01453" class="external-link">Angelopoulos et al., 2023b</a>, and post-prediction adaptive inference (PSPA) by <a href="https://arxiv.org/abs/2311.14220" class="external-link">Miao et al., 2023</a>. Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:</p>
+<p>Several works have proposed methods for IPD, including post-prediction inference (PostPI) by <a href="https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117" class="external-link">Wang et al., 2020</a>, prediction-powered inference (PPI) and PPI++ by <a href="https://www.science.org/doi/10.1126/science.adi6000" class="external-link">Angelopoulos et al., 2023a</a> and <a href="https://arxiv.org/abs/2311.01453" class="external-link">Angelopoulos et al., 2023b</a>, post-prediction adaptive inference (PSPA) by <a href="https://arxiv.org/abs/2311.14220" class="external-link">Miao et al., 2023</a>, and a correction based on the Chen and Chen method and alternate PPI “All” by <a href="https://arxiv.org/pdf/2411.19908" class="external-link">Gronsbell et al., 2025</a>. Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:</p>
 <ol style="list-style-type: decimal">
 <li>A dataset consisting of our outcome and features of interst, where the outcome is only observed for a small ‘labeled’ subset and missing for a, typically larger, ‘unlabeled’ subset.</li>
 <li>Access to an algorithm to predict the missing outcome in the entire dataset using the fully observed features.</li>
@@ -89,7 +88,7 @@ Overview of data and setup for IPD
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Install devtools if it is not already installed</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>   </span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#-- Install the ipd package from GitHub</span></span>
 <span></span>
@@ -106,9 +105,9 @@ Overview of data and setup for IPD
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Load the ipd Library</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ipd-tools/ipd" class="external-link">ipd</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#-- Generate Example Data for Linear Regression</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ipd-tools/ipd" class="external-link">ipd</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#-- Generate Example Data for Linear Regression</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span></span>
@@ -118,9 +117,9 @@ Overview of data and setup for IPD
 <span></span>
 <span><span class="co">#-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>digits<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"training"</span>,<span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"training"</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       X1    X2    X3     X4     Y  f set_label</span></span>
 <span><span class="co">#&gt; 1 -0.560 -0.56  0.82 -0.356 -0.15 NA  training</span></span>
 <span><span class="co">#&gt; 2 -0.230  0.13 -1.54  0.040 -4.49 NA  training</span></span>
@@ -129,7 +128,7 @@ Overview of data and setup for IPD
 <span><span class="co">#&gt; 5  0.129 -0.72 -0.71  0.634  2.19 NA  training</span></span>
 <span><span class="co">#&gt; 6  1.715  0.58 -0.54 -0.037 -1.42 NA  training</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"labeled"</span>,<span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"labeled"</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          X1      X2    X3    X4     Y     f set_label</span></span>
 <span><span class="co">#&gt; 10001  2.37 -1.8984  0.20 -0.17  1.40  3.24   labeled</span></span>
 <span><span class="co">#&gt; 10002 -0.17  1.7428  0.26 -2.05  3.56  1.03   labeled</span></span>
@@ -138,7 +137,7 @@ Overview of data and setup for IPD
 <span><span class="co">#&gt; 10005  0.23  2.0620 -1.35  1.46 -0.82 -0.15   labeled</span></span>
 <span><span class="co">#&gt; 10006  1.13 -0.0028  0.23 -0.24  7.30  2.16   labeled</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"unlabeled"</span>,<span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"unlabeled"</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          X1     X2    X3    X4    Y     f set_label</span></span>
 <span><span class="co">#&gt; 10501  0.99 -3.280 -0.39  0.97  8.4  1.25 unlabeled</span></span>
 <span><span class="co">#&gt; 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.08 unlabeled</span></span>
@@ -158,23 +157,26 @@ Overview of data and setup for IPD
 <h3 id="model-fitting">Model Fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a>
 </h3>
 <p>We compare two non-IPD approaches to analyzing the data to methods included in the <code>ipd</code> package. A summary comparison is provided in the table below, followed by the specific calls for each method:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co">#&gt;                    Estimate Std.Error</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; Naive                  0.98      0.03</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Classic                1.10      0.19</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; PostPI (Bootstrap)     1.16      0.18</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; PostPI (Analytic)      1.15      0.18</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; PPI++                  1.12      0.19</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; PSPA                   1.12      0.19</span></span></code></pre></div>
-<p>We can see that the IPD methods have similar estimates and standard errors, while the ‘naive’ method has a different estimate and standard errors that are too small.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">#&gt;                    Estimate Std. Error</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; Naive                  0.98       0.03</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Classic                1.10       0.19</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; Chen and Chen          1.11       0.19</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; PostPI (Bootstrap)     1.16       0.18</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; PostPI (Analytic)      1.15       0.18</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; PPI                    1.12       0.19</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; PPI All                1.11       0.19</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; PPI++                  1.12       0.19</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; PSPA                   1.11       0.19</span></span></code></pre></div>
+<p>We can see that the IPD methods have similar estimates and standard errors, while the ‘naive’ method has a different estimate and standard errors that are too small. We compare two non-IPD approaches to analyzing the data to methods included in the <code>ipd</code> package in more detail below.</p>
 <div class="section level4">
 <h4 id="id_01-naive-regression-using-the-predicted-outcomes">0.1 ‘Naive’ Regression Using the Predicted Outcomes<a class="anchor" aria-label="anchor" href="#id_01-naive-regression-using-the-predicted-outcomes"></a>
 </h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#--- Fit the Naive Regression</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">f</span> <span class="op">~</span> <span class="va">X1</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"unlabeled"</span>,<span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">f</span> <span class="op">~</span> <span class="va">X1</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"unlabeled"</span>, <span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; lm(formula = f ~ X1, data = dat[dat$set_label == "unlabeled", </span></span>
@@ -198,12 +200,12 @@ Overview of data and setup for IPD
 <div class="section level4">
 <h4 id="id_02-classic-regression-using-only-the-labeled-data">0.2 ‘Classic’ Regression Using only the Labeled Data<a class="anchor" aria-label="anchor" href="#id_02-classic-regression-using-only-the-labeled-data"></a>
 </h4>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#--- Fit the Classic Regression</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">X1</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"labeled"</span>,<span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">X1</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">set_label</span> <span class="op">==</span> <span class="st">"labeled"</span>, <span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; lm(formula = Y ~ X1, data = dat[dat$set_label == "labeled", ])</span></span>
@@ -225,192 +227,262 @@ Overview of data and setup for IPD
 <p>You can fit the various IPD methods to your data and obtain summaries using the provided wrapper function, <code><a href="reference/ipd.html">ipd()</a></code>:</p>
 </div>
 <div class="section level4">
-<h4 id="id_11-postpi-bootstrap-correction-wang-et-al-2020">1.1 PostPI Bootstrap Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#id_11-postpi-bootstrap-correction-wang-et-al-2020"></a>
+<h4 id="id_1-chen-and-chen-correction-gronsbell-et-al-2025">1. Chen and Chen Correction (Gronsbell et al., 2025)<a class="anchor" aria-label="anchor" href="#id_1-chen-and-chen-correction-gronsbell-et-al-2025"></a>
 </h4>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Specify the Formula</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co">#-- Specify the Formula</span></span>
 <span></span>
 <span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">f</span> <span class="op">~</span> <span class="va">X1</span></span>
 <span></span>
+<span><span class="co">#-- Fit the Chen and Chen Correction</span></span>
+<span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"chen"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Method:    chen </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
+<span><span class="co">#&gt; Intercept: Yes </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.880      0.182    4.83  1.4e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.114      0.195    5.72  1.1e-08 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="id_21-postpi-bootstrap-correction-wang-et-al-2020">2.1 PostPI Bootstrap Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#id_21-postpi-bootstrap-correction-wang-et-al-2020"></a>
+</h4>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co">#-- Fit the PostPI Bootstrap Correction</span></span>
 <span></span>
 <span><span class="va">nboot</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
 <span></span>
-<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, </span>
-<span>         </span>
-<span>  method <span class="op">=</span> <span class="st">"postpi_boot"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span>, </span>
-<span>  </span>
-<span>  nboot <span class="op">=</span> <span class="va">nboot</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Method: postpi_boot </span></span>
-<span><span class="co">#&gt; Model: ols </span></span>
-<span><span class="co">#&gt; Intercept: Yes </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std.Error Lower.CI Upper.CI</span></span>
-<span><span class="co">#&gt; (Intercept)    0.866     0.183    0.507     1.22</span></span>
-<span><span class="co">#&gt; X1             1.164     0.183    0.806     1.52</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="id_12-postpi-analytic-correction-wang-et-al-2020">1.2 PostPI Analytic Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#id_12-postpi-analytic-correction-wang-et-al-2020"></a>
-</h4>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Fit the PostPI Analytic Correction</span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"postpi_boot"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
 <span></span>
-<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, </span>
-<span>         </span>
-<span>  method <span class="op">=</span> <span class="st">"postpi_analytic"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Method: postpi_analytic </span></span>
-<span><span class="co">#&gt; Model: ols </span></span>
-<span><span class="co">#&gt; Intercept: Yes </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std.Error Lower.CI Upper.CI</span></span>
-<span><span class="co">#&gt; (Intercept)    0.865     0.183    0.505     1.22</span></span>
-<span><span class="co">#&gt; X1             1.145     0.182    0.788     1.50</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="id_2-prediction-powered-inference-ppi-angelopoulos-et-al-2023">2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#id_2-prediction-powered-inference-ppi-angelopoulos-et-al-2023"></a>
-</h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Fit the PPI Correction</span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span>, nboot <span class="op">=</span> <span class="va">nboot</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span></span>
-<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, </span>
-<span>         </span>
-<span>  method <span class="op">=</span> <span class="st">"ppi"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Method: ppi </span></span>
-<span><span class="co">#&gt; Model: ols </span></span>
+<span><span class="co">#&gt; Method:    postpi_boot </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
 <span><span class="co">#&gt; Intercept: Yes </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std.Error Lower.CI Upper.CI</span></span>
-<span><span class="co">#&gt; (Intercept)    0.871     0.182    0.514     1.23</span></span>
-<span><span class="co">#&gt; X1             1.122     0.195    0.740     1.50</span></span></code></pre></div>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.866      0.183    4.73  2.2e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.164      0.183    6.38  1.8e-10 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="id_3-ppi-angelopoulos-et-al-2023">3. PPI++ (Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#id_3-ppi-angelopoulos-et-al-2023"></a>
+<h4 id="id_22-postpi-analytic-correction-wang-et-al-2020">2.2 PostPI Analytic Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#id_22-postpi-analytic-correction-wang-et-al-2020"></a>
 </h4>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Fit the PPI++ Correction</span></span>
+<code class="sourceCode R"><span><span class="co">#-- Fit the PostPI Analytic Correction</span></span>
 <span></span>
-<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, </span>
-<span>         </span>
-<span>  method <span class="op">=</span> <span class="st">"ppi_plusplus"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"postpi_analytic"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Method: ppi_plusplus </span></span>
-<span><span class="co">#&gt; Model: ols </span></span>
+<span><span class="co">#&gt; Method:    postpi_analytic </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
 <span><span class="co">#&gt; Intercept: Yes </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std.Error Lower.CI Upper.CI</span></span>
-<span><span class="co">#&gt; (Intercept)    0.881     0.182    0.524     1.24</span></span>
-<span><span class="co">#&gt; X1             1.116     0.187    0.750     1.48</span></span></code></pre></div>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.865      0.183    4.72  2.4e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.145      0.182    6.28  3.5e-10 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="id_4-post-prediction-adaptive-inference-pspa-miao-et-al-2023">4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)<a class="anchor" aria-label="anchor" href="#id_4-post-prediction-adaptive-inference-pspa-miao-et-al-2023"></a>
+<h4 id="id_3-prediction-powered-inference-ppi-angelopoulos-et-al-2023">3. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#id_3-prediction-powered-inference-ppi-angelopoulos-et-al-2023"></a>
 </h4>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Fit the PSPA Correction</span></span>
+<code class="sourceCode R"><span><span class="co">#-- Fit the PPI Correction</span></span>
 <span></span>
-<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, </span>
-<span>         </span>
-<span>  method <span class="op">=</span> <span class="st">"pspa"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"ppi"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Method: pspa </span></span>
-<span><span class="co">#&gt; Model: ols </span></span>
+<span><span class="co">#&gt; Method:    ppi </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
 <span><span class="co">#&gt; Intercept: Yes </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std.Error Lower.CI Upper.CI</span></span>
-<span><span class="co">#&gt; (Intercept)    0.881     0.182    0.524     1.24</span></span>
-<span><span class="co">#&gt; X1             1.109     0.187    0.743     1.47</span></span></code></pre></div>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.871      0.182    4.78  1.8e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.122      0.195    5.76  8.6e-09 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="id_4-ppi-all-gronsbell-et-al-2025">4. PPI “All” (Gronsbell et al., 2025)<a class="anchor" aria-label="anchor" href="#id_4-ppi-all-gronsbell-et-al-2025"></a>
+</h4>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#-- Fit the PPI Correction</span></span>
+<span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"ppi_a"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Method:    ppi_a </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
+<span><span class="co">#&gt; Intercept: Yes </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.883      0.182    4.86  1.2e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.114      0.194    5.73  9.9e-09 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="id_5-ppi-angelopoulos-et-al-2023">5. PPI++ (Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#id_5-ppi-angelopoulos-et-al-2023"></a>
+</h4>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#-- Fit the PPI++ Correction</span></span>
+<span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"ppi_plusplus"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Method:    ppi_plusplus </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
+<span><span class="co">#&gt; Intercept: Yes </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.881      0.182    4.83  1.3e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.116      0.187    5.98  2.2e-09 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="id_6-post-prediction-adaptive-inference-pspa-miao-et-al-2023">6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)<a class="anchor" aria-label="anchor" href="#id_6-post-prediction-adaptive-inference-pspa-miao-et-al-2023"></a>
+</h4>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#-- Fit the PSPA Correction</span></span>
+<span></span>
+<span><span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"pspa"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span></span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Method:    pspa </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
+<span><span class="co">#&gt; Intercept: Yes </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.881      0.182    4.83  1.3e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.109      0.187    5.94  2.8e-09 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
 <h3 id="printing-and-tidying">Printing and Tidying<a class="anchor" aria-label="anchor" href="#printing-and-tidying"></a>
 </h3>
 <p>The package also provides custom <code>print</code>, <code>summary</code>, <code>tidy</code>, <code>glance</code>, and <code>augment</code> methods to facilitate easy model inspection:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PostPI Bootstrap Correction</span></span>
 <span></span>
 <span><span class="va">nboot</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
 <span></span>
-<span><span class="va">fit_postpi</span> <span class="op">&lt;-</span> <span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, </span>
-<span>         </span>
-<span>  method <span class="op">=</span> <span class="st">"postpi_boot"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span>, </span>
-<span>  </span>
-<span>  nboot <span class="op">=</span> <span class="va">nboot</span><span class="op">)</span></span>
-<span>  </span>
+<span><span class="va">fit_postpi</span> <span class="op">&lt;-</span> <span class="fu">ipd</span><span class="fu">::</span><span class="fu"><a href="reference/ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>, method <span class="op">=</span> <span class="st">"postpi_boot"</span>, model <span class="op">=</span> <span class="st">"ols"</span>, </span>
+<span>                       </span>
+<span>    data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span>, nboot <span class="op">=</span> <span class="va">nboot</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co">#-- Print the Model</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit_postpi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
+<span><span class="co">#&gt; IPD inference summary</span></span>
+<span><span class="co">#&gt;   Method:   postpi_boot </span></span>
+<span><span class="co">#&gt;   Model:    ols </span></span>
+<span><span class="co">#&gt;   Formula:  Y - f ~ X1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt; (Intercept)          X1 </span></span>
-<span><span class="co">#&gt;        0.86        1.15</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.860      0.183    4.71  2.5e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.148      0.182    6.30  3.1e-10 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span></span>
 <span><span class="co">#-- Summarize the Model</span></span>
 <span></span>
 <span><span class="va">summ_fit_postpi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_postpi</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span><span class="co">#-- Print the Model Summary</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summ_fit_postpi</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  Y - f ~ X1 </span></span>
+<span><span class="co">#&gt;   Y - f ~ X1 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Method: postpi_boot </span></span>
-<span><span class="co">#&gt; Model: ols </span></span>
+<span><span class="co">#&gt; Method:    postpi_boot </span></span>
+<span><span class="co">#&gt; Model:     ols </span></span>
 <span><span class="co">#&gt; Intercept: Yes </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std.Error Lower.CI Upper.CI</span></span>
-<span><span class="co">#&gt; (Intercept)    0.860     0.183    0.502     1.22</span></span>
-<span><span class="co">#&gt; X1             1.148     0.182    0.790     1.50</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    0.860      0.183    4.71  2.5e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.148      0.182    6.30  3.1e-10 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span></span>
 <span><span class="co">#-- Tidy the Model Output</span></span>
 <span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_postpi</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                    term estimate std.error conf.low conf.high</span></span>
-<span><span class="co">#&gt; (Intercept) (Intercept)     0.86      0.18     0.50       1.2</span></span>
-<span><span class="co">#&gt; X1                   X1     1.15      0.18     0.79       1.5</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 5</span></span>
+<span><span class="co">#&gt;   term        estimate std.error conf.low conf.high</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept)    0.860     0.183    0.502      1.22</span></span>
+<span><span class="co">#&gt; 2 X1             1.15      0.182    0.790      1.50</span></span>
 <span></span>
 <span><span class="co">#-- Get a One-Row Summary of the Model</span></span>
 <span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit_postpi</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        method model include_intercept nobs_labeled nobs_unlabeled       call</span></span>
-<span><span class="co">#&gt; 1 postpi_boot   ols              TRUE          500           1000 Y - f ~ X1</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
+<span><span class="co">#&gt;   method      model intercept nobs_labeled nobs_unlabeled call      </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt; &lt;lgl&gt;            &lt;int&gt;          &lt;int&gt; &lt;chr&gt;     </span></span>
+<span><span class="co">#&gt; 1 postpi_boot ols   TRUE               500           1000 Y - f ~ X1</span></span>
 <span></span>
 <span><span class="co">#-- Augment the Original Data with Fitted Values and Residuals</span></span>
 <span></span>
@@ -430,7 +502,7 @@ Overview of data and setup for IPD
 <h2 id="vignette">Vignette<a class="anchor" aria-label="anchor" href="#vignette"></a>
 </h2>
 <p>For additional details, we provide more use cases and examples in the package vignette:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"ipd"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -551,6 +623,63 @@ Overview of data and setup for IPD
 </h2>
 <p>This package is licensed under the MIT License.</p>
 </div>
+<div class="section level2">
+<h2 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.4.1 (2024-06-14 ucrt)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-w64-mingw32/x64</span></span>
+<span><span class="co">#&gt; Running under: Windows 11 x64 (build 22631)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt; [1] LC_COLLATE=English_United States.utf8 </span></span>
+<span><span class="co">#&gt; [2] LC_CTYPE=English_United States.utf8   </span></span>
+<span><span class="co">#&gt; [3] LC_MONETARY=English_United States.utf8</span></span>
+<span><span class="co">#&gt; [4] LC_NUMERIC=C                          </span></span>
+<span><span class="co">#&gt; [5] LC_TIME=English_United States.utf8    </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: America/New_York</span></span>
+<span><span class="co">#&gt; tzcode source: internal</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt;  [1] patchwork_1.3.0 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  </span></span>
+<span><span class="co">#&gt;  [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    </span></span>
+<span><span class="co">#&gt;  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.99.0     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;  [1] gtable_0.3.6         xfun_0.52            recipes_1.2.1       </span></span>
+<span><span class="co">#&gt;  [4] lattice_0.22-6       tzdb_0.5.0           vctrs_0.6.5         </span></span>
+<span><span class="co">#&gt;  [7] tools_4.4.1          generics_0.1.3       stats4_4.4.1        </span></span>
+<span><span class="co">#&gt; [10] parallel_4.4.1       pkgconfig_2.0.3      ModelMetrics_1.2.2.2</span></span>
+<span><span class="co">#&gt; [13] Matrix_1.7-0         data.table_1.17.0    lifecycle_1.0.4     </span></span>
+<span><span class="co">#&gt; [16] farver_2.1.2         compiler_4.4.1       munsell_0.5.1       </span></span>
+<span><span class="co">#&gt; [19] codetools_0.2-20     htmltools_0.5.8.1    class_7.3-22        </span></span>
+<span><span class="co">#&gt; [22] yaml_2.3.10          prodlim_2024.06.25   pillar_1.10.2       </span></span>
+<span><span class="co">#&gt; [25] MASS_7.3-60.2        gower_1.0.2          iterators_1.0.14    </span></span>
+<span><span class="co">#&gt; [28] rpart_4.1.23         foreach_1.5.2        nlme_3.1-164        </span></span>
+<span><span class="co">#&gt; [31] parallelly_1.43.0    lava_1.8.1           tidyselect_1.2.1    </span></span>
+<span><span class="co">#&gt; [34] digest_0.6.37        stringi_1.8.7        future_1.40.0       </span></span>
+<span><span class="co">#&gt; [37] reshape2_1.4.4       listenv_0.9.1        labeling_0.4.3      </span></span>
+<span><span class="co">#&gt; [40] splines_4.4.1        fastmap_1.2.0        grid_4.4.1          </span></span>
+<span><span class="co">#&gt; [43] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      </span></span>
+<span><span class="co">#&gt; [46] utf8_1.2.4           randomForest_4.7-1.2 survival_3.8-3      </span></span>
+<span><span class="co">#&gt; [49] future.apply_1.11.3  withr_3.0.2          scales_1.3.0        </span></span>
+<span><span class="co">#&gt; [52] timechange_0.3.0     rmarkdown_2.29       globals_0.16.3      </span></span>
+<span><span class="co">#&gt; [55] nnet_7.3-19          timeDate_4041.110    ranger_0.17.0       </span></span>
+<span><span class="co">#&gt; [58] hms_1.1.3            gam_1.22-5           evaluate_1.0.3      </span></span>
+<span><span class="co">#&gt; [61] knitr_1.50           hardhat_1.4.1        caret_7.0-1         </span></span>
+<span><span class="co">#&gt; [64] mgcv_1.9-1           rlang_1.1.4          Rcpp_1.0.13-1       </span></span>
+<span><span class="co">#&gt; [67] glue_1.8.0           BiocGenerics_0.50.0  pROC_1.18.5         </span></span>
+<span><span class="co">#&gt; [70] ipred_0.9-15         rstudioapi_0.17.1    R6_2.6.1            </span></span>
+<span><span class="co">#&gt; [73] plyr_1.8.9</span></span></code></pre></div>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
@@ -584,6 +713,9 @@ Overview of data and setup for IPD
 <li>Jiacheng Miao <br><small class="roles"> Author </small>   </li>
 <li>Awan Afiaz <br><small class="roles"> Author </small>   </li>
 <li>Kentaro Hoffman <br><small class="roles"> Author </small>   </li>
+<li>Jesse Gronsbell <br><small class="roles"> Author </small>   </li>
+<li>Jianhui Gao <br><small class="roles"> Author </small>   </li>
+<li>David Cheng <br><small class="roles"> Author </small>   </li>
 <li>Anna Neufeld <br><small class="roles"> Author </small>   </li>
 <li>Qiongshi Lu <br><small class="roles"> Author </small>   </li>
 <li>Tyler H McCormick <br><small class="roles"> Author </small>   </li>
@@ -595,6 +727,8 @@ Overview of data and setup for IPD
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ipd-tools/ipd/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://CRAN.R-project.org/package=ipd" class="external-link"><img src="https://www.r-pkg.org/badges/version/ipd" alt="CRAN Status"></a></li>
+<li><a href="https://CRAN.R-project.org/package=ipd" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/ipd" alt="Downloads"></a></li>
 </ul>
 </div>
 
@@ -603,7 +737,7 @@ Overview of data and setup for IPD
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Stephen Salerno, Jiacheng Miao, Awan Afiaz, Kentaro Hoffman, Anna Neufeld, Qiongshi Lu, Tyler H McCormick, Jeffrey T Leek.</p>
+  <p>Developed by Stephen Salerno, Jiacheng Miao, Awan Afiaz, Kentaro Hoffman, Jesse Gronsbell, Jianhui Gao, David Cheng, Anna Neufeld, Qiongshi Lu, Tyler H McCormick, Jeffrey T Leek.</p>
 </div>
 
 <div class="pkgdown-footer-right">

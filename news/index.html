@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,12 +56,99 @@
 <li><p>Updated the documentation for <code><a href="../reference/simdat.html">simdat()</a></code> to include a more thorough explanation of how to simulate data with this function.</p></li>
 <li><p><code><a href="../reference/simdat.html">simdat()</a></code> now outputs a <code>data.frame</code> with a column named <code>"set_label"</code> instead of <code>"set"</code> to denote the labeled/unlabeled observation indicator.</p></li>
 </ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.99.0" id="ipd-0990">ipd 0.99.0<a class="anchor" aria-label="anchor" href="#ipd-0990"></a></h2>
+<div class="section level3">
+<h3 id="summary-0-99-0">Summary:<a class="anchor" aria-label="anchor" href="#summary-0-99-0"></a></h3>
+<ul><li><p>Preparations to archive on CRAN and move to Bioconductor.</p></li>
+<li><p>Slight formatting changes to conform to <code>styler</code> and <code>lintr</code> suggestions.</p></li>
+<li><p>Added PPIa, Chen and Chen methods from Gronsbell et al. (2025) “Another look at inference after prediction.”</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="specific-changes-0-99-0">Specific Changes:<a class="anchor" aria-label="anchor" href="#specific-changes-0-99-0"></a></h3>
+<ul><li>
+<strong>Version bump</strong>
+<ul><li>Pre‑release version set to <strong>0.99.0</strong> for Bioconductor devel.</li>
+</ul></li>
+<li>
+<strong>DESCRIPTION updates</strong>
+<ul><li>
+<code>Depends: R (&gt;= 4.4.0)</code><br></li>
+<li>Added <code>biocViews: Software</code><br></li>
+<li>Added <code>Suggests: BiocStyle, BiocManager</code>
+</li>
+</ul></li>
+<li>
+<strong>Vignettes</strong>
+<ul><li>Converted existing R Markdown vignettes to Bioconductor style with <code><a href="https://rdrr.io/pkg/BiocStyle/man/html_document.html" class="external-link">BiocStyle::html_document</a></code> and proper <code>VignetteIndexEntry</code> headers.</li>
+<li>Added examples for Chen and Chen, PPI “All” methods.</li>
+</ul></li>
+<li>
+<strong>NEWS &amp; CITATION</strong>
+<ul><li>Added <code>NEWS.md</code> entry (this file) and a <code>CITATION</code> file for package citation metadata.</li>
+</ul></li>
+<li>
+<strong>Testing &amp; QA</strong>
+<ul><li>Passed <code>BiocCheck</code> with no errors or warnings.<br></li>
+<li>Updated <code>testthat</code> suite as needed for Bioc compliance.</li>
+</ul></li>
+<li>
+<strong>Continuous Integration</strong>
+<ul><li>Added GitHub Actions via <code>usethis::use_github_action("bioc-workflow")</code> to run Bioconductor checks on Linux, macOS, and Windows.</li>
+</ul></li>
+<li>
+<strong>README</strong>
+<ul><li>
+<p>Installation instructions updated to:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"ipd"</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li>
+<p>Replaced CRAN build badge with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">[</span><span class="al">![Bioc build status](https://bioconductor.org/shields/build/release/bioc/ipd.svg)</span><span class="co">](https://bioconductor.org/packages/ipd)</span></span></code></pre></div>
+</li>
+</ul></li>
+<li>
+<strong>New functions</strong>
+<ul><li>
+<code><a href="../reference/ppi_a_ols.html">ppi_a_ols()</a></code> — implements the PPIa estimator for prediction‑powered inference.<br></li>
+<li>
+<code><a href="../reference/chen_ols.html">chen_ols()</a></code> — implements the Chen &amp; Chen estimator for inference on predicted data.</li>
+<li>
+<code><a href="../reference/dot-parse_inputs.html">.parse_inputs()</a></code> - helper to validate and split input data.</li>
+<li>
+<code><a href="../reference/dot-drop_unused_levels.html">.drop_unused_levels()</a></code> - helper to drop unused factor levels and report which were removed.</li>
+<li>
+<code><a href="../reference/dot-warn_differing_levels.html">.warn_differing_levels()</a></code> - helper to warn on differing factor levels between labeled and unlabeled data.</li>
+<li>
+<code><a href="../reference/dot-build_design.html">.build_design()</a></code> - helper to build design matrices and outcome vectors.</li>
+<li>
+<code>show()</code> - implements S4 method for <code>ipd</code> class.</li>
+</ul></li>
+<li>
+<strong>Updates to functions</strong>
+<ul><li>
+<code><a href="../reference/ipd.html">ipd()</a></code> - registered new methods in wrapper.</li>
+<li>
+<code><a href="../reference/ipd.html">ipd()</a></code> - helper functions for parsing inputs and additional warnings to users when parsing formulas.</li>
+<li>
+<code>methods.R</code> - Updated with new S4 class for <code>ipd</code>.</li>
+</ul></li>
+<li>
+<strong>Bioconductor submission prep</strong>
+<ul><li>Branch created, tag <code>v0.99.0</code> applied.<br></li>
+<li>Will request CRAN archiving of the CRAN version upon successful Bioconductor acceptance.</li>
+</ul></li>
+</ul></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Stephen Salerno, Jiacheng Miao, Awan Afiaz, Kentaro Hoffman, Anna Neufeld, Qiongshi Lu, Tyler H McCormick, Jeffrey T Leek.</p>
+  <p>Developed by Stephen Salerno, Jiacheng Miao, Awan Afiaz, Kentaro Hoffman, Jesse Gronsbell, Jianhui Gao, David Cheng, Anna Neufeld, Qiongshi Lu, Tyler H McCormick, Jeffrey T Leek.</p>
 </div>
 
 <div class="pkgdown-footer-right">

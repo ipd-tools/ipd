@@ -12,11 +12,17 @@
 <url><loc>https://ipd-tools.github.io/ipd/reference/Sigma_cal.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/augment.ipd.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/calc_lhat_glm.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/chen_ols.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/compute_cdf.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/compute_cdf_diff.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/dot-build_design.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/dot-drop_unused_levels.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/dot-parse_inputs.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/dot-warn_differing_levels.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/est_ini.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/glance.ipd.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/index.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/ipd-class.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/ipd-package.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/ipd.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/link_Hessian.html</loc></url>
@@ -32,6 +38,7 @@
 <url><loc>https://ipd-tools.github.io/ipd/reference/postpi_analytic_ols.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/postpi_boot_logistic.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/postpi_boot_ols.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/ppi_a_ols.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/ppi_logistic.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/ppi_mean.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/ppi_ols.html</loc></url>
@@ -56,6 +63,7 @@
 <url><loc>https://ipd-tools.github.io/ipd/reference/rectified_cdf.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/rectified_p_value.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/reexports.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/show-ipd-method.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/sim_data_y.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/simdat.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/summary.ipd.html</loc></url>
