@@ -2,45 +2,30 @@
 % Please edit documentation in R/methods.R
 \name{augment.ipd}
 \alias{augment.ipd}
-\title{Augment Data from an IPD Fit}
+\title{Augment data from an ipd fit}
 \usage{
-\method{augment}{ipd}(x, data = x$data_u, ...)
+\method{augment}{ipd}(x, data = x@data_u, ...)
 }
 \arguments{
 \item{x}{An object of class \code{ipd}.}
 
-\item{data}{The \code{data.frame} used to fit the model. Default is
-\code{x$data}.}
+\item{data}{A \code{data.frame} to augment; defaults to \code{x@data_u}.}
 
-\item{...}{Additional arguments to be passed to the augment function.}
+\item{...}{Ignored.}
 }
 \value{
-A \code{data.frame} containing the original data along with fitted
-values and residuals.
+The \code{data.frame} with columns \code{.fitted} and \code{.resid}.
 }
 \description{
-Augments the data used for an IPD method/model fit with additional
-information about each observation.
+Augment data from an ipd fit
 }
 \examples{
 
-#-- Generate Example Data
+dat <- simdat()
 
-set.seed(2023)
+fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
 
-dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-
-head(dat)
-
-formula <- Y - f ~ X1
-
-#-- Fit IPD
-
-fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-
-  data = dat, label = "set_label")
-
-#-- Augment Data
+    data = dat, label = "set_label")
 
 augmented_df <- augment(fit)
 

@@ -2,43 +2,18 @@
 % Please edit documentation in R/methods.R
 \name{print.summary.ipd}
 \alias{print.summary.ipd}
-\title{Print Summary of IPD Fit}
+\title{Print summary.ipd}
 \usage{
 \method{print}{summary.ipd}(x, ...)
 }
 \arguments{
 \item{x}{An object of class \code{summary.ipd}.}
 
-\item{...}{Additional arguments to be passed to the print function.}
+\item{...}{Ignored.}
 }
 \value{
-The input \code{x}, invisibly.
+Invisibly returns \code{x}.
 }
 \description{
-Prints a detailed summary of the IPD method/model combination.
-}
-\examples{
-
-#-- Generate Example Data
-
-set.seed(2023)
-
-dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-
-head(dat)
-
-formula <- Y - f ~ X1
-
-#-- Fit IPD
-
-fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-
-  data = dat, label = "set_label")
-
-#-- Summarize Output
-
-summ_fit <- summary(fit)
-
-print(summ_fit)
-
+Print summary.ipd
 }

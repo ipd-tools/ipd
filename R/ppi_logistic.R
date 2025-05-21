@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI LOGISTIC REGRESSION
-#===============================================================================
-
 #--- PPI LOGISTIC REGRESSION ---------------------------------------------------
 
 #' PPI Logistic Regression
@@ -54,15 +50,21 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_logistic(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -70,37 +72,45 @@
 #'
 #' @export
 
-ppi_logistic <- function(X_l, Y_l, f_l, X_u, f_u, opts = NULL) {
+ppi_logistic <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    opts = NULL) {
 
-  n <- nrow(f_l)
+    n <- nrow(f_l)
+    N <- nrow(f_u)
+    p <- ncol(X_u)
 
-  N <- nrow(f_u)
+    theta0 <- coef(glm(Y_l ~ . - 1,
 
-  p <- ncol(X_u)
+        data = data.frame(Y_l, X_l), family = binomial))
 
-  theta0 <- coef(glm(Y_l ~ . - 1,
+    est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
-    data = data.frame(Y_l, X_l), family = binomial))
+        opts = opts, lhat = 1)
 
-  est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
+    stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, use_u = TRUE)
 
-    opts = opts, lhat = 1)
+    var_u <- cov(stats$grads_hat_unlabeled)
 
-  stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, use_u = T)
+    var_l <- cov(stats$grads - stats$grads_hat)
 
-  var_u <- cov(stats$grads_hat_unlabeled)
+    Sigma_hat <- stats$inv_hessian %*%
 
-  var_l <- cov(stats$grads - stats$grads_hat)
+        (n / N * var_u + var_l) %*% stats$inv_hessian
 
-  Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
-
-  return(list(est = est, se = sqrt(diag(Sigma_hat) / n),
-
-    rectifier_est = theta0 - est, var_u = var_u, var_l = var_l,
-
-    grads = stats$grads, grads_hat_unlabeled = stats$grads_hat_unlabeled,
-
-    grads_hat = stats$grads_hat, inv_hessian = stats$inv_hessian))
+    return(list(
+        est = est,
+        se = sqrt(diag(Sigma_hat) / n),
+        rectifier_est = theta0 - est,
+        var_u = var_u,
+        var_l = var_l,
+        grads = stats$grads,
+        grads_hat_unlabeled = stats$grads_hat_unlabeled,
+        grads_hat = stats$grads_hat,
+        inv_hessian = stats$inv_hessian
+    ))
 }
-
-#=== END =======================================================================

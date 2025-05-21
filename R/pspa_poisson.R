@@ -1,6 +1,4 @@
-#===============================================================================
-# PSPA POISSON REGRESSION
-#===============================================================================
+#--- PSPA POISSON REGRESSION ---------------------------------------------------
 
 #' PSPA Poisson Regression
 #'
@@ -36,15 +34,18 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' pspa_poisson(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -52,25 +53,24 @@
 #'
 #' @export
 
-pspa_poisson <- function(X_l, Y_l, f_l, X_u, f_u,
+pspa_poisson <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    weights = NA,
+    alpha = 0.05) {
 
-  weights = NA, alpha = 0.05) {
+    fit <- pspa_y(X_l = X_l, X_u = X_u, Y_l = Y_l, f_l = f_l, f_u = f_u,
 
-  fit <- pspa_y(X_lab = X_l, X_unlab = X_u,
+        intercept = TRUE, weights = weights, alpha = alpha, method = "poisson")
 
-    Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
+    fit <- as.data.frame(fit)
 
-    intercept = T,
+    est <- fit$Estimate
 
-    weights = weights, alpha = alpha, method = "poisson")
+    se <- fit$Std.Error
 
-  fit <- as.data.frame(fit)
-
-  est <- fit$Estimate
-
-  se <- fit$Std.Error
-
-  return(list(est = est, se = se))
+    return(list(est = est, se = se))
 }
-
-#=== END =======================================================================

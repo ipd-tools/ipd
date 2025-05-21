@@ -2,52 +2,25 @@
 % Please edit documentation in R/methods.R
 \name{summary.ipd}
 \alias{summary.ipd}
-\title{Summarize IPD Fit}
+\title{Summarize ipd fit}
 \usage{
 \method{summary}{ipd}(object, ...)
 }
 \arguments{
 \item{object}{An object of class \code{ipd}.}
 
-\item{...}{Additional arguments to be passed to the summary function.}
+\item{...}{Ignored.}
 }
 \value{
-A list containing:
-
+An object of class \code{summary.ipd} containing:
 \describe{
-
-\item{coefficients}{Model coefficients and related statistics.}
-
-\item{performance}{Performance metrics of the model fit.}
-
-\item{...}{Additional summary information.}
+\item{call}{The model formula.}
+\item{coefficients}{A glm-style table of estimates, SE, z, p.}
+\item{method}{Which IPD method was used.}
+\item{model}{Which downstream model was fitted.}
+\item{intercept}{Logical; whether an intercept was included.}
 }
 }
 \description{
-Produces a summary of the IPD method/model combination.
-}
-\examples{
-
-#-- Generate Example Data
-
-set.seed(2023)
-
-dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-
-head(dat)
-
-formula <- Y - f ~ X1
-
-#-- Fit IPD
-
-fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-
-  data = dat, label = "set_label")
-
-#-- Summarize Output
-
-summ_fit <- summary(fit)
-
-summ_fit
-
+Summarize ipd fit
 }

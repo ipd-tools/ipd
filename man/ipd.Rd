@@ -11,11 +11,9 @@ ipd(
   data,
   label = NULL,
   unlabeled_data = NULL,
-  seed = NULL,
   intercept = TRUE,
   alpha = 0.05,
   alternative = "two-sided",
-  n_t = Inf,
   na_action = "na.fail",
   ...
 )
@@ -29,15 +27,15 @@ predicted outcome in both labeled and unlabeled data, and \code{X}
 corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
 See \strong{1. Formula} in the \strong{Details} below for more information.}
 
-\item{method}{The IPD method to be used for fitting the model. Must be one of
-\code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
-\code{"ppi_plusplus"}, or \code{"pspa"}.
+\item{method}{The IPD method to be used for fitting the model. Must be one
+of \code{"chen"}, \code{"postpi_analytic"}, \code{"postpi_boot"},
+\code{"ppi"}, \code{"ppi_a"}, \code{"ppi_plusplus"}, or \code{"pspa"}.
 See \strong{3. Method} in the \strong{Details} below for more information.}
 
 \item{model}{The type of downstream inferential model to be fitted, or the
-parameter being estimated. Must be one of \code{"mean"},
-\code{"quantile"}, \code{"ols"}, \code{"logistic"}, or \code{"poisson"}.
-See \strong{4. Model} in the \strong{Details} below for more information.}
+parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
+\code{"ols"}, \code{"logistic"}, or \code{"poisson"}. See \strong{4. Model}
+in the \strong{Details} below for more information.}
 
 \item{data}{A \code{data.frame} containing the variables in the model,
 either a stacked data frame with a specific column identifying the labeled
@@ -60,8 +58,6 @@ specified, must contain columns for the predicted outcomes (\code{f}), and
 the features (\code{X}) needed to specify the \code{formula}. See
 \strong{2. Data} in the \strong{Details} below for more information.}
 
-\item{seed}{(optional) An \code{integer} seed for random number generation.}
-
 \item{intercept}{\code{Logical}. Should an intercept be included in the
 model? Default is \code{TRUE}.}
 
@@ -70,11 +66,6 @@ model? Default is \code{TRUE}.}
 
 \item{alternative}{A string specifying the alternative hypothesis. Must be
 one of \code{"two-sided"}, \code{"less"}, or \code{"greater"}.}
-
-\item{n_t}{(integer, optional) Size of the dataset used to train the
-prediction function (necessary for the \code{"postpi_analytic"} and
-\code{"postpi_boot"} methods if \code{n_t} < \code{nrow(X_l)}.
-Defaults to \code{Inf}.}
 
 \item{na_action}{(string, optional) How missing covariate data should be
 handled. Currently \code{"na.fail"} and \code{"na.omit"} are accommodated.
@@ -88,21 +79,30 @@ the \code{Details} section for more information. See
 \value{
 a summary of model output.
 
-A list containing the fitted model components:
-
+An S4 object of class \code{IPD} with the following slots:
 \describe{
-\item{coefficients}{Estimated coefficients of the model}
-\item{se}{Standard errors of the estimated coefficients}
-\item{ci}{Confidence intervals for the estimated coefficients}
-\item{formula}{The formula used to fit the ipd model.}
-\item{data}{The data frame used for model fitting.}
-\item{method}{The method used for model fitting.}
-\item{model}{The type of model fitted.}
-\item{intercept}{Logical. Indicates if an intercept was included in the
-model.}
-\item{fit}{Fitted model object containing estimated coefficients, standard
-errors, confidence intervals, and additional method-specific output.}
-\item{...}{Additional output specific to the method used.}
+\item{\code{coefficients}}{Named \code{\link[base]{numeric}}
+vector of estimated parameters.}
+\item{\code{se}}{Named \code{\link[base]{numeric}}
+vector of standard errors.}
+\item{\code{ci}}{A \code{\link[base]{matrix}} of confidence intervals,
+with columns \code{lower} and \code{upper}.}
+\item{\code{coefTable}}{A \code{\link[base]{data.frame}} summarizing
+Estimate, Std. Error, z-value, and Pr(>|z|) (glm-style).}
+\item{\code{fit}}{The raw output \code{\link[base]{list}} returned by
+the method-specific helper function.}
+\item{\code{formula}}{The \code{\link[stats]{formula}} used for fitting
+the IPD model.}
+\item{\code{data_l}}{The labeled \code{\link[base]{data.frame}} used in
+the analysis.}
+\item{\code{data_u}}{The unlabeled \code{\link[base]{data.frame}} used
+in the analysis.}
+\item{\code{method}}{A \code{\link[base]{character}} string indicating
+which IPD method was applied.}
+\item{\code{model}}{A \code{\link[base]{character}} string indicating
+the downstream inferential model.}
+\item{\code{intercept}}{A \code{\link[base]{logical}} indicating whether
+an intercept was included.}
 }
 }
 \description{
@@ -155,8 +155,8 @@ Unlabeled data identifiers can be:
 
 For option (2), provide separate data arguments for the labeled data set
 (\code{data}) and the unlabeled data set (\code{unlabeled_data}). If the
-second argument is provided, the function ignores the \code{label} identifier
-and assumes the data provided are not stacked.
+second argument is provided, the function ignores the \code{label}
+identifier and assumes the data provided are not stacked.
 
 NOTE: Not all columns in \code{data} or \code{unlabeled_data} may be used
 unless explicitly referenced in the \code{formula} argument or in the
@@ -167,10 +167,14 @@ unless explicitly referenced in the \code{formula} argument or in the
 Use the \code{method} argument to specify the fitting method:
 
 \describe{
-\item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Analytic Correction}
-\item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference (PostPI) Bootstrap Correction}
+\item{"chen"}{Gronsbell et al. (2025) Chen and Chen Correction}
+\item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
+(PostPI) Analytic Correction}
+\item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference
+(PostPI) Bootstrap Correction}
 \item{"ppi"}{Angelopoulos et al. (2023) Prediction-Powered Inference
 (PPI)}
+\item{"ppi_a"}{Gronsbell et al. (2025) PPI "All" Correction}
 \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
 \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
 Post-Prediction Inference (PSPA)}
@@ -208,44 +212,61 @@ other method-specific arguments, will have defaults.
 
 #-- Generate Example Data
 
-set.seed(12345)
-
 dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
 
 head(dat)
 
 formula <- Y - f ~ X1
 
+#-- Chen and Chen Correction (Gronsbell et al., 2025)
+
+ipd(formula,
+  method = "chen", model = "ols",
+  data = dat, label = "set_label"
+)
+
 #-- PostPI Analytic Correction (Wang et al., 2020)
 
-ipd(formula, method = "postpi_analytic", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "postpi_analytic", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- PostPI Bootstrap Correction (Wang et al., 2020)
 
 nboot <- 200
 
-ipd(formula, method = "postpi_boot", model = "ols",
-
-    data = dat, label = "set_label", nboot = nboot)
+ipd(formula,
+  method = "postpi_boot", model = "ols",
+  data = dat, label = "set_label", nboot = nboot
+)
 
 #-- PPI (Angelopoulos et al., 2023)
 
-ipd(formula, method = "ppi", model = "ols",
+ipd(formula,
+  method = "ppi", model = "ols",
+  data = dat, label = "set_label"
+)
 
-    data = dat, label = "set_label")
+#-- PPI "All" (Gronsbell et al., 2025)
+
+ipd(formula,
+  method = "ppi_a", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- PPI++ (Angelopoulos et al., 2023)
 
-ipd(formula, method = "ppi_plusplus", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "ppi_plusplus", model = "ols",
+  data = dat, label = "set_label"
+)
 
 #-- PSPA (Miao et al., 2023)
 
-ipd(formula, method = "pspa", model = "ols",
-
-    data = dat, label = "set_label")
+ipd(formula,
+  method = "pspa", model = "ols",
+  data = dat, label = "set_label"
+)
 
 }

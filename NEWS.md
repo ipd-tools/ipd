@@ -27,3 +27,68 @@
 * Updated the documentation for `simdat()` to include a more thorough explanation of how to simulate data with this function. 
 
 * `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
+
+# ipd 0.99.0
+
+## Summary:
+
+* Preparations to archive on CRAN and move to Bioconductor.
+
+* Slight formatting changes to conform to `styler` and `lintr` suggestions.
+
+* Added PPIa, Chen and Chen methods from Gronsbell et al. (2025) "Another look at inference after prediction."
+
+## Specific Changes: 
+
+- **Version bump**  
+  - Pre‑release version set to **0.99.0** for Bioconductor devel.
+
+- **DESCRIPTION updates**  
+  - `Depends: R (>= 4.4.0)`  
+  - Added `biocViews: Software`  
+  - Added `Suggests: BiocStyle, BiocManager`
+
+- **Vignettes**  
+  - Converted existing R Markdown vignettes to Bioconductor style with `BiocStyle::html_document` and proper `VignetteIndexEntry` headers.
+  - Added examples for Chen and Chen, PPI "All" methods.
+
+- **NEWS & CITATION**  
+  - Added `NEWS.md` entry (this file) and a `CITATION` file for package citation metadata.
+
+- **Testing & QA**  
+  - Passed `BiocCheck` with no errors or warnings.  
+  - Updated `testthat` suite as needed for Bioc compliance.
+
+- **Continuous Integration**  
+  - Added GitHub Actions via `usethis::use_github_action("bioc-workflow")` to run Bioconductor checks on Linux, macOS, and Windows.
+
+- **README**  
+  - Installation instructions updated to:
+    ```r
+    if (!requireNamespace("BiocManager", quietly=TRUE))
+      install.packages("BiocManager")
+    BiocManager::install("ipd")
+    ```
+  - Replaced CRAN build badge with:
+    ```markdown
+    [![Bioc build status](https://bioconductor.org/shields/build/release/bioc/ipd.svg)](https://bioconductor.org/packages/ipd)
+    ```
+    
+- **New functions**  
+  - `ppi_a_ols()` — implements the PPIa estimator for prediction‑powered inference.  
+  - `chen_ols()` — implements the Chen & Chen estimator for inference on predicted data.
+  - `.parse_inputs()` - helper to validate and split input data.
+  - `.drop_unused_levels()` - helper to drop unused factor levels and report which were removed.
+  - `.warn_differing_levels()` - helper to warn on differing factor levels between labeled and unlabeled data.
+  - `.build_design()` - helper to build design matrices and outcome vectors.
+  - `show()` - implements S4 method for `ipd` class.
+  
+- **Updates to functions**
+  - `ipd()` - registered new methods in wrapper.
+  - `ipd()` - helper functions for parsing inputs and additional warnings to users when parsing formulas.
+  - `methods.R` - Updated with new S4 class for `ipd`.
+
+- **Bioconductor submission prep**  
+  - Branch created, tag `v0.99.0` applied.  
+  - Will request CRAN archiving of the CRAN version upon successful Bioconductor acceptance.
+

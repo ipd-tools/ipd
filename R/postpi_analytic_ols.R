@@ -1,7 +1,3 @@
-#===============================================================================
-# POSTPI ANALYTIC ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- POSTPI ANALYTIC OLS -------------------------------------------------------
 
 #' PostPI OLS (Analytic Correction)
@@ -24,12 +20,8 @@
 #'
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
-#' @param scale_se (boolean): Logical argument to scale relationship model
-#' error variance. Defaults to TRUE; FALSE option is retained for posterity.
-#'
-#' @param n_t (integer, optional) Size of the dataset used to train the
-#' prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
-#' Defaults to \code{Inf}.
+#' @param original (boolean): Logical argument to use original method from
+#' Wang et al. (2020). Defaults to FALSE; TRUE retained for posterity.
 #'
 #' @return A list of outputs: estimate of the inference model parameters and
 #' corresponding standard error estimate.
@@ -40,15 +32,18 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -56,44 +51,79 @@
 #'
 #' @export
 
-postpi_analytic_ols <- function(X_l, Y_l, f_l, X_u, f_u,
+postpi_analytic_ols <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    original = FALSE) {
 
-  scale_se = TRUE, n_t = Inf) {
+    n_l <- nrow(X_l)
 
-  #- 1. Estimate Relationship Model
+    n_u <- nrow(X_u)
 
-  fit_rel <- lm(Y_l ~ f_l)
+    #-- 1. Relationship Model
 
-  #- 2. Estimate Inference Model
+    fit_rel <- lm(Y_l ~ f_l)
 
-  fit_inf <- lm(f_u ~ X_u - 1)
+    eta_hat <- residuals(fit_rel)
 
-  #- 3. Coefficient Estimator
+    gamma0_hat <- coef(fit_rel)[1]
 
-  est <- solve(crossprod(X_u)) %*% t(X_u) %*%
+    gamma1_hat <- coef(fit_rel)[2]
 
-    (coef(fit_rel)[1] + coef(fit_rel)[2] * X_u %*% coef(fit_inf))
+    #-- 2. Point Estimates
 
-  #- 4. SE of Coefficient Estimator
+    if (original) {
 
-  if (scale_se) {
+        #- a. Naive Inference Model
 
-    se <- sqrt(diag(solve(crossprod(X_u)) *
+        fit_inf <- lm(f_u ~ X_u - 1)
 
-      (sigma(fit_rel)^2 * nrow(X_u) / min(nrow(X_l), n_t) +
+        #- b. Estimator
 
-      (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
+        est <- solve(crossprod(X_u)) %*% t(X_u) %*%
 
-  } else {
+            (gamma0_hat + gamma1_hat * X_u %*% coef(fit_inf))
 
-    se <- sqrt(diag(solve(crossprod(X_u)) *
+    } else {
 
-      (sigma(fit_rel)^2 + (coef(fit_rel)[2]^2) * sigma(fit_inf)^2)))
-  }
+        #- a. Means-Based Covariances
 
-  #- Output
+        C_Xf_u <- crossprod(X_u, f_u) / n_u
 
-  return(list(est = as.vector(est), se = as.vector(se)))
+        C_Xe_l <- crossprod(X_l, eta_hat) / n_l
+
+        M_XX_u <- crossprod(X_u) / n_u
+
+        #- b. Estimator
+
+        est <- solve(M_XX_u) %*% (gamma1_hat * C_Xf_u + C_Xe_l)
+    }
+
+    #-- 3. Standard Errors
+
+    if (original) {
+
+        var_hat <- solve(crossprod(X_u)) *
+
+            (sigma(fit_rel)^2 + (gamma1_hat^2) * sigma(fit_inf)^2)
+
+    } else {
+
+        S1 <- crossprod(X_u * c(f_u))  / n_u  -  C_Xf_u %*% t(C_Xf_u)
+
+        S2 <- crossprod(X_l * eta_hat) / n_l  -  C_Xe_l %*% t(C_Xe_l)
+
+        Gamma <- gamma1_hat^2 * S1 + (n_u / n_l) * S2
+
+        var_hat <- solve(M_XX_u) %*% Gamma %*% solve(M_XX_u) / n_u
+    }
+
+    se <- sqrt(diag(var_hat))
+
+    #-- 4. Output
+
+    return(list(est = as.vector(est), se = as.vector(se)))
 }
-
-#=== END =======================================================================

@@ -1,6 +1,4 @@
-#===============================================================================
-# PSPA MEAN ESTIMATION
-#===============================================================================
+#--- PSPA MEAN ESTIMATION ------------------------------------------------------
 
 #' PSPA Mean Estimation
 #'
@@ -32,33 +30,37 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' pspa_mean(Y_l, f_l, f_u)
+#' pspa_mean(Y_l = Y_l, f_l = f_l, f_u = f_u)
 #'
 #' @import stats
 #'
 #' @export
 
-pspa_mean <- function(Y_l, f_l, f_u,
+pspa_mean <- function(
+    Y_l,
+    f_l,
+    f_u,
+    weights = NA,
+    alpha = 0.05) {
 
-  weights = NA, alpha = 0.05) {
+    fit <- pspa_y(Y_l = Y_l, f_l = f_l, f_u = f_u,
 
-  fit <- pspa_y(Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
+        weights = weights, alpha = alpha, method = "mean")
 
-    weights = weights, alpha = alpha, method = "mean")
+    fit <- as.data.frame(fit)
 
-  fit <- as.data.frame(fit)
+    est <- fit$Estimate
 
-  est <- fit$Estimate
+    se <- fit$Std.Error
 
-  se <- fit$Std.Error
-
-  return(list(est = est, se = se))
+    return(list(est = est, se = se))
 }
-
-#=== END =======================================================================

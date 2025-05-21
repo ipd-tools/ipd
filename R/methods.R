@@ -1,232 +1,166 @@
-#===============================================================================
-# METHODS
-#===============================================================================
+#--- S4 SHOW METHOD ------------------------------------------------------------
 
-#=== STANDARD METHODS ==========================================================
+#' Show an ipd object
+#'
+#' @description
+#' Display a concise summary of an \code{ipd} S4 object, including
+#' method, model, formula, and a glm-style coefficient table.
+#'
+#' @param object An object of S4 class \code{ipd}.
+#'
+#' @return Invisibly returns \code{object} after printing.
+#'
+#' @import methods
+#'
+#' @exportMethod show
 
-#--- PRINT.IPD -----------------------------------------------------------------
+setMethod("show", "ipd", function(object) {
 
-#' Print IPD Fit
+    cat("IPD inference summary\n")
+    cat("  Method:  ",  object@method,  "\n")
+    cat("  Model:   ",  object@model,   "\n")
+    cat("  Formula: ",  deparse(object@formula), "\n\n")
+    cat("Coefficients:\n")
+
+    printCoefmat(object@coefTable, P.values = TRUE, has.Pvalue = TRUE)
+
+    invisible(object)
+})
+
+#--- S3 PRINT.IPD --------------------------------------------------------------
+
+#' Print ipd fit
 #'
-#' Prints a brief summary of the IPD method/model combination.
+#' @param x   An object of class \code{ipd}.
 #'
-#' @param x An object of class \code{ipd}.
+#' @param ... Ignored.
 #'
-#' @param ... Additional arguments to be passed to the print function.
-#'
-#' @return The input \code{x}, invisibly.
-#'
-#' @examples
-#'
-#' #-- Generate Example Data
-#'
-#' set.seed(2023)
-#'
-#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-#'
-#' head(dat)
-#'
-#' formula <- Y - f ~ X1
-#'
-#' #-- Fit IPD
-#'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
-#'
-#' #-- Print Output
-#'
-#' print(fit)
+#' @return Invisibly returns \code{x}.
 #'
 #' @export
 
 print.ipd <- function(x, ...) {
 
-  if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
+    if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
-  cat("\nCall:\n", deparse(x$formula), "\n\n")
+    show(x)
 
-  cat("Coefficients:\n")
-
-  print(x$coefficients)
-
-  invisible(x)
+    invisible(x)
 }
 
-#--- SUMMARY.IPD ---------------------------------------------------------------
+#--- S3 SUMMARY.IPD ------------------------------------------------------------
 
-#' Summarize IPD Fit
-#'
-#' Produces a summary of the IPD method/model combination.
+#' Summarize ipd fit
 #'
 #' @param object An object of class \code{ipd}.
 #'
-#' @param ... Additional arguments to be passed to the summary function.
+#' @param ...    Ignored.
 #'
-#' @return A list containing:
-#'
-#' \describe{
-#'
-#'   \item{coefficients}{Model coefficients and related statistics.}
-#'
-#'   \item{performance}{Performance metrics of the model fit.}
-#'
-#'   \item{...}{Additional summary information.}
-#' }
-#'
-#' @examples
-#'
-#' #-- Generate Example Data
-#'
-#' set.seed(2023)
-#'
-#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-#'
-#' head(dat)
-#'
-#' formula <- Y - f ~ X1
-#'
-#' #-- Fit IPD
-#'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
-#'
-#' #-- Summarize Output
-#'
-#' summ_fit <- summary(fit)
-#'
-#' summ_fit
+#' @return An object of class \code{summary.ipd} containing:
+#'   \describe{
+#'     \item{call}{The model formula.}
+#'     \item{coefficients}{A glm-style table of estimates, SE, z, p.}
+#'     \item{method}{Which IPD method was used.}
+#'     \item{model}{Which downstream model was fitted.}
+#'     \item{intercept}{Logical; whether an intercept was included.}
+#'   }
 #'
 #' @export
 
 summary.ipd <- function(object, ...) {
 
-  if (!inherits(object, "ipd")) stop("Object is not of class 'ipd'")
+    if (!is(object, "ipd")) stop("Object is not of class 'ipd'")
 
-  coef_table <- data.frame(
+    coef_tab <- object@coefTable
 
-    Estimate = object$coefficients,
+    summ <- list(
+        call         = object@formula,
+        coefficients = coef_tab,
+        method       = object@method,
+        model        = object@model,
+        intercept    = object@intercept
+    )
 
-    Std.Error = object$se,
+    class(summ) <- "summary.ipd"
 
-    `Lower CI` = object$ci[, 1],
-
-    `Upper CI` = object$ci[, 2]
-  )
-
-  result <- list(
-
-    call = object$formula,
-
-    coefficients = coef_table,
-
-    method = object$method,
-
-    model = object$model,
-
-    intercept = object$intercept
-  )
-
-  class(result) <- "summary.ipd"
-
-  return(result)
+    summ
 }
 
-#--- PRINT.SUMMARY.IPD ---------------------------------------------------------
+#--- S3 PRINT.SUMMARY.IPD ------------------------------------------------------
 
-#' Print Summary of IPD Fit
+#' Print summary.ipd
 #'
-#' Prints a detailed summary of the IPD method/model combination.
+#' @param x   An object of class \code{summary.ipd}.
 #'
-#' @param x An object of class \code{summary.ipd}.
+#' @param ... Ignored.
 #'
-#' @param ... Additional arguments to be passed to the print function.
-#'
-#' @examples
-#'
-#' #-- Generate Example Data
-#'
-#' set.seed(2023)
-#'
-#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-#'
-#' head(dat)
-#'
-#' formula <- Y - f ~ X1
-#'
-#' #-- Fit IPD
-#'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
-#'
-#' #-- Summarize Output
-#'
-#' summ_fit <- summary(fit)
-#'
-#' print(summ_fit)
-#'
-#' @return The input \code{x}, invisibly.
+#' @return Invisibly returns \code{x}.
 #'
 #' @export
 
 print.summary.ipd <- function(x, ...) {
 
-  if (!inherits(x, "summary.ipd")) stop("Object is not of class 'summary.ipd'")
+    if (!inherits(x, "summary.ipd")) {
 
-  cat("\nCall:\n", deparse(x$call), "\n\n")
+        stop("Object is not of class 'summary.ipd'")
+    }
 
-  cat("Method:", x$method, "\n")
+    cat("\nCall:\n")
+    cat(" ", deparse(x$call), "\n\n")
+    cat("Method:   ", x$method, "\n")
+    cat("Model:    ", x$model, "\n")
+    cat("Intercept:", ifelse(x$intercept, "Yes", "No"), "\n\n")
+    cat("Coefficients:\n")
 
-  cat("Model:", x$model, "\n")
+    printCoefmat(x$coefficients, P.values = TRUE, has.Pvalue = TRUE)
 
-  cat("Intercept:", ifelse(x$intercept, "Yes", "No"), "\n\n")
-
-  cat("Coefficients:\n")
-
-  printCoefmat(x$coefficients, P.values = FALSE, has.Pvalue = FALSE)
-
-  invisible(x)
+    invisible(x)
 }
 
-#=== BROOM TIDIER METHODS ======================================================
+#--- S3 TIDY.IPD ---------------------------------------------------------------
 
-#--- TIDY.IPD ------------------------------------------------------------------
-
+#' tidy re-exported from generics packages
+#'
+#' @return A wrapper for the \code{tidy} generic.
+#' See \code{\link[generics]{tidy}} for details.
+#'
+#' @seealso
+#' \code{\link[generics]{tidy}}
+#'
 #' @importFrom generics tidy
-#' @export
-generics::tidy
-
-#' Tidy an IPD Fit
-#'
-#' Tidies the IPD method/model fit into a data frame.
-#'
-#' @param x An object of class \code{ipd}.
-#'
-#' @param ... Additional arguments to be passed to the tidy function.
-#'
-#' @return A tidy data frame of the model's coefficients.
 #'
 #' @examples
 #'
-#' #-- Generate Example Data
+#' dat <- simdat()
 #'
-#' set.seed(2023)
+#' fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
 #'
-#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
+#'     data = dat, label = "set_label")
 #'
-#' head(dat)
+#' tidy(fit)
 #'
-#' formula <- Y - f ~ X1
+#' @export
+
+generics::tidy
+
+#' Tidy an ipd fit
 #'
-#' #-- Fit IPD
+#' @param x   An object of class \code{ipd}.
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
+#' @param ... Ignored.
 #'
-#'   data = dat, label = "set_label")
+#' @return A \code{\link[tibble]{tibble}} with columns
+#'   \code{term, estimate, std.error, conf.low, conf.high}.
 #'
-#' #-- Tidy Output
+#' @importFrom tibble tibble
+#'
+#' @examples
+#'
+#' dat <- simdat()
+#'
+#' fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
+#'
+#'     data = dat, label = "set_label")
 #'
 #' tidy(fit)
 #'
@@ -234,58 +168,59 @@ generics::tidy
 
 tidy.ipd <- function(x, ...) {
 
-  if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
+    if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
-  result <- data.frame(
-
-    term = names(x$coefficients),
-
-    estimate = x$coefficients,
-
-    std.error = x$se,
-
-    conf.low = x$ci[, 1],
-
-    conf.high = x$ci[, 2])
-
-  return(result)
+    tibble::tibble(
+        term      = names(x@coefficients),
+        estimate  = x@coefficients,
+        std.error = x@se,
+        conf.low  = x@ci[ , "lower"],
+        conf.high = x@ci[ , "upper"]
+    )
 }
 
-#--- GLANCE.IPD ----------------------------------------------------------------
+#--- S3 GLANCE.IPD -------------------------------------------------------------
 
+#' glance re-exported from generics packages
+#'
+#' @return A wrapper for the \code{glance} generic.
+#' See \code{\link[generics]{glance}} for details.
+#'
+#' @seealso
+#' \code{\link[generics]{glance}}
+#'
 #' @importFrom generics glance
-#' @export
-generics::glance
-
-#' Glance at an IPD Fit
-#'
-#' Glances at the IPD method/model fit, returning a one-row summary.
-#'
-#' @param x An object of class \code{ipd}.
-#'
-#' @param ... Additional arguments to be passed to the glance function.
-#'
-#' @return A one-row data frame summarizing the IPD method/model fit.
 #'
 #' @examples
 #'
-#' #-- Generate Example Data
+#' dat <- simdat()
 #'
-#' set.seed(2023)
+#' fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
 #'
-#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
+#'     data = dat, label = "set_label")
 #'
-#' head(dat)
+#' glance(fit)
 #'
-#' formula <- Y - f ~ X1
+#' @export
+
+generics::glance
+
+#' Glance at an ipd fit
 #'
-#' #-- Fit IPD
+#' @param x   An object of class \code{ipd}.
+#' @param ... Ignored.
 #'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
+#' @return A one-row \code{\link[tibble]{tibble}} summarizing the fit.
 #'
-#'   data = dat, label = "set_label")
+#' @importFrom tibble tibble
 #'
-#' #-- Glance Output
+#' @examples
+#'
+#' dat <- simdat()
+#'
+#' fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
+#'
+#'     data = dat, label = "set_label")
 #'
 #' glance(fit)
 #'
@@ -293,66 +228,37 @@ generics::glance
 
 glance.ipd <- function(x, ...) {
 
-  if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
+    if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
-  glance_df <- data.frame(
-
-    method = x$method,
-
-    model = x$model,
-
-    include_intercept = x$intercept,
-
-    nobs_labeled = nrow(x$data_l),
-
-    nobs_unlabeled = nrow(x$data_u),
-
-    call = deparse(x$formula)
-  )
-
-  return(glance_df)
+    tibble::tibble(
+        method           = x@method,
+        model            = x@model,
+        intercept        = x@intercept,
+        nobs_labeled     = nrow(x@data_l),
+        nobs_unlabeled   = nrow(x@data_u),
+        call             = deparse(x@formula)
+    )
 }
 
-#--- AUGMENT.IPD ---------------------------------------------------------------
+#--- S3 AUGMENT.IPD ------------------------------------------------------------
 
+#' augment re-exported from generics packages
+#'
+#' @return A wrapper for the \code{augment} generic.
+#' See \code{\link[generics]{augment}} for details.
+#'
+#' @seealso
+#' \code{\link[generics]{augment}}
+#'
 #' @importFrom generics augment
-#' @export
-generics::augment
-
-#' Augment Data from an IPD Fit
-#'
-#' Augments the data used for an IPD method/model fit with additional
-#' information about each observation.
-#'
-#' @param x An object of class \code{ipd}.
-#'
-#' @param data The \code{data.frame} used to fit the model. Default is
-#' \code{x$data}.
-#'
-#' @param ... Additional arguments to be passed to the augment function.
-#'
-#' @return A \code{data.frame} containing the original data along with fitted
-#' values and residuals.
 #'
 #' @examples
 #'
-#' #-- Generate Example Data
+#' dat <- simdat()
 #'
-#' set.seed(2023)
+#' fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
 #'
-#' dat <- simdat(n = c(300, 300, 300), effect = 1, sigma_Y = 1)
-#'
-#' head(dat)
-#'
-#' formula <- Y - f ~ X1
-#'
-#' #-- Fit IPD
-#'
-#' fit <- ipd(formula, method = "postpi_analytic", model = "ols",
-#'
-#'   data = dat, label = "set_label")
-#'
-#' #-- Augment Data
+#'     data = dat, label = "set_label")
 #'
 #' augmented_df <- augment(fit)
 #'
@@ -360,21 +266,45 @@ generics::augment
 #'
 #' @export
 
-augment.ipd <- function(x, data = x$data_u, ...) {
+generics::augment
 
-  if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
+#' Augment data from an ipd fit
+#'
+#' @param x    An object of class \code{ipd}.
+#' @param data A \code{data.frame} to augment; defaults to \code{x@data_u}.
+#' @param ...  Ignored.
+#'
+#' @return The \code{data.frame} with columns \code{.fitted} and \code{.resid}.
+#'
+#' @examples
+#'
+#' dat <- simdat()
+#'
+#' fit <- ipd(Y - f ~ X1, method = "pspa", model = "ols",
+#'
+#'     data = dat, label = "set_label")
+#'
+#' augmented_df <- augment(fit)
+#'
+#' head(augmented_df)
+#'
+#' @export
 
-  data_aug <- data
+augment.ipd <- function(x, data = x@data_u, ...) {
 
-  model_matrix <- model.matrix(x$formula, data)
+    if (!inherits(x, "ipd")) stop("Object is not of class 'ipd'")
 
-  fitted_values <- model_matrix %*% x$coefficients
+    data_aug <- data
 
-  data_aug$.fitted <- fitted_values
+    mm <- model.matrix(x@formula, data_aug)
 
-  data_aug$.resid <- data_aug[, all.vars(x$formula)[1]] - fitted_values
+    fv <- as.vector(mm %*% x@coefficients)
 
-  return(data_aug)
+    data_aug$.fitted <- fv
+
+    resp <- all.vars(x@formula)[1]
+
+    data_aug$.resid  <- data_aug[[resp]] - fv
+
+    data_aug
 }
-
-#=== END =======================================================================

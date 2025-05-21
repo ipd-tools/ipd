@@ -4,7 +4,7 @@
 \alias{postpi_analytic_ols}
 \title{PostPI OLS (Analytic Correction)}
 \usage{
-postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = TRUE, n_t = Inf)
+postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, original = FALSE)
 }
 \arguments{
 \item{X_l}{(matrix): n x p matrix of covariates in the labeled data.}
@@ -17,12 +17,8 @@ postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u, scale_se = TRUE, n_t = Inf)
 
 \item{f_u}{(vector): N-vector of predictions in the unlabeled data.}
 
-\item{scale_se}{(boolean): Logical argument to scale relationship model
-error variance. Defaults to TRUE; FALSE option is retained for posterity.}
-
-\item{n_t}{(integer, optional) Size of the dataset used to train the
-prediction function (necessary if \code{n_t} < \code{nrow(X_l)}.
-Defaults to \code{Inf}.}
+\item{original}{(boolean): Logical argument to use original method from
+Wang et al. (2020). Defaults to FALSE; TRUE retained for posterity.}
 }
 \value{
 A list of outputs: estimate of the inference model parameters and
@@ -42,15 +38,18 @@ dat <- simdat(model = "ols")
 
 form <- Y - f ~ X1
 
-X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 
-Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+  matrix(ncol = 1)
 
-f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+  matrix(ncol = 1)
 
-X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 
-f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+  matrix(ncol = 1)
 
 postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 

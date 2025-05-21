@@ -1,8 +1,4 @@
-#===============================================================================
-# PSPA QUANTILE ESTIMATION
-#===============================================================================
-
-#--- PSPA QUANTILE ESTIMATION -----------------------------------------------
+#--- PSPA QUANTILE ESTIMATION --------------------------------------------------
 
 #' PSPA Quantile Estimation
 #'
@@ -36,37 +32,36 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' pspa_quantile(Y_l, f_l, f_u, q = 0.5)
+#' pspa_quantile(Y_l = Y_l, f_l = f_l, f_u = f_u, q = 0.5)
 #'
 #' @import stats
 #'
 #' @export
 
-pspa_quantile <- function(Y_l, f_l, f_u, q,
+pspa_quantile <- function(
+    Y_l,
+    f_l,
+    f_u,
+    q,
+    weights = NA,
+    alpha = 0.05) {
 
-  weights = NA, alpha = 0.05) {
+    fit <- pspa_y(Y_l = Y_l, f_l = f_l, f_u = f_u, quant = q, intercept = TRUE,
 
-  fit <- pspa_y(Y_lab = Y_l, Yhat_lab = f_l, Yhat_unlab = f_u,
+        weights = weights, alpha = alpha, method = "quantile")
 
-    quant = q, intercept = T,
+    fit <- as.data.frame(fit)
 
-    weights = weights,
+    est <- fit$Estimate
 
-    alpha = alpha, method = "quantile")
+    se <- fit$Std.Error
 
-  fit <- as.data.frame(fit)
-
-  est <- fit$Estimate
-
-  se <- fit$Std.Error
-
-  return(list(est = est, se = se))
+    return(list(est = est, se = se))
 }
-
-#=== END =======================================================================

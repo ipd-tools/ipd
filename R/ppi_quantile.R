@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI QUANTILE ESTIMATION
-#===============================================================================
-
 #--- PPI QUANTILE ESTIMATION ---------------------------------------------------
 
 #' PPI Quantile Estimation
@@ -37,56 +33,59 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_quantile(Y_l, f_l, f_u, q = 0.5)
 #'
 #' @export
 
-ppi_quantile <- function(Y_l, f_l, f_u, q,
+ppi_quantile <- function(
+    Y_l,
+    f_l,
+    f_u,
+    q,
+    alpha = 0.05,
+    exact_grid = FALSE) {
 
-  alpha = 0.05, exact_grid = FALSE) {
+    Y_l <- c(Y_l)
+    f_l <- c(f_l)
+    f_u <- c(f_u)
 
-  Y_l <- c(Y_l)
+    n <- length(Y_l)
+    N <- length(f_u)
 
-  f_l <- c(f_l)
+    grid <- c(Y_l, f_l, f_u)
 
-  f_u <- c(f_u)
+    if (exact_grid) {
 
-  n <- length(Y_l)
+        grid <- sort(unique(grid))
 
-  N <- length(f_u)
+    } else {
 
-  grid <- c(Y_l, f_l, f_u)
+        grid <- seq(min(grid), max(grid), length.out = 5000)
+    }
 
-  if (exact_grid) {
+    cdf_f_u <- compute_cdf(f_u, grid, w = NULL)
 
-    grid <- sort(unique(grid))
+    cdf_rectifier <- compute_cdf_diff(Y_l, f_l, grid, w = NULL)
 
-  } else {
+    rec_p_value <- rectified_p_value(cdf_rectifier[[1]],
 
-    grid <- seq(min(grid), max(grid), length.out = 5000)
-  }
+        cdf_rectifier[[2]] / sqrt(n), cdf_f_u[[1]], cdf_f_u[[2]] / sqrt(N),
 
-  cdf_f_u <- compute_cdf(f_u, grid, w = NULL)
+        null = q, alternative = "two-sided")
 
-  cdf_rectifier <- compute_cdf_diff(Y_l, f_l, grid, w = NULL)
+    result_grid <- grid[rec_p_value > alpha]
 
-  rec_p_value <- rectified_p_value(
-
-    cdf_rectifier[[1]], cdf_rectifier[[2]] / sqrt(n),
-
-    cdf_f_u[[1]], cdf_f_u[[2]] / sqrt(N),
-
-    null = q, alternative = "two-sided")
-
-  result_grid <- grid[rec_p_value > alpha]
-
-  return(c(result_grid[1], result_grid[length(result_grid)]))
+    return(c(result_grid[1], result_grid[length(result_grid)]))
 }
-
-#=== END =======================================================================

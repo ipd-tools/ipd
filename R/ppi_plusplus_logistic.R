@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI++ LOGISTIC REGRESSION
-#===============================================================================
-
 #--- PPI++ LOGISTIC REGRESSION - POINT ESTIMATE --------------------------------
 
 #' PPI++ Logistic Regression (Point Estimate)
@@ -51,15 +47,21 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -67,81 +69,86 @@
 #'
 #' @export
 
-ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
+ppi_plusplus_logistic_est <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    lhat = NULL,
+    coord = NULL,
+    opts = NULL,
+    w_l = NULL,
+    w_u = NULL) {
 
-  lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
+    n <- nrow(f_l)
+    N <- nrow(f_u)
+    p <- ncol(X_u)
 
-  n <- nrow(f_l)
+    if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
 
-  N <- nrow(f_u)
+    if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
 
-  p <- ncol(X_u)
+    if (is.null(opts) || !("factr" %in% names(opts))) {
 
-  if (is.null(w_l)) w_l <- rep(1, n) else w_l <- w_l / sum(w_l) * n
+        opts <- list(factr = 1e-15)
+    }
 
-  if (is.null(w_u)) w_u <- rep(1, N) else w_u <- w_u / sum(w_u) * N
+    theta <- coef(glm(Y_l ~ . - 1,
 
-  if (is.null(opts) || !("factr" %in% names(opts))) {
+        data = data.frame(Y_l, X_l), family = binomial))
 
-    opts <- list(factr = 1e-15)
-  }
+    theta <- matrix(theta, ncol = 1)
 
-  theta <- coef(glm(Y_l ~ . - 1,
+    lhat_curr <- ifelse(is.null(lhat), 1, lhat)
 
-    data = data.frame(Y_l, X_l), family = binomial))
+    #-- Rectified Logistic Regression Loss Function
 
-  theta <- matrix(theta, ncol = 1)
+    rectified_logistic_loss <- function(theta) {
 
-  lhat_curr <- ifelse(is.null(lhat), 1, lhat)
+        sum(w_u * (-f_u * (X_u %*% theta) + log1pexp(X_u %*% theta))) *
 
-  #-- Rectified Logistic Regression Loss Function
+            lhat_curr / N - sum(w_l * (-f_l * (X_l %*% theta) +
 
-  rectified_logistic_loss <- function(theta) {
+                log1pexp(X_l %*% theta))) *
 
-    sum(w_u * (-f_u * (X_u %*% theta) + log1pexp(X_u %*% theta))) *
+            lhat_curr / n + sum(w_l * (-Y_l * (X_l %*% theta) +
 
-      lhat_curr / N - sum(
+                log1pexp(X_l %*% theta))) / n
+    }
 
-        w_l * (-f_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) *
+    #-- Rectified Logistic Regression Gradient
 
-      lhat_curr / n + sum(
+    rectified_logistic_grad <- function(theta) {
 
-        w_l * (-Y_l * (X_l %*% theta) + log1pexp(X_l %*% theta))) / n
-  }
+        lhat_curr / N * t(X_u) %*% (w_u * (plogis(X_u %*% theta) - f_u)) -
 
-  #-- Rectified Logistic Regression Gradient
+        lhat_curr / n * t(X_l) %*% (w_l * (plogis(X_l %*% theta) - f_l)) +
 
-  rectified_logistic_grad <- function(theta) {
+            1 / n * t(X_l) %*% (w_l * (plogis(X_l %*% theta) - Y_l))
+    }
 
-    lhat_curr / N * t(X_u) %*% (w_u * (plogis(X_u %*% theta) - f_u)) -
+    est <- optim(par = theta, fn = rectified_logistic_loss,
 
-      lhat_curr / n * t(X_l) %*% (w_l * (plogis(X_l %*% theta) - f_l)) +
+        gr = rectified_logistic_grad, method = "L-BFGS-B",
+        control = list(factr = opts$factr))$par
 
-      1 / n * t(X_l) %*% (w_l * (plogis(X_l %*% theta) - Y_l))
-  }
+    if (is.null(lhat)) {
 
-  est <- optim(par = theta, fn = rectified_logistic_loss,
+        stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u)
 
-    gr = rectified_logistic_grad, method = "L-BFGS-B",
+        lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-    control = list(factr = opts$factr))$par
+            stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-  if (is.null(lhat)) {
+        return(ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
-    stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u)
+            opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
 
-    lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
+    } else {
 
-      stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
-
-    return(ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
-
-      opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u))
-
-  } else {
-
-    return(est)
-  }
+        return(est)
+    }
 }
 
 #--- PPI++ LOGISTIC REGRESSION - INFERENCE -------------------------------------
@@ -212,15 +219,21 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -228,58 +241,69 @@ ppi_plusplus_logistic_est <- function(X_l, Y_l, f_l, X_u, f_u,
 #'
 #' @export
 
-ppi_plusplus_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
+ppi_plusplus_logistic <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    lhat = NULL,
+    coord = NULL,
+    opts = NULL,
+    w_l = NULL,
+    w_u = NULL) {
 
-  lhat = NULL, coord = NULL, opts = NULL, w_l = NULL, w_u = NULL) {
+    n <- nrow(f_l)
+    N <- nrow(f_u)
+    p <- ncol(X_u)
 
-  n <- nrow(f_l)
+    w_l <- if (is.null(w_l)) rep(1, n) else w_l / sum(w_l) * n
 
-  N <- nrow(f_u)
+    w_u <- if (is.null(w_u)) rep(1, N) else w_u / sum(w_u) * N
 
-  p <- ncol(X_u)
+    use_u <- is.null(lhat) || lhat != 0
 
-  w_l <- if (is.null(w_l)) rep(1, n) else w_l / sum(w_l) * n
+    theta0 <- coef(glm(Y_l ~ . - 1,
 
-  w_u <- if (is.null(w_u)) rep(1, N) else w_u / sum(w_u) * N
+        data = data.frame(Y_l, X_l), family = binomial))
 
-  use_u <- is.null(lhat) || lhat != 0
+    est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
 
-  theta0 <- coef(glm(Y_l ~ . - 1,
+        opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u)
 
-    data = data.frame(Y_l, X_l), family = binomial))
+    stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u,
 
-  est <- ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u,
+        use_u = use_u)
 
-    opts = opts, lhat = lhat, coord = coord, w_l = w_l, w_u = w_u)
+    if (is.null(lhat)) {
 
-  stats <- logistic_get_stats(est, X_l, Y_l, f_l, X_u, f_u, w_l, w_u,
+        lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
 
-    use_u = use_u)
+            stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
 
-  if (is.null(lhat)) {
+        return(ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u,
 
-    lhat <- calc_lhat_glm(stats$grads, stats$grads_hat,
+            lhat = lhat, coord = coord, opts = opts, w_l = w_l, w_u = w_u))
+    }
 
-      stats$grads_hat_unlabeled, stats$inv_hessian, clip = TRUE)
+    var_u <- cov(lhat * stats$grads_hat_unlabeled)
 
-    return(ppi_plusplus_logistic(X_l, Y_l, f_l, X_u, f_u,
+    var_l <- cov(stats$grads - lhat * stats$grads_hat)
 
-      lhat = lhat, coord = coord, opts = opts, w_l = w_l, w_u = w_u))
-  }
+    Sigma_hat <- stats$inv_hessian %*%
 
-  var_u <- cov(lhat * stats$grads_hat_unlabeled)
+        (n / N * var_u + var_l) %*% stats$inv_hessian
 
-  var_l <- cov(stats$grads - lhat * stats$grads_hat)
-
-  Sigma_hat <- stats$inv_hessian %*% (n/N * var_u + var_l) %*% stats$inv_hessian
-
-  return(list(est = est, se = sqrt(diag(Sigma_hat) / n), lambda = lhat,
-
-    rectifier_est = theta0 - est, var_u = var_u, var_l = var_l,
-
-    grads = stats$grads, grads_hat_unlabeled = stats$grads_hat_unlabeled,
-
-    grads_hat = stats$grads_hat, inv_hessian = stats$inv_hessian))
+    return(list(
+        est = est,
+        se = sqrt(diag(Sigma_hat) / n),
+        lambda = lhat,
+        rectifier_est = theta0 - est,
+        var_u = var_u,
+        var_l = var_l,
+        grads = stats$grads,
+        grads_hat_unlabeled = stats$grads_hat_unlabeled,
+        grads_hat = stats$grads_hat,
+        inv_hessian = stats$inv_hessian
+    ))
 }
-
-#=== END =======================================================================

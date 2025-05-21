@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI MEAN ESTIMATION
-#===============================================================================
-
 #--- PPI MEAN ESTIMATION -------------------------------------------------------
 
 #' PPI Mean Estimation
@@ -34,11 +30,14 @@
 #'
 #' form <- Y - f ~ 1
 #'
-#' Y_l <- dat[dat$set_label == "labeled",   all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled",   all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' ppi_mean(Y_l, f_l, f_u)
 #'
@@ -46,25 +45,23 @@
 #'
 #' @export
 
-ppi_mean <- function(Y_l, f_l, f_u, alpha = 0.05, alternative = "two-sided") {
+ppi_mean <- function(
+    Y_l,
+    f_l,
+    f_u,
+    alpha = 0.05,
+    alternative = "two-sided") {
 
-  #- Compute Dimensions of Inputs
+    n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
+    N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
 
-  n <- ifelse(is.null(dim(Y_l)), length(Y_l), nrow(Y_l))
+    est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat = 1)
 
-  N <- ifelse(is.null(dim(f_u)), length(f_u), nrow(f_u))
+    imputed_std <- sd(f_u) * sqrt((N - 1) / N) / sqrt(N)
 
-  p <- if (length(dim(f_l)) > 1) dim(f_l)[2] else 1
+    rectifier_std <- sd(Y_l - f_l) * sqrt((n - 1) / n) / sqrt(n)
 
-  est <- ppi_plusplus_mean_est(Y_l, f_l, f_u, lhat = 1)
+    return(zconfint_generic(est, sqrt(imputed_std^2 + rectifier_std^2),
 
-  imputed_std <- sd(f_u) * sqrt((N - 1) / N) / sqrt(N)
-
-  rectifier_std <- sd(Y_l - f_l) * sqrt((n - 1) / n) / sqrt(n)
-
-  return(zconfint_generic(
-
-    est, sqrt(imputed_std^2 + rectifier_std^2), alpha, alternative))
+        alpha, alternative))
 }
-
-#=== END =======================================================================

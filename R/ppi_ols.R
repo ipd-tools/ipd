@@ -1,7 +1,3 @@
-#===============================================================================
-# PPI ORDINARY LEAST SQUARES
-#===============================================================================
-
 #--- PPI OLS -------------------------------------------------------------------
 
 #' PPI OLS
@@ -45,15 +41,21 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#'   matrix(ncol = 1)
+#'
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
+#'
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'
+#'   matrix(ncol = 1)
 #'
 #' ppi_ols(X_l, Y_l, f_l, X_u, f_u)
 #'
@@ -61,65 +63,82 @@
 #'
 #' @export
 
-ppi_ols <- function(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL) {
+ppi_ols <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    w_l = NULL,
+    w_u = NULL) {
 
-  n <- NROW(X_l)
+    n <- NROW(X_l)
+    p <- NCOL(X_l)
+    N <- NROW(X_u)
 
-  p <- NCOL(X_l)
+    #- 1. Prediction-Powered Estimator
 
-  N <- NROW(X_u)
+    theta_tilde_f <- solve(crossprod(X_u)) %*% t(X_u) %*% f_u
 
-  #- 1. Prediction-Powered Estimator
+    delta_hat_f <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
 
-  theta_tilde_f <- solve(crossprod(X_u)) %*% t(X_u) %*% f_u
+    theta_hat_pp <- theta_tilde_f - delta_hat_f
 
-  delta_hat_f   <- solve(crossprod(X_l)) %*% t(X_l) %*% (f_l - Y_l)
+    #- 2. Meat and Bread for Imputed Estimate
 
-  theta_hat_pp  <- theta_tilde_f - delta_hat_f
+    Sigma_tilde <- crossprod(X_u) / N
 
-  #- 2. Meat and Bread for Imputed Estimate
+    M_tilde <- vapply(seq_len(N),
 
-  Sigma_tilde <- crossprod(X_u) / N
+        function(i) {
 
-  M_tilde <- sapply(1:N, function(i) {
+            (c(f_u[i] - crossprod(X_u[i, ], theta_tilde_f)))^2 *
 
-    (c(f_u[i] - crossprod(X_u[i,], theta_tilde_f)))^2 *
+                tcrossprod(X_u[i, ])
+        },
 
-      tcrossprod(X_u[i,])}) |>
+        FUN.VALUE = matrix(0, nrow = p^2)) |>
 
-    rowMeans() |> matrix(nrow = p)
+        rowMeans() |>
 
-  iSigma_tilde <- solve(Sigma_tilde)
+        matrix(nrow = p)
 
-  #- 3. Sandwich Variance Estimator for Imputed Estimate
+    iSigma_tilde <- solve(Sigma_tilde)
 
-  V_tilde <- iSigma_tilde %*% M_tilde %*% iSigma_tilde
+    #- 3. Sandwich Variance Estimator for Imputed Estimate
 
-  #- 4. Meat and Bread for Empirical Rectifier
+    V_tilde <- iSigma_tilde %*% M_tilde %*% iSigma_tilde
 
-  Sigma <- crossprod(X_l) / n
+    #- 4. Meat and Bread for Empirical Rectifier
 
-  M <- sapply(1:n, function(i) {
+    Sigma <- crossprod(X_l) / n
 
-    (c(f_l[i] - Y_l[i] - crossprod(X_l[i,], delta_hat_f)))^2 *
+    M <- vapply(seq_len(n),
 
-      tcrossprod(X_l[i,])}) |>
+        function(i) {
 
-    rowMeans() |> matrix(nrow = p)
+            (c(f_l[i] - Y_l[i] - crossprod(X_l[i, ], delta_hat_f)))^2 *
 
-  iSigma <- solve(Sigma)
+                tcrossprod(X_l[i, ])
+        },
 
-  #- 5. Sandwich Variance Estimator for Empirical Rectifier
+        FUN.VALUE = matrix(0, nrow = p^2)) |>
 
-  V <- iSigma %*% M %*% iSigma
+        rowMeans() |>
 
-  #- 6. Standard Error Estimates
+        matrix(nrow = p)
 
-  se <- sqrt(diag(V) / n + diag(V_tilde) / N)
+    iSigma <- solve(Sigma)
 
-  #- Output
+    #- 5. Sandwich Variance Estimator for Empirical Rectifier
 
-  return(list(est = theta_hat_pp, se = se, rectifier_est = delta_hat_f))
+    V <- iSigma %*% M %*% iSigma
+
+    #- 6. Standard Error Estimates
+
+    se <- sqrt(diag(V) / n + diag(V_tilde) / N)
+
+    #- Output
+
+    return(list(est = theta_hat_pp, se = se, rectifier_est = delta_hat_f))
 }
-
-#=== END =======================================================================

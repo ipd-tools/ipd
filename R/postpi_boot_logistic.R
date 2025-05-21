@@ -1,7 +1,3 @@
-#===============================================================================
-#  POSTPI BOOTSTRAP LOGISTIC REGRESSION
-#===============================================================================
-
 #--- POSTPI BOOTSTRAP LOGISTIC REGRESSION --------------------------------------
 
 #' PostPI Logistic Regression (Bootstrap Correction)
@@ -30,8 +26,6 @@
 #' Options include "par" (parametric) or "npar" (nonparametric).
 #' Defaults to "par".
 #'
-#' @param seed (optional) An \code{integer} seed for random number generation.
-#'
 #' @return A list of outputs: estimate of inference model parameters and
 #' corresponding standard error based on both parametric and non-parametric
 #' bootstrap methods.
@@ -42,15 +36,18 @@
 #'
 #' form <- Y - f ~ X1
 #'
-#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled",])
+#' X_l <- model.matrix(form, data = dat[dat$set_label == "labeled", ])
 #'
-#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |> matrix(ncol = 1)
+#' Y_l <- dat[dat$set_label == "labeled", all.vars(form)[1]] |>
+#'   matrix(ncol = 1)
 #'
-#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_l <- dat[dat$set_label == "labeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
-#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled",])
+#' X_u <- model.matrix(form, data = dat[dat$set_label == "unlabeled", ])
 #'
-#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |> matrix(ncol = 1)
+#' f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
+#'   matrix(ncol = 1)
 #'
 #' postpi_boot_logistic(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 #'
@@ -60,79 +57,57 @@
 #'
 #' @export
 
-postpi_boot_logistic <- function(X_l, Y_l, f_l, X_u, f_u,
+postpi_boot_logistic <- function(
+    X_l,
+    Y_l,
+    f_l,
+    X_u,
+    f_u,
+    nboot = 100,
+    se_type = "par") {
 
-  nboot = 100, se_type = "par", seed = NULL) {
+    fit_rel <- caret::train(factor(Y) ~ factor(f),
 
-  #-- 1. Estimate Prediction Model (Done in Data Step)
+        data = data.frame(Y = Y_l, f = f_l), method = "knn")
 
-  #-- 2. Estimate Relationship Model
+    N <- nrow(X_u)
+    p <- ncol(X_u)
 
-  fit_rel <- caret::train(
+    boot_mat <- matrix(NA_real_, nrow = 2*p, ncol = nboot)
 
-    factor(Y) ~ factor(f), data = data.frame(Y = Y_l, f = f_l),
+    for (b in seq_len(nboot)) {
 
-    method = "knn")
+        idx   <- sample.int(N, N, replace = TRUE)
+        f_u_b <- f_u[idx]
+        X_u_b <- X_u[idx, , drop = FALSE]
 
-  #-- 3. Bootstrap
+        prob_b <- predict(fit_rel,
 
-  if (!is.null(seed)) set.seed(seed)
+            newdata = data.frame(f = as.numeric(f_u_b)), type = "prob")[,2]
 
-  n <- nrow(X_l)
+        Y_u_b <- rbinom(N, 1, prob_b)
 
-  N <- nrow(X_u)
+        fit_inf <- glm(Y_u_b ~ X_u_b - 1, family = binomial)
 
-  ests_b <- sapply(1:nboot, function(b) {
+        cm <- summary(fit_inf)$coefficients[, seq_len(2)]
 
-    #-   i. Sample Predicted Values and Covariates with Replacement
+        boot_mat[, b] <- c(cm[,1], cm[,2])
+    }
 
-    idx_b <- sample(1:N, N, replace = T)
+    est_vec <- apply(boot_mat[seq_len(p), ], 1, median)
 
-    f_u_b <- f_u[idx_b, ]
+    if (se_type == "par") {
 
-    X_u_b <- X_u[idx_b, ]
+        se_vec <- apply(boot_mat[(p+1):(2*p), ], 1, median)
 
-    #-  ii. Simulate Values from Relationship Model
+    } else if (se_type == "npar") {
 
-    prob_b <- predict(fit_rel, data.frame(f = f_u_b), type = "prob")[,2]
+        se_vec <- apply(boot_mat[      seq_len(p), ], 1, sd)
 
-    Y_u_b  <- rbinom(N, 1, prob_b)
+    } else {
 
-    #- iii. Fit Inference Model on Simulated Outcomes
+        stop("`se_type` must be either 'par' or 'npar'")
+    }
 
-    fit_inf_b <- glm(Y_u_b ~ X_u_b - 1, family = binomial)
-
-    #-  iv. Extract Coefficient Estimator
-
-    #-   v. Extract SE of Estimator
-
-    return(summary(fit_inf_b)$coefficients[, 1:2])
-  })
-
-  #-- 4. Estimate Inference Model Coefficient
-
-  est <- apply(ests_b[1:(nrow(ests_b)/2),], 1, median)
-
-  #-- 5. Estimate Inference Model SE
-
-  if (se_type == "par") {
-
-    #- a. Parametric Bootstrap
-
-    se <- apply(ests_b[(nrow(ests_b)/2 + 1):nrow(ests_b),], 1, median)
-
-  } else if (se_type == "npar") {
-
-    #- b. Nonparametric Bootstrap
-
-    se <- apply(ests_b[1:(nrow(ests_b)/2),], 1, sd)
-
-  } else {
-
-    stop("se_type must be one of 'par' or 'npar'")
-  }
-
-  #-- Output
-
-  return(list(est = est, se = se))
+    list(est = est_vec, se = se_vec)
 }

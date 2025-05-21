@@ -1,0 +1,23 @@
+## CITATION file for the ipd package
+citHeader("To cite the ipd package in publications, please use:")
+
+citEntry(
+  entry = "Article",
+  title = "ipd: an R package for conducting inference on predicted data",
+  author = c(
+    person("Stephen",    "Salerno",    role = c("aut", "cre")),
+    person("Jiacheng",   "Miao",       role = "aut"),
+    person("Awan",       "Afiaz",      role = "aut"),
+    person("Kentaro",    "Hoffman",    role = "aut"),
+    person("Anna",       "Neufeld",    role = "aut"),
+    person("Qiongshi",   "Lu",         role = "aut"),
+    person("Tyler H",    "McCormick",  role = "aut"),
+    person("Jeffrey T",  "Leek",       role = "aut")
+  ),
+  year    = "2025",
+  journal = "Bioinformatics",
+  volume  = "41",
+  number  = "2",
+  pages   = "btaf055",
+  doi     = "10.1093/bioinformatics/btaf055"
+)
