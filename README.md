@@ -9,6 +9,10 @@
 [![CRAN
 Status](https://www.r-pkg.org/badges/version/ipd)](https://CRAN.R-project.org/package=ipd)
 [![Downloads](https://cranlogs.r-pkg.org/badges/ipd)](https://CRAN.R-project.org/package=ipd)
+[![🇬🇧
+English](https://img.shields.io/badge/English-EN-blue)](/README.md)
+[![🇯🇵
+日本語](https://img.shields.io/badge/日本語-JP-blue)](/README-JPN.md)
 <!-- badges: end -->
 
 ## <img src="man/figures/ipd.png" align="right" height="200" style="float:right; height:200px;"/>
@@ -181,7 +185,7 @@ table below, followed by the specific calls for each method:
     #> Classic                1.10       0.19
     #> Chen and Chen          1.11       0.19
     #> PostPI (Bootstrap)     1.16       0.18
-    #> PostPI (Analytic)      1.15       0.18
+    #> PostPI (Analytic)      1.13       0.19
     #> PPI                    1.12       0.19
     #> PPI All                1.11       0.19
     #> PPI++                  1.12       0.19
@@ -333,8 +337,8 @@ ipd::ipd(formula, method = "postpi_analytic", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.865      0.183    4.72  2.4e-06 ***
-#> X1             1.145      0.182    6.28  3.5e-10 ***
+#> (Intercept)    0.976      0.186    5.24  1.6e-07 ***
+#> X1             1.128      0.192    5.86  4.6e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
