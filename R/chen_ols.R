@@ -63,11 +63,17 @@ chen_ols <- function(
     f_u,
     intercept = TRUE) {
 
+    #- Full Data Vectors/Matrices
+
     f_a <- rbind(f_l, f_u)
     X_a <- rbind(X_l, X_u)
 
-    n_l <- nrow(Y_l)
-    n_a <- nrow(f_a)
+    #- Sample Sizes
+
+    n_l <- nrow(Y_l)  # Number of Labeled Samples
+    n_a <- nrow(f_a)  # Total Number of Samples (Labeled + Unlabeled)
+
+    #- Fit Models and Extract Coefficients
 
     if (intercept){
 
@@ -82,31 +88,46 @@ chen_ols <- function(
         fit_gamma_a <- lm(f_a ~ X_a)
     }
 
-    coef_beta_l  <- coef(fit_beta_l)
-    coef_gamma_l <- coef(fit_gamma_l)
-    coef_gamma_a <- coef(fit_gamma_a)
+    coef_beta_l  <- coef(fit_beta_l)   # Observed Outcomes in Labeled Data
+    coef_gamma_l <- coef(fit_gamma_l)  # Predictions in Labeled Data
+    coef_gamma_a <- coef(fit_gamma_a)  # Predictions in All Data
 
-    D1 <- -crossprod(X_l, X_l) / n_l
-    D2 <- -crossprod(X_l, X_l) / n_l
+    #- Derivative Matrices
+
+    D1 <- D2 <- -crossprod(X_a, X_a) / n_a
+
+    #- Score Matrices
 
     score_beta  <- X_l * residuals(fit_beta_l)
     score_gamma <- X_l * residuals(fit_gamma_l)
+
+    #- Covariance Matrices
 
     C11 <- crossprod(score_beta,  score_beta)  / n_l
     C12 <- crossprod(score_beta,  score_gamma) / n_l
     C22 <- crossprod(score_gamma, score_gamma) / n_l
 
+    #- Matrix Inverses
+
     D1_inv  <- solve(D1)
     C22_inv <- solve(C22)
+
+    #- Correction Terms
 
     D1_C12     <- D1_inv %*% C12
     D1_C12_C22 <- D1_C12 %*% C22_inv
 
+    #- Adjusted Coefficient Estimates
+
     theta_hat <- coef_beta_l -
         D1_C12_C22 %*% D2 %*% (coef_gamma_l - coef_gamma_a)
 
+    #- Variance/Covariance Matrix
+
     Omega <- (D1_inv %*% C11 %*% D1_inv -
         (1 - n_l / n_a) * D1_C12_C22 %*% t(D1_C12)) / n_l
+
+    #-- Standard Errors
 
     se_beta <- sqrt(diag(Omega))
 
