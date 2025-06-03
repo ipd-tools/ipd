@@ -52,7 +52,22 @@ To enable researchers and practitioners interested in these state-of-the-art met
 
 ## Installation
 
-To install the development version of `ipd` from [GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools` package:
+To install the `ipd` package from [Bioconductor](https://www.bioconductor.org/), you can use the `BiocManager` package:
+
+```{r eval = FALSE}
+#-- Install BiocManager if it is not already installed
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(version = "3.21")
+
+#-- Install the ipd package from Bioconductor
+
+BiocManager::install("ipd")
+```
+
+Or, to install the development version of `ipd` from [GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools` package:
 
 ```{r, eval = FALSE}
 #-- Install devtools if it is not already installed
@@ -85,7 +100,9 @@ set.seed(123)
 
 n <- c(10000, 500, 1000)
 
-dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
+dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols", 
+              
+    shift = 1, scale = 2)
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
@@ -456,17 +473,14 @@ For questions, comments, or any other feedback, please contact the developers (<
 
 Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/ipd-tools/ipd). The following method/model combinations are currently implemented:
 
-| Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression | Multiclass Regression |
+| Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression |
 |----------------|----------|----------|----------|----------|----------|----------|
-| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                | :x:                   |
-| [PSPA](https://arxiv.org/abs/2311.14220)                        | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :x:                   |
-| [PSPS](https://arxiv.org/abs/2405.20039)                        | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [PDC](https://arxiv.org/abs/2312.06478)                         | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121)   | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [PPBoot](https://arxiv.org/abs/2405.18379)                      | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
-| [DSL](https://naokiegami.com/paper/dsl.pdf)                     | :x:                | :x:                 | :x:                | :x:                 | :x:                | :x:                   |
+| [Chen and Chen](https://arxiv.org/pdf/2411.19908)               | :x:                | :x:                 | :white_check_mark: | :x:                 | :x:                |
+| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | 
+| [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                |
+| [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                |
+| [PPIa](https://arxiv.org/pdf/2411.19908)                        | :x:                | :x:                 | :white_check_mark: | :x:                 | :x:                |
+| [PSPA](https://arxiv.org/abs/2311.14220)                        | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
 
 ## License
 

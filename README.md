@@ -82,7 +82,24 @@ package.
 
 ## Installation
 
-To install the development version of `ipd` from
+To install the `ipd` package from
+[Bioconductor](https://www.bioconductor.org/), you can use the
+`BiocManager` package:
+
+``` r
+#-- Install BiocManager if it is not already installed
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(version = "3.21")
+
+#-- Install the ipd package from Bioconductor
+
+BiocManager::install("ipd")
+```
+
+Or, to install the development version of `ipd` from
 [GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools`
 package:
 
@@ -126,7 +143,9 @@ set.seed(123)
 
 n <- c(10000, 500, 1000)
 
-dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
+dat <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols", 
+              
+    shift = 1, scale = 2)
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
@@ -142,22 +161,22 @@ head(dat[dat$set_label == "training", ])
 #> 6  1.715  0.58 -0.54 -0.037 -1.42 NA  training
 
 head(dat[dat$set_label == "labeled", ])
-#>          X1      X2    X3    X4     Y     f set_label
-#> 10001  2.37 -1.8984  0.20 -0.17  1.40  3.24   labeled
-#> 10002 -0.17  1.7428  0.26 -2.05  3.56  1.03   labeled
-#> 10003  0.93 -1.0947  0.76  1.25 -3.66  2.37   labeled
-#> 10004 -0.57  0.1757  0.32  0.65 -0.56  0.58   labeled
-#> 10005  0.23  2.0620 -1.35  1.46 -0.82 -0.15   labeled
-#> 10006  1.13 -0.0028  0.23 -0.24  7.30  2.16   labeled
+#>          X1      X2    X3    X4     Y      f set_label
+#> 10001  2.37 -1.8984  0.20 -0.17  1.40  1.120   labeled
+#> 10002 -0.17  1.7428  0.26 -2.05  3.56  0.017   labeled
+#> 10003  0.93 -1.0947  0.76  1.25 -3.66  0.686   labeled
+#> 10004 -0.57  0.1757  0.32  0.65 -0.56 -0.212   labeled
+#> 10005  0.23  2.0620 -1.35  1.46 -0.82 -0.573   labeled
+#> 10006  1.13 -0.0028  0.23 -0.24  7.30  0.579   labeled
 
 head(dat[dat$set_label == "unlabeled", ])
-#>          X1     X2    X3    X4    Y     f set_label
-#> 10501  0.99 -3.280 -0.39  0.97  8.4  1.25 unlabeled
-#> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.08 unlabeled
-#> 10503  0.58 -1.368 -1.73  0.15  5.6 -0.31 unlabeled
-#> 10504 -0.14 -0.728  0.26 -0.23 -4.2  0.91 unlabeled
-#> 10505 -0.17 -0.068 -1.10  0.58  2.2 -0.39 unlabeled
-#> 10506  0.58  0.514 -0.69  0.97 -1.2  0.76 unlabeled
+#>          X1     X2    X3    X4    Y      f set_label
+#> 10501  0.99 -3.280 -0.39  0.97  8.4  0.124 unlabeled
+#> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.040 unlabeled
+#> 10503  0.58 -1.368 -1.73  0.15  5.6 -0.653 unlabeled
+#> 10504 -0.14 -0.728  0.26 -0.23 -4.2 -0.047 unlabeled
+#> 10505 -0.17 -0.068 -1.10  0.58  2.2 -0.693 unlabeled
+#> 10506  0.58  0.514 -0.69  0.97 -1.2 -0.122 unlabeled
 ```
 
 The `simdat` function provides observed and unobserved outcomes for both
@@ -181,15 +200,15 @@ included in the `ipd` package. A summary comparison is provided in the
 table below, followed by the specific calls for each method:
 
     #>                    Estimate Std. Error
-    #> Naive                  0.98       0.03
-    #> Classic                1.10       0.19
-    #> Chen and Chen          1.11       0.19
-    #> PostPI (Bootstrap)     1.16       0.18
-    #> PostPI (Analytic)      1.13       0.19
-    #> PPI                    1.12       0.19
-    #> PPI All                1.11       0.19
-    #> PPI++                  1.12       0.19
-    #> PSPA                   1.11       0.19
+    #> Naive                  0.49      0.015
+    #> Classic                1.10      0.192
+    #> Chen and Chen          1.11      0.186
+    #> PostPI (Bootstrap)     1.16      0.183
+    #> PostPI (Analytic)      1.13      0.191
+    #> PPI                    1.11      0.195
+    #> PPI All                1.11      0.195
+    #> PPI++                  1.10      0.190
+    #> PSPA                   1.09      0.190
 
 We can see that the IPD methods have similar estimates and standard
 errors, while the ‘naive’ method has a different estimate and standard
@@ -212,16 +231,16 @@ lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
 #> 
 #> Residuals:
 #>     Min      1Q  Median      3Q     Max 
-#> -2.5426 -0.6138 -0.0153  0.6345  2.8907 
+#> -1.2713 -0.3069 -0.0076  0.3173  1.4453 
 #> 
 #> Coefficients:
 #>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)   0.8391     0.0297    28.3   <2e-16 ***
-#> X1            0.9848     0.0296    33.3   <2e-16 ***
+#> (Intercept)  -0.0805     0.0148   -5.42  7.4e-08 ***
+#> X1            0.4924     0.0148   33.32  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 0.94 on 998 degrees of freedom
+#> Residual standard error: 0.47 on 998 degrees of freedom
 #> Multiple R-squared:  0.527,  Adjusted R-squared:  0.526 
 #> F-statistic: 1.11e+03 on 1 and 998 DF,  p-value: <2e-16
 ```
@@ -282,8 +301,8 @@ ipd::ipd(formula, method = "chen", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.880      0.182    4.83  1.4e-06 ***
-#> X1             1.114      0.195    5.72  1.1e-08 ***
+#> (Intercept)    0.880      0.182    4.83  1.3e-06 ***
+#> X1             1.114      0.186    5.98  2.2e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -337,8 +356,8 @@ ipd::ipd(formula, method = "postpi_analytic", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.976      0.186    5.24  1.6e-07 ***
-#> X1             1.128      0.192    5.86  4.6e-09 ***
+#> (Intercept)   -0.187      0.187   -1.00     0.32    
+#> X1             1.128      0.191    5.92  3.3e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -363,8 +382,8 @@ ipd::ipd(formula, method = "ppi", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.871      0.182    4.78  1.8e-06 ***
-#> X1             1.122      0.195    5.76  8.6e-09 ***
+#> (Intercept)    0.890      0.183    4.87  1.1e-06 ***
+#> X1             1.110      0.195    5.69  1.3e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -389,8 +408,8 @@ ipd::ipd(formula, method = "ppi_a", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.883      0.182    4.86  1.2e-06 ***
-#> X1             1.114      0.194    5.73  9.9e-09 ***
+#> (Intercept)    0.896      0.183    4.91  9.2e-07 ***
+#> X1             1.106      0.195    5.67  1.4e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -415,8 +434,8 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.881      0.182    4.83  1.3e-06 ***
-#> X1             1.116      0.187    5.98  2.2e-09 ***
+#> (Intercept)    0.904      0.185    4.87  1.1e-06 ***
+#> X1             1.100      0.190    5.78  7.5e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -441,8 +460,8 @@ ipd::ipd(formula, method = "pspa", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.881      0.182    4.83  1.3e-06 ***
-#> X1             1.109      0.187    5.94  2.8e-09 ***
+#> (Intercept)    0.900      0.185    4.87  1.1e-06 ***
+#> X1             1.095      0.190    5.76  8.5e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -520,13 +539,13 @@ glance(fit_postpi)
 augmented_df <- augment(fit_postpi)
 
 head(augmented_df)
-#>          X1     X2    X3    X4    Y     f set_label .fitted .resid
-#> 10501  0.99 -3.280 -0.39  0.97  8.4  1.25 unlabeled   1.992    6.5
-#> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.08 unlabeled   0.099   -7.3
-#> 10503  0.58 -1.368 -1.73  0.15  5.6 -0.31 unlabeled   1.522    4.1
-#> 10504 -0.14 -0.728  0.26 -0.23 -4.2  0.91 unlabeled   0.702   -4.9
-#> 10505 -0.17 -0.068 -1.10  0.58  2.2 -0.39 unlabeled   0.667    1.5
-#> 10506  0.58  0.514 -0.69  0.97 -1.2  0.76 unlabeled   1.521   -2.7
+#>          X1     X2    X3    X4    Y      f set_label .fitted .resid
+#> 10501  0.99 -3.280 -0.39  0.97  8.4  0.124 unlabeled   1.992    6.5
+#> 10502 -0.66  0.142 -1.36 -0.22 -7.2 -1.040 unlabeled   0.099   -7.3
+#> 10503  0.58 -1.368 -1.73  0.15  5.6 -0.653 unlabeled   1.522    4.1
+#> 10504 -0.14 -0.728  0.26 -0.23 -4.2 -0.047 unlabeled   0.702   -4.9
+#> 10505 -0.17 -0.068 -1.10  0.58  2.2 -0.693 unlabeled   0.667    1.5
+#> 10506  0.58  0.514 -0.69  0.97 -1.2 -0.122 unlabeled   1.521   -2.7
 ```
 
 ## Vignette
@@ -549,17 +568,14 @@ Contributions are welcome! Please open an issue or submit a pull request
 on [GitHub](https://github.com/ipd-tools/ipd). The following
 method/model combinations are currently implemented:
 
-| Method | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression | Multiclass Regression |
+| Method | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression |  |
 |----|----|----|----|----|----|----|
-| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x: | :x: | :white_check_mark: | :white_check_mark: | :x: | :x: |
-| [PPI](https://www.science.org/doi/10.1126/science.adi6000) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: |
-| [PPI++](https://arxiv.org/abs/2311.01453) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: |
-| [PSPA](https://arxiv.org/abs/2311.14220) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: |
-| [PSPS](https://arxiv.org/abs/2405.20039) | :x: | :x: | :x: | :x: | :x: | :x: |
-| [PDC](https://arxiv.org/abs/2312.06478) | :x: | :x: | :x: | :x: | :x: | :x: |
-| [Cross-PPI](https://www.pnas.org/doi/10.1073/pnas.2322083121) | :x: | :x: | :x: | :x: | :x: | :x: |
-| [PPBoot](https://arxiv.org/abs/2405.18379) | :x: | :x: | :x: | :x: | :x: | :x: |
-| [DSL](https://naokiegami.com/paper/dsl.pdf) | :x: | :x: | :x: | :x: | :x: | :x: |
+| [Chen and Chen](https://arxiv.org/pdf/2411.19908) | :x: | :x: | :white_check_mark: | :x: | :x: |  |
+| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x: | :x: | :white_check_mark: | :white_check_mark: | :x: |  |
+| [PPI](https://www.science.org/doi/10.1126/science.adi6000) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: |  |
+| [PPI++](https://arxiv.org/abs/2311.01453) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: |  |
+| [PPIa](https://arxiv.org/pdf/2411.19908) | :x: | :x: | :white_check_mark: | :x: | :x: |  |
+| [PSPA](https://arxiv.org/abs/2311.14220) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |  |
 
 ## License
 

@@ -1,6 +1,8 @@
 ---
 title: "Getting Started with the ipd Package"
-output: BiocStyle::html_document
+output: 
+  BiocStyle::html_document:
+    keep_md: true
 vignette: >
   %\VignetteIndexEntry{Getting Started with the ipd Package}
   %\VignetteEngine{knitr::rmarkdown}
@@ -85,7 +87,22 @@ $f(X^\mathcal{U})$.
 
 ## Installation
 
-To install the development version of `ipd` from 
+To install the `ipd` package from [Bioconductor](https://www.bioconductor.org/), you can use the `BiocManager` package:
+
+```{r eval = FALSE}
+#-- Install BiocManager if it is not already installed
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(version = "3.21")
+
+#-- Install the ipd package from Bioconductor
+
+BiocManager::install("ipd")
+```
+
+Or, to install the development version of `ipd` from 
 [GitHub](https://github.com/ipd-tools/ipd), you can use the `devtools` package:
 
 ```{r, eval=FALSE}
@@ -154,7 +171,9 @@ set.seed(123)
 
 n <- c(10000, 500, 1000)
 
-dat_ols <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols")
+dat_ols <- simdat(n = n, effect = 1, sigma_Y = 4, model = "ols",
+                  
+    shift = 1, scale = 2)
 
 #-- Print First 6 Rows of Training, Labeled, and Unlabeled Subsets
 
