@@ -131,9 +131,12 @@ observations used to fit a prediction model, and “labeled” and
 the simulated features of interest.
 
 ``` r
-#-- Load the ipd Library
+#-- Load necessary libraries
 
 library(ipd)
+library(viridis)
+library(tidyverse)
+library(patchwork)
 ```
 
 ``` r
@@ -189,15 +192,21 @@ relationships between these variables:
 We can see that:
 
 - The predicted outcomes are more correlated with the covariate than the
-  true outcomes (plot A).
+  true outcomes (panels A and B).
 - The predicted outcomes are not perfect substitutes for the true
-  outcomes (plot B).
+  outcomes (panel C).
 
 ### Model Fitting
 
 We compare two non-IPD approaches to analyzing the data to methods
-included in the `ipd` package. A summary comparison is provided in the
-table below, followed by the specific calls for each method:
+included in the `ipd` package. The two non-IPD benchmarks are the
+‘naive’ method and the ‘classic’ method. The ‘naive’ treats the
+predicted outcomes as if they were observed and regresses the
+predictions on the covariates of interest without calibration. The
+‘classic’ uses only the subset of labeled observations where we observe
+the true outcome. The IPD methods are listed in alphabetical order by
+method name. A summary comparison is provided in the table below,
+followed by the specific calls for each method:
 
     #>                    Estimate Std. Error
     #> Naive                  0.49      0.015
@@ -216,7 +225,7 @@ errors that are too small. We compare two non-IPD approaches to
 analyzing the data to methods included in the `ipd` package in more
 detail below.
 
-#### 0.1 ‘Naive’ Regression Using the Predicted Outcomes
+#### ‘Naive’ Regression Using the Predicted Outcomes
 
 ``` r
 #--- Fit the Naive Regression
@@ -245,7 +254,7 @@ lm(f ~ X1, data = dat[dat$set_label == "unlabeled", ]) |>
 #> F-statistic: 1.11e+03 on 1 and 998 DF,  p-value: <2e-16
 ```
 
-#### 0.2 ‘Classic’ Regression Using only the Labeled Data
+#### ‘Classic’ Regression Using only the Labeled Data
 
 ``` r
 #--- Fit the Classic Regression
@@ -276,7 +285,7 @@ lm(Y ~ X1, data = dat[dat$set_label == "labeled", ]) |>
 You can fit the various IPD methods to your data and obtain summaries
 using the provided wrapper function, `ipd()`:
 
-#### 1. Chen and Chen Correction (Gronsbell et al., 2025)
+#### Chen and Chen Correction (Gronsbell et al., 2025)
 
 ``` r
 
@@ -307,7 +316,7 @@ ipd::ipd(formula, method = "chen", model = "ols",
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 2.1 PostPI Bootstrap Correction (Wang et al., 2020)
+#### PostPI Bootstrap Correction (Wang et al., 2020)
 
 ``` r
 
@@ -336,7 +345,7 @@ ipd::ipd(formula, method = "postpi_boot", model = "ols",
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 2.2 PostPI Analytic Correction (Wang et al., 2020)
+#### PostPI Analytic Correction (Wang et al., 2020)
 
 ``` r
 #-- Fit the PostPI Analytic Correction
@@ -362,7 +371,7 @@ ipd::ipd(formula, method = "postpi_analytic", model = "ols",
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 3. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+#### Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ``` r
 #-- Fit the PPI Correction
@@ -388,7 +397,7 @@ ipd::ipd(formula, method = "ppi", model = "ols",
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 4. PPI “All” (Gronsbell et al., 2025)
+#### PPI “All” (Gronsbell et al., 2025)
 
 ``` r
 #-- Fit the PPI Correction
@@ -414,7 +423,7 @@ ipd::ipd(formula, method = "ppi_a", model = "ols",
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 5. PPI++ (Angelopoulos et al., 2023)
+#### PPI++ (Angelopoulos et al., 2023)
 
 ``` r
 #-- Fit the PPI++ Correction
@@ -440,7 +449,7 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "ols",
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-#### 6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
+#### Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ``` r
 #-- Fit the PSPA Correction
@@ -606,34 +615,35 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] patchwork_1.3.0 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  
-#>  [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
-#>  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.99.0     
+#>  [1] patchwork_1.3.0   lubridate_1.9.4   forcats_1.0.0     stringr_1.5.1    
+#>  [5] dplyr_1.1.4       purrr_1.0.2       readr_2.1.5       tidyr_1.3.1      
+#>  [9] tibble_3.2.1      ggplot2_3.5.2     tidyverse_2.0.0   viridis_0.6.5    
+#> [13] viridisLite_0.4.2 ipd_0.99.0       
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6         xfun_0.52            recipes_1.2.1       
-#>  [4] lattice_0.22-6       tzdb_0.5.0           vctrs_0.6.5         
-#>  [7] tools_4.4.1          generics_0.1.3       stats4_4.4.1        
-#> [10] parallel_4.4.1       pkgconfig_2.0.3      ModelMetrics_1.2.2.2
-#> [13] Matrix_1.7-0         data.table_1.17.0    lifecycle_1.0.4     
-#> [16] farver_2.1.2         compiler_4.4.1       munsell_0.5.1       
-#> [19] codetools_0.2-20     htmltools_0.5.8.1    class_7.3-22        
-#> [22] yaml_2.3.10          prodlim_2024.06.25   pillar_1.10.2       
-#> [25] MASS_7.3-60.2        gower_1.0.2          iterators_1.0.14    
-#> [28] rpart_4.1.23         foreach_1.5.2        nlme_3.1-164        
-#> [31] parallelly_1.43.0    lava_1.8.1           tidyselect_1.2.1    
-#> [34] digest_0.6.37        stringi_1.8.7        future_1.40.0       
-#> [37] reshape2_1.4.4       listenv_0.9.1        labeling_0.4.3      
-#> [40] splines_4.4.1        fastmap_1.2.0        grid_4.4.1          
-#> [43] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
-#> [46] utf8_1.2.4           randomForest_4.7-1.2 survival_3.8-3      
-#> [49] future.apply_1.11.3  withr_3.0.2          scales_1.3.0        
-#> [52] timechange_0.3.0     rmarkdown_2.29       globals_0.16.3      
-#> [55] nnet_7.3-19          timeDate_4041.110    ranger_0.17.0       
-#> [58] hms_1.1.3            gam_1.22-5           evaluate_1.0.3      
-#> [61] knitr_1.50           hardhat_1.4.1        caret_7.0-1         
-#> [64] mgcv_1.9-1           rlang_1.1.4          Rcpp_1.0.13-1       
-#> [67] glue_1.8.0           BiocGenerics_0.50.0  pROC_1.18.5         
-#> [70] ipred_0.9-15         rstudioapi_0.17.1    R6_2.6.1            
-#> [73] plyr_1.8.9
+#>  [1] tidyselect_1.2.1     timeDate_4041.110    farver_2.1.2        
+#>  [4] fastmap_1.2.0        pROC_1.18.5          caret_7.0-1         
+#>  [7] digest_0.6.37        rpart_4.1.23         timechange_0.3.0    
+#> [10] lifecycle_1.0.4      survival_3.8-3       magrittr_2.0.3      
+#> [13] compiler_4.4.1       rlang_1.1.4          tools_4.4.1         
+#> [16] utf8_1.2.4           yaml_2.3.10          data.table_1.17.0   
+#> [19] knitr_1.50           labeling_0.4.3       plyr_1.8.9          
+#> [22] withr_3.0.2          BiocGenerics_0.50.0  nnet_7.3-19         
+#> [25] grid_4.4.1           stats4_4.4.1         colorspace_2.1-1    
+#> [28] future_1.40.0        globals_0.16.3       scales_1.3.0        
+#> [31] iterators_1.0.14     MASS_7.3-60.2        cli_3.6.3           
+#> [34] rmarkdown_2.29       generics_0.1.3       rstudioapi_0.17.1   
+#> [37] future.apply_1.11.3  reshape2_1.4.4       tzdb_0.5.0          
+#> [40] splines_4.4.1        parallel_4.4.1       vctrs_0.6.5         
+#> [43] hardhat_1.4.1        Matrix_1.7-0         hms_1.1.3           
+#> [46] listenv_0.9.1        foreach_1.5.2        gam_1.22-5          
+#> [49] gower_1.0.2          recipes_1.2.1        glue_1.8.0          
+#> [52] parallelly_1.43.0    codetools_0.2-20     stringi_1.8.7       
+#> [55] gtable_0.3.6         munsell_0.5.1        pillar_1.10.2       
+#> [58] htmltools_0.5.8.1    ipred_0.9-15         randomForest_4.7-1.2
+#> [61] lava_1.8.1           R6_2.6.1             evaluate_1.0.3      
+#> [64] lattice_0.22-6       class_7.3-22         Rcpp_1.0.13-1       
+#> [67] gridExtra_2.3        nlme_3.1-164         prodlim_2024.06.25  
+#> [70] mgcv_1.9-1           ranger_0.17.0        xfun_0.52           
+#> [73] ModelMetrics_1.2.2.2 pkgconfig_2.0.3
 ```

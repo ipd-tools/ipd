@@ -121,9 +121,12 @@ We provide a simple example to demonstrate the basic use of the functions
 included in the `ipd` package.
 
 ```{r setup}
-#-- Load ipd Package
+#-- Load necessary libraries
 
 library(ipd)
+library(viridis)
+library(tidyverse)
+library(patchwork)
 ```
 
 ## Data Generation
@@ -191,92 +194,63 @@ labeled and unlabeled datasets, though in practice the observed outcomes are
 not in the unlabeled set. We can visualize the relationships between these 
 variables in the labeled data subset:
 
-```{r plot, echo=FALSE, comment = NA, fig.height=4, fig.width=7}
-library(tidyverse)
-
-library(patchwork)
-
+```{r plot, echo = FALSE, error = FALSE, warning = FALSE, message = FALSE, comment = NA, fig.height=3, dpi=900}
 #-- Plot example labeled data
 
 dat_labeled <- dat_ols[dat_ols$set_label == "labeled", ]
 
-p1 <- dat_labeled |>
+my_theme <- theme_bw() +
 
-    pivot_longer(Y:f) |>
+    theme(
+        
+        axis.title = element_text(size = 8),
+            
+        axis.text = element_text(size = 8),
+            
+        title = element_text(size = 8))
 
-    mutate(
+p1 <- ggplot(dat_labeled, aes(x = X1, y = Y)) + my_theme +
+  
+    coord_fixed(1 / 3) + geom_abline(slope = 1, intercept = 0) +
 
-        name = factor(name, c("f", "Y"), c("Predicted ", "Observed ")) |> 
+    geom_point(alpha = 0.5) + geom_smooth(method = "lm") +
 
-                fct_rev()) |>
+    scale_x_continuous(limits = c(-2.5, 2.5)) +
+      
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+      
+    labs(x = "\nCovariate", y = "Observed Outcome\n")
 
-    ggplot(aes(x = X1, y = value, group = name, color = name, fill = name)) +
+p2 <- ggplot(dat_labeled, aes(x = X1, y = f)) +
+  
+    my_theme + coord_fixed(1 / 3) + geom_abline(slope = 1, intercept = 0) +
+      
+    geom_point(alpha = 0.5) + geom_smooth(method = "lm") +
+      
+    scale_x_continuous(limits = c(-2.5, 2.5)) +
+      
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+      
+    labs(x = "\nCovariate", y = "Predicted Outcome\n") 
 
-        theme_bw() +
-
-        coord_fixed(1 / 3) +
-
-        geom_abline(slope = 1, intercept = 0) +
-
-        geom_point(alpha = 0.5) +
-
-        geom_smooth(method = "lm") +
-
-        scale_x_continuous(limits = c(-2.5, 2.5)) +
-
-        scale_y_continuous(limits = c(-7.5, 7.5)) +
-
-        scale_color_manual(values = c("#AA4AC4", "#00C1D5")) +
-
-        scale_fill_manual(values = c("#AA4AC4", "#00C1D5")) +
-
-        labs(
-
-            x = "\nCovariate", y = "Outcome\n", fill = NULL, color = NULL,
-            title = "Outcomes vs. Covariate") +
-
-        theme(
+p3 <- ggplot(dat_labeled, aes(x = f, y = Y)) +
     
-            legend.direction = "horizontal",
-            legend.position = "inside",
-            legend.position.inside = c(0.5, 0.91),
-            axis.title = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            title = element_text(size = 8))
+    my_theme + coord_fixed(2 / 3) + geom_abline(slope = 1, intercept = 0) +
+    
+    geom_point(alpha = 0.5) + geom_smooth(method = "lm") +
+    
+    scale_x_continuous(limits = c(-5.0, 5.0)) +
+    
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+    
+    labs(x = "\nPredicted Outcome", y = "Observed Outcome\n")
 
-p2 <- dat_labeled |>
+fig1 <- (p1 + theme(plot.margin = unit(c(0, 0, 0, 0), "pt"))) +
 
-    ggplot(aes(x = f, y = Y)) +
-
-        theme_bw() +
-
-        coord_fixed(1) +
-
-        geom_abline(slope = 1, intercept = 1) +
-
-        geom_point(color = "#00C1D5", alpha = 0.5) +
-
-        geom_smooth(method = "lm", color = "#00C1D5") +
-
-        scale_x_continuous(limits = c(-7.5, 7.5)) +
-
-        scale_y_continuous(limits = c(-7.5, 7.5)) +
-
-        labs(
-
-            x = "\nPredicted Outcome", y = "Observed Outcome\n",
-            title = "Predicted vs. Observed Outcomes") +
-
-        theme(
-
-            axis.title = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            title = element_text(size = 8))
-
-fig1 <- (p1 + theme(plot.margin = unit(c(0, 20, 0, 0), "pt"))) +
-
-    (p2 + theme(plot.margin = unit(c(0, 20, 0, 20), "pt"))) +
-
+    (p2 + theme(plot.margin = unit(c(0, 10, 0, 10), "pt"))) +
+  
+    (p3 + theme(plot.margin = unit(c(0, 10, 0, 0), "pt"))) +
+  
     plot_annotation(tag_levels = "A")
 
 fig1
@@ -284,10 +258,8 @@ fig1
 
 We can see that:
 
--   The predicted outcomes are more correlated with the covariate than the 
-true outcomes (plot A)
--   The predicted outcomes are not perfect substitutes for the 
-true outcomes (plot B)
+-   The predicted outcomes are more correlated with the covariate than the true outcomes (panels A and B).
+-   The predicted outcomes are not perfect substitutes for the true outcomes (panel C).
 
 ### Generating Data for Logistic Regression
 
@@ -333,7 +305,7 @@ outcome variables in the labeled data subset and see that
 `r sprintf("%2.1f%%", sum(with(dat_logistic_labeled_summ, pct[fill == 1])))`
 observations are correctly predicted:
 
-```{r plot2, echo=FALSE, fig.width=7}
+```{r plot2, echo=FALSE, fig.width=7, dpi=900}
 dat_logistic_labeled_summ |>
 
     ggplot(aes(x = f, y = Y, fill = fill)) +
@@ -350,8 +322,10 @@ dat_logistic_labeled_summ |>
 
         scale_y_discrete(expand = c(0, 0)) +
 
-        scale_fill_gradient(high = "#00C1D5", low = "#FFB500") +
-
+        scale_fill_gradient(high = "steelblue", low = "white") +
+  
+        labs(x = "\nPredicted Outcome", y = "Observed Outcome\n") +
+  
         theme(legend.position = "none")
 ```
 
@@ -359,10 +333,9 @@ dat_logistic_labeled_summ |>
 
 ### Linear Regression
 
-We compare two non-IPD approaches to analyzing the data to methods included in 
-the `ipd` package.
+We compare two non-IPD approaches to analyzing the data to methods included in the `ipd` package. The two non-IPD benchmarks are the 'naive' method and the 'classic' method. The 'naive' treats the predicted outcomes as if they were observed and regresses the predictions on the covariates of interest without calibration. The 'classic' uses only the subset of labeled observations where we observe the true outcome. The IPD methods are listed in alphabetical order by method name. 
 
-#### 0.1 'Naive' Regression Using the Predicted Outcomes
+#### 'Naive' Regression Using the Predicted Outcomes
 
 ```{r naive}
 #--- Fit the Naive Regression
@@ -372,7 +345,7 @@ lm(f ~ X1, data = dat_ols[dat_ols$set_label == "unlabeled", ]) |>
     summary()
 ```
 
-#### 0.2 'Classic' Regression Using only the Labeled Data
+#### 'Classic' Regression Using only the Labeled Data
 
 ```{r classic}
 #--- Fit the Classic Regression
@@ -385,7 +358,7 @@ lm(Y ~ X1, data = dat_ols[dat_ols$set_label == "labeled", ]) |>
 You can fit the various IPD methods to your data and obtain summaries using the 
 provided wrapper function, `ipd()`:
 
-#### 1. Chen and Chen Correction (Gronsbell et al., 2025)
+#### Chen and Chen Correction (Gronsbell et al., 2025)
 
 ```{r chen_ols}
 
@@ -403,7 +376,7 @@ ipd::ipd(formula, method = "chen", model = "ols",
 
 ```
 
-#### 2.1 PostPI Bootstrap Correction (Wang et al., 2020)
+#### PostPI Bootstrap Correction (Wang et al., 2020)
 
 ```{r postpi_boot_ols}
 
@@ -418,7 +391,7 @@ ipd::ipd(formula, method = "postpi_boot", model = "ols",
     summary()
 ```
 
-#### 2.2 PostPI Analytic Correction (Wang et al., 2020)
+#### PostPI Analytic Correction (Wang et al., 2020)
 
 ```{r postpi_analytic_ols}
 #-- Fit the PostPI Analytic Correction
@@ -430,7 +403,7 @@ ipd::ipd(formula, method = "postpi_analytic", model = "ols",
     summary()
 ```
 
-#### 3. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+#### Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ```{r ppi_ols}
 #-- Fit the PPI Correction
@@ -442,7 +415,7 @@ ipd::ipd(formula, method = "ppi", model = "ols",
     summary()
 ```
 
-#### 4. PPI "All" (Gronsbell et al., 2025)
+#### PPI "All" (Gronsbell et al., 2025)
 
 
 ```{r ppi_a_ols}
@@ -456,7 +429,7 @@ ipd::ipd(formula, method = "ppi_a", model = "ols",
 ```
 
 
-#### 5. PPI++ (Angelopoulos et al., 2023)
+#### PPI++ (Angelopoulos et al., 2023)
 
 ```{r ppi_plusplus}
 #-- Fit the PPI++ Correction
@@ -468,7 +441,7 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "ols",
     summary()
 ```
 
-#### 6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
+#### Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ```{r pspa}
 #-- Fit the PSPA Correction
@@ -484,7 +457,7 @@ ipd::ipd(formula, method = "pspa", model = "ols",
 
 We also show how these methods compare for logistic regression.
 
-#### 0.1 'Naive' Regression Using the Predicted Outcomes
+#### 'Naive' Regression Using the Predicted Outcomes
 
 ```{r naive2}
 #--- Fit the Naive Regression
@@ -496,7 +469,7 @@ glm(f ~ X1, family = binomial,
     summary()
 ```
 
-#### 0.2 'Classic' Regression Using only the Labeled Data
+#### 'Classic' Regression Using only the Labeled Data
 
 ```{r classic2}
 #--- Fit the Classic Regression
@@ -511,7 +484,7 @@ glm(Y ~ X1, family = binomial,
 You can again fit the various IPD methods to your data and obtain summaries 
 using the provided wrapper function, `ipd()`:
 
-#### 1. PostPI Bootstrap Correction (Wang et al., 2020)
+#### PostPI Bootstrap Correction (Wang et al., 2020)
 
 ```{r postpi_boot2}
 #-- Specify the Formula
@@ -529,7 +502,7 @@ ipd::ipd(formula, method = "postpi_boot", model = "logistic",
     summary()
 ```
 
-#### 2. Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
+#### Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)
 
 ```{r ppi2}
 #-- Fit the PPI Correction
@@ -541,7 +514,7 @@ ipd::ipd(formula, method = "ppi", model = "logistic",
     summary()
 ```
 
-#### 3. PPI++ (Angelopoulos et al., 2023)
+#### PPI++ (Angelopoulos et al., 2023)
 
 ```{r ppi_plusplus2}
 #-- Fit the PPI++ Correction
@@ -553,7 +526,7 @@ ipd::ipd(formula, method = "ppi_plusplus", model = "logistic",
     summary()
 ```
 
-#### 4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
+#### Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)
 
 ```{r pspa2}
 #-- Fit the PSPA Correction
