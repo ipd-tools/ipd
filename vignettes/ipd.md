@@ -117,7 +117,6 @@ included in the `ipd` package.
 #-- Load necessary libraries
 
 library(ipd)
-library(viridis)
 library(tidyverse)
 library(patchwork)
 ```

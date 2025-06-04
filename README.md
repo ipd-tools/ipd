@@ -134,7 +134,6 @@ the simulated features of interest.
 #-- Load necessary libraries
 
 library(ipd)
-library(viridis)
 library(tidyverse)
 library(patchwork)
 ```
@@ -615,35 +614,34 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] patchwork_1.3.0   lubridate_1.9.4   forcats_1.0.0     stringr_1.5.1    
-#>  [5] dplyr_1.1.4       purrr_1.0.2       readr_2.1.5       tidyr_1.3.1      
-#>  [9] tibble_3.2.1      ggplot2_3.5.2     tidyverse_2.0.0   viridis_0.6.5    
-#> [13] viridisLite_0.4.2 ipd_0.99.0       
+#>  [1] patchwork_1.3.0 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  
+#>  [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
+#>  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.99.0     
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] tidyselect_1.2.1     timeDate_4041.110    farver_2.1.2        
-#>  [4] fastmap_1.2.0        pROC_1.18.5          caret_7.0-1         
-#>  [7] digest_0.6.37        rpart_4.1.23         timechange_0.3.0    
-#> [10] lifecycle_1.0.4      survival_3.8-3       magrittr_2.0.3      
-#> [13] compiler_4.4.1       rlang_1.1.4          tools_4.4.1         
-#> [16] utf8_1.2.4           yaml_2.3.10          data.table_1.17.0   
-#> [19] knitr_1.50           labeling_0.4.3       plyr_1.8.9          
-#> [22] withr_3.0.2          BiocGenerics_0.50.0  nnet_7.3-19         
-#> [25] grid_4.4.1           stats4_4.4.1         colorspace_2.1-1    
-#> [28] future_1.40.0        globals_0.16.3       scales_1.3.0        
-#> [31] iterators_1.0.14     MASS_7.3-60.2        cli_3.6.3           
-#> [34] rmarkdown_2.29       generics_0.1.3       rstudioapi_0.17.1   
-#> [37] future.apply_1.11.3  reshape2_1.4.4       tzdb_0.5.0          
-#> [40] splines_4.4.1        parallel_4.4.1       vctrs_0.6.5         
-#> [43] hardhat_1.4.1        Matrix_1.7-0         hms_1.1.3           
-#> [46] listenv_0.9.1        foreach_1.5.2        gam_1.22-5          
-#> [49] gower_1.0.2          recipes_1.2.1        glue_1.8.0          
-#> [52] parallelly_1.43.0    codetools_0.2-20     stringi_1.8.7       
-#> [55] gtable_0.3.6         munsell_0.5.1        pillar_1.10.2       
-#> [58] htmltools_0.5.8.1    ipred_0.9-15         randomForest_4.7-1.2
-#> [61] lava_1.8.1           R6_2.6.1             evaluate_1.0.3      
-#> [64] lattice_0.22-6       class_7.3-22         Rcpp_1.0.13-1       
-#> [67] gridExtra_2.3        nlme_3.1-164         prodlim_2024.06.25  
-#> [70] mgcv_1.9-1           ranger_0.17.0        xfun_0.52           
-#> [73] ModelMetrics_1.2.2.2 pkgconfig_2.0.3
+#>  [1] gtable_0.3.6         xfun_0.52            recipes_1.2.1       
+#>  [4] lattice_0.22-6       tzdb_0.5.0           vctrs_0.6.5         
+#>  [7] tools_4.4.1          generics_0.1.3       stats4_4.4.1        
+#> [10] parallel_4.4.1       pkgconfig_2.0.3      ModelMetrics_1.2.2.2
+#> [13] Matrix_1.7-0         data.table_1.17.0    lifecycle_1.0.4     
+#> [16] farver_2.1.2         compiler_4.4.1       munsell_0.5.1       
+#> [19] codetools_0.2-20     htmltools_0.5.8.1    class_7.3-22        
+#> [22] yaml_2.3.10          prodlim_2024.06.25   pillar_1.10.2       
+#> [25] MASS_7.3-60.2        gower_1.0.2          iterators_1.0.14    
+#> [28] rpart_4.1.23         foreach_1.5.2        nlme_3.1-164        
+#> [31] parallelly_1.43.0    lava_1.8.1           tidyselect_1.2.1    
+#> [34] digest_0.6.37        stringi_1.8.7        future_1.40.0       
+#> [37] reshape2_1.4.4       listenv_0.9.1        labeling_0.4.3      
+#> [40] splines_4.4.1        fastmap_1.2.0        grid_4.4.1          
+#> [43] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
+#> [46] utf8_1.2.4           randomForest_4.7-1.2 survival_3.8-3      
+#> [49] future.apply_1.11.3  withr_3.0.2          scales_1.3.0        
+#> [52] timechange_0.3.0     rmarkdown_2.29       globals_0.16.3      
+#> [55] nnet_7.3-19          timeDate_4041.110    ranger_0.17.0       
+#> [58] hms_1.1.3            gam_1.22-5           evaluate_1.0.3      
+#> [61] knitr_1.50           hardhat_1.4.1        caret_7.0-1         
+#> [64] mgcv_1.9-1           rlang_1.1.4          Rcpp_1.0.13-1       
+#> [67] glue_1.8.0           BiocGenerics_0.50.0  pROC_1.18.5         
+#> [70] ipred_0.9-15         rstudioapi_0.17.1    R6_2.6.1            
+#> [73] plyr_1.8.9
 ```

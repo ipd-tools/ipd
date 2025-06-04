@@ -91,7 +91,6 @@ You can generate synthetic datasets for different types of regression models usi
 #-- Load necessary libraries
 
 library(ipd)
-library(viridis)
 library(tidyverse)
 library(patchwork)
 ```
