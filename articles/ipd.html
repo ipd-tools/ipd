@@ -171,9 +171,11 @@ by
 <p>We provide a simple example to demonstrate the basic use of the
 functions included in the <code>ipd</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Load ipd Package</span></span>
+<code class="sourceCode R"><span><span class="co">#-- Load necessary libraries</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ipd-tools/ipd" class="external-link">ipd</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ipd-tools/ipd" class="external-link">ipd</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="data-generation">Data Generation<a class="anchor" aria-label="anchor" href="#data-generation"></a>
 </h3>
@@ -273,13 +275,13 @@ subsets:</p>
 outcomes for both the labeled and unlabeled datasets, though in practice
 the observed outcomes are not in the unlabeled set. We can visualize the
 relationships between these variables in the labeled data subset:</p>
-<p><img src="ipd_files/figure-html/plot-1.png" width="672"></p>
+<p><img src="ipd_files/figure-html/plot-1.png" width="6562.5"></p>
 <p>We can see that:</p>
 <ul>
 <li>The predicted outcomes are more correlated with the covariate than
-the true outcomes (plot A)</li>
+the true outcomes (panels A and B).</li>
 <li>The predicted outcomes are not perfect substitutes for the true
-outcomes (plot B)</li>
+outcomes (panel C).</li>
 </ul>
 </div>
 <div class="section level4">
@@ -325,7 +327,7 @@ predictors for logistic regression as follows:</p>
 <p>We can again visualize the relationships between the true and
 predicted outcome variables in the labeled data subset and see that
 81.8% observations are correctly predicted:</p>
-<p><img src="ipd_files/figure-html/plot2-1.png" width="672"></p>
+<p><img src="ipd_files/figure-html/plot2-1.png" width="6300"></p>
 </div>
 </div>
 <div class="section level3">
@@ -335,9 +337,15 @@ predicted outcome variables in the labeled data subset and see that
 <h4 id="linear-regression">Linear Regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
 </h4>
 <p>We compare two non-IPD approaches to analyzing the data to methods
-included in the <code>ipd</code> package.</p>
+included in the <code>ipd</code> package. The two non-IPD benchmarks are
+the ‘naive’ method and the ‘classic’ method. The ‘naive’ treats the
+predicted outcomes as if they were observed and regresses the
+predictions on the covariates of interest without calibration. The
+‘classic’ uses only the subset of labeled observations where we observe
+the true outcome. The IPD methods are listed in alphabetical order by
+method name.</p>
 <div class="section level5">
-<h5 id="naive-regression-using-the-predicted-outcomes">0.1 ‘Naive’ Regression Using the Predicted Outcomes<a class="anchor" aria-label="anchor" href="#naive-regression-using-the-predicted-outcomes"></a>
+<h5 id="naive-regression-using-the-predicted-outcomes">‘Naive’ Regression Using the Predicted Outcomes<a class="anchor" aria-label="anchor" href="#naive-regression-using-the-predicted-outcomes"></a>
 </h5>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#--- Fit the Naive Regression</span></span>
@@ -366,7 +374,7 @@ included in the <code>ipd</code> package.</p>
 <span><span class="co">#&gt; F-statistic: 1.11e+03 on 1 and 998 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="classic-regression-using-only-the-labeled-data">0.2 ‘Classic’ Regression Using only the Labeled Data<a class="anchor" aria-label="anchor" href="#classic-regression-using-only-the-labeled-data"></a>
+<h5 id="classic-regression-using-only-the-labeled-data">‘Classic’ Regression Using only the Labeled Data<a class="anchor" aria-label="anchor" href="#classic-regression-using-only-the-labeled-data"></a>
 </h5>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#--- Fit the Classic Regression</span></span>
@@ -397,7 +405,7 @@ included in the <code>ipd</code> package.</p>
 using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()</a></code>:</p>
 </div>
 <div class="section level5">
-<h5 id="chen-and-chen-correction-gronsbell-et-al--2025">1. Chen and Chen Correction (Gronsbell et al., 2025)<a class="anchor" aria-label="anchor" href="#chen-and-chen-correction-gronsbell-et-al--2025"></a>
+<h5 id="chen-and-chen-correction-gronsbell-et-al--2025">Chen and Chen Correction (Gronsbell et al., 2025)<a class="anchor" aria-label="anchor" href="#chen-and-chen-correction-gronsbell-et-al--2025"></a>
 </h5>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -428,7 +436,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="postpi-bootstrap-correction-wang-et-al--2020">2.1 PostPI Bootstrap Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#postpi-bootstrap-correction-wang-et-al--2020"></a>
+<h5 id="postpi-bootstrap-correction-wang-et-al--2020">PostPI Bootstrap Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#postpi-bootstrap-correction-wang-et-al--2020"></a>
 </h5>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -457,7 +465,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="postpi-analytic-correction-wang-et-al--2020">2.2 PostPI Analytic Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#postpi-analytic-correction-wang-et-al--2020"></a>
+<h5 id="postpi-analytic-correction-wang-et-al--2020">PostPI Analytic Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#postpi-analytic-correction-wang-et-al--2020"></a>
 </h5>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PostPI Analytic Correction</span></span>
@@ -483,8 +491,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="prediction-powered-inference-ppi-angelopoulos-et-al--2023">3. Prediction-Powered Inference (PPI; Angelopoulos et al.,
-2023)<a class="anchor" aria-label="anchor" href="#prediction-powered-inference-ppi-angelopoulos-et-al--2023"></a>
+<h5 id="prediction-powered-inference-ppi-angelopoulos-et-al--2023">Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#prediction-powered-inference-ppi-angelopoulos-et-al--2023"></a>
 </h5>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PPI Correction</span></span>
@@ -510,7 +517,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="ppi-all-gronsbell-et-al--2025">4. PPI “All” (Gronsbell et al., 2025)<a class="anchor" aria-label="anchor" href="#ppi-all-gronsbell-et-al--2025"></a>
+<h5 id="ppi-all-gronsbell-et-al--2025">PPI “All” (Gronsbell et al., 2025)<a class="anchor" aria-label="anchor" href="#ppi-all-gronsbell-et-al--2025"></a>
 </h5>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PPI Correction</span></span>
@@ -536,7 +543,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="ppi-angelopoulos-et-al--2023">5. PPI++ (Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#ppi-angelopoulos-et-al--2023"></a>
+<h5 id="ppi-angelopoulos-et-al--2023">PPI++ (Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#ppi-angelopoulos-et-al--2023"></a>
 </h5>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PPI++ Correction</span></span>
@@ -562,7 +569,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="post-prediction-adaptive-inference-pspa-miao-et-al--2023">6. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)<a class="anchor" aria-label="anchor" href="#post-prediction-adaptive-inference-pspa-miao-et-al--2023"></a>
+<h5 id="post-prediction-adaptive-inference-pspa-miao-et-al--2023">Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)<a class="anchor" aria-label="anchor" href="#post-prediction-adaptive-inference-pspa-miao-et-al--2023"></a>
 </h5>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PSPA Correction</span></span>
@@ -593,7 +600,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 </h4>
 <p>We also show how these methods compare for logistic regression.</p>
 <div class="section level5">
-<h5 id="naive-regression-using-the-predicted-outcomes-1">0.1 ‘Naive’ Regression Using the Predicted Outcomes<a class="anchor" aria-label="anchor" href="#naive-regression-using-the-predicted-outcomes-1"></a>
+<h5 id="naive-regression-using-the-predicted-outcomes-1">‘Naive’ Regression Using the Predicted Outcomes<a class="anchor" aria-label="anchor" href="#naive-regression-using-the-predicted-outcomes-1"></a>
 </h5>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#--- Fit the Naive Regression</span></span>
@@ -624,7 +631,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; Number of Fisher Scoring iterations: 7</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="classic-regression-using-only-the-labeled-data-1">0.2 ‘Classic’ Regression Using only the Labeled Data<a class="anchor" aria-label="anchor" href="#classic-regression-using-only-the-labeled-data-1"></a>
+<h5 id="classic-regression-using-only-the-labeled-data-1">‘Classic’ Regression Using only the Labeled Data<a class="anchor" aria-label="anchor" href="#classic-regression-using-only-the-labeled-data-1"></a>
 </h5>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#--- Fit the Classic Regression</span></span>
@@ -657,7 +664,7 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 summaries using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()</a></code>:</p>
 </div>
 <div class="section level5">
-<h5 id="postpi-bootstrap-correction-wang-et-al--2020-1">1. PostPI Bootstrap Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#postpi-bootstrap-correction-wang-et-al--2020-1"></a>
+<h5 id="postpi-bootstrap-correction-wang-et-al--2020-1">PostPI Bootstrap Correction (Wang et al., 2020)<a class="anchor" aria-label="anchor" href="#postpi-bootstrap-correction-wang-et-al--2020-1"></a>
 </h5>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Specify the Formula</span></span>
@@ -689,8 +696,7 @@ summaries using the provided wrapper function, <code><a href="../reference/ipd.h
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="prediction-powered-inference-ppi-angelopoulos-et-al--2023-1">2. Prediction-Powered Inference (PPI; Angelopoulos et al.,
-2023)<a class="anchor" aria-label="anchor" href="#prediction-powered-inference-ppi-angelopoulos-et-al--2023-1"></a>
+<h5 id="prediction-powered-inference-ppi-angelopoulos-et-al--2023-1">Prediction-Powered Inference (PPI; Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#prediction-powered-inference-ppi-angelopoulos-et-al--2023-1"></a>
 </h5>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PPI Correction</span></span>
@@ -716,7 +722,7 @@ summaries using the provided wrapper function, <code><a href="../reference/ipd.h
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="ppi-angelopoulos-et-al--2023-1">3. PPI++ (Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#ppi-angelopoulos-et-al--2023-1"></a>
+<h5 id="ppi-angelopoulos-et-al--2023-1">PPI++ (Angelopoulos et al., 2023)<a class="anchor" aria-label="anchor" href="#ppi-angelopoulos-et-al--2023-1"></a>
 </h5>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PPI++ Correction</span></span>
@@ -742,7 +748,7 @@ summaries using the provided wrapper function, <code><a href="../reference/ipd.h
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
 <div class="section level5">
-<h5 id="post-prediction-adaptive-inference-pspa-miao-et-al--2023-1">4. Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)<a class="anchor" aria-label="anchor" href="#post-prediction-adaptive-inference-pspa-miao-et-al--2023-1"></a>
+<h5 id="post-prediction-adaptive-inference-pspa-miao-et-al--2023-1">Post-Prediction Adaptive Inference (PSPA; Miao et al., 2023)<a class="anchor" aria-label="anchor" href="#post-prediction-adaptive-inference-pspa-miao-et-al--2023-1"></a>
 </h5>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Fit the PSPA Correction</span></span>
