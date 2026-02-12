@@ -1,6 +1,6 @@
 Package: ipd
 Title: Inference on Predicted Data
-Version: 0.99.0
+Version: 0.99.1
 Authors@R: c(
       person(given = "Stephen", family = "Salerno",
         email = "ssalerno@fredhutch.org", role = c("aut", "cre", "cph"),
@@ -62,5 +62,5 @@ biocViews:
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Language: en-US
