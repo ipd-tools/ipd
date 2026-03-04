@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,9 +113,9 @@
 <li>
 <strong>New functions</strong>
 <ul><li>
-<code><a href="../reference/ppi_a_ols.html">ppi_a_ols()</a></code> — implements the PPIa estimator for prediction‑powered inference.<br></li>
+<code><a href="../reference/ppi_a_ols.html">ppi_a_ols()</a></code>: implements the PPIa estimator for prediction‑powered inference.<br></li>
 <li>
-<code><a href="../reference/chen_ols.html">chen_ols()</a></code> — implements the Chen &amp; Chen estimator for inference on predicted data.</li>
+<code><a href="../reference/chen_ols.html">chen_ols()</a></code>: implements the Chen &amp; Chen estimator for inference on predicted data.</li>
 <li>
 <code><a href="../reference/dot-parse_inputs.html">.parse_inputs()</a></code> - helper to validate and split input data.</li>
 <li>
@@ -143,6 +143,66 @@
 </ul></li>
 </ul></div>
 </div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.99.1" id="ipd-0991">ipd 0.99.1<a class="anchor" aria-label="anchor" href="#ipd-0991"></a></h2>
+<div class="section level3">
+<h3 id="summary-0-99-1">Summary:<a class="anchor" aria-label="anchor" href="#summary-0-99-1"></a></h3>
+<ul><li><p>Refactored internal Chen-Chen and PDC functions to centralize matrix-based estimators and reduce duplicated logic across models.</p></li>
+<li><p>Added thin ipd-compatible wrappers for OLS, logistic, and Poisson Chen-Chen and PDC methods.</p></li>
+<li><p>Improved internal GLM handling and documentation to support ongoing methodological development.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="specific-changes-0-99-1">Specific Changes:<a class="anchor" aria-label="anchor" href="#specific-changes-0-99-1"></a></h3>
+<ul><li>
+<p><strong>Chen / PDC Refactor</strong></p>
+<ul><li><p>Added new internal utilities file <code>utils_chen.R</code> housing shared score/Hessian computation and matrix-based estimators.</p></li>
+<li>
+<p>Centralized core augmented estimators:</p>
+<ul><li>
+<code>compute_min_mse_est()</code>: Chen-Chen min-MSE form</li>
+<li>
+<code>compute_pdc_est()</code>: PDC augmentation</li>
+<li>
+<code>compute_min_mse_est_new()</code>: experimental Chen-Chen variant with separate auxiliary design/family</li>
+</ul></li>
+<li>
+<p>Added shared internal helpers:</p>
+<ul><li>
+<code>compute_residuals()</code>: GLM residual and Hessian computation</li>
+<li>
+<code>.fit_glm_from_matrix()</code>: GLM fitting directly from design matrices</li>
+<li>
+<code>.resolve_family()</code>: robust family resolution for Gaussian, Binomial, and Poisson models</li>
+<li>
+<code>expit()</code> and <code>expit_derivative()</code>
+</li>
+</ul></li>
+</ul></li>
+<li>
+<p><strong>Thin Wrapper Functions (ipd helpers)</strong></p>
+<ul><li><p>Rewrote <code><a href="../reference/chen_ols.html">chen_ols()</a></code> to use centralized matrix-based estimators.</p></li>
+<li>
+<p>Added thin wrappers preserving existing <code><a href="../reference/ipd.html">ipd()</a></code> method lookup:</p>
+<ul><li><code><a href="../reference/chen_logistic.html">chen_logistic()</a></code></li>
+<li><code><a href="../reference/chen_poisson.html">chen_poisson()</a></code></li>
+<li><code><a href="../reference/pdc_ols.html">pdc_ols()</a></code></li>
+<li><code><a href="../reference/pdc_logistic.html">pdc_logistic()</a></code></li>
+<li><code><a href="../reference/pdc_poisson.html">pdc_poisson()</a></code></li>
+</ul></li>
+<li><p>All wrappers maintain backward compatibility with the existing helper contract (<code>list(est, se)</code>).</p></li>
+</ul></li>
+<li>
+<p><strong>Internal Documentation</strong></p>
+<ul><li>Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).</li>
+<li>Introduced consistent section headers for estimator components and wrappers.</li>
+</ul></li>
+<li>
+<p><strong>Development Notes</strong></p>
+<ul><li>
+<code>compute_min_mse_est_new()</code> is currently internal-only and not yet wired into the <code><a href="../reference/ipd.html">ipd()</a></code> method registry; future work will determine exposure via a new method (e.g., <code>chen_new</code>) or argument toggle.</li>
+</ul></li>
+</ul></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -152,7 +212,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

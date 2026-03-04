@@ -12,7 +12,9 @@
 <url><loc>https://ipd-tools.github.io/ipd/reference/Sigma_cal.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/augment.ipd.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/calc_lhat_glm.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/chen_logistic.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/chen_ols.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/chen_poisson.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/compute_cdf.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/compute_cdf_diff.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/dot-build_design.html</loc></url>
@@ -35,6 +37,9 @@
 <url><loc>https://ipd-tools.github.io/ipd/reference/ols_get_stats.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/optim_est.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/optim_weights.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/pdc_logistic.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/pdc_ols.html</loc></url>
+<url><loc>https://ipd-tools.github.io/ipd/reference/pdc_poisson.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/postpi_analytic_ols.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/postpi_boot_logistic.html</loc></url>
 <url><loc>https://ipd-tools.github.io/ipd/reference/postpi_boot_ols.html</loc></url>

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -275,7 +275,7 @@ subsets:</p>
 outcomes for both the labeled and unlabeled datasets, though in practice
 the observed outcomes are not in the unlabeled set. We can visualize the
 relationships between these variables in the labeled data subset:</p>
-<p><img src="ipd_files/figure-html/plot-1.png" width="6562.5"></p>
+<p><img src="ipd_files/figure-html/plot-1.png" class="r-plt" alt="" width="6562.5"></p>
 <p>We can see that:</p>
 <ul>
 <li>The predicted outcomes are more correlated with the covariate than
@@ -327,7 +327,7 @@ predictors for logistic regression as follows:</p>
 <p>We can again visualize the relationships between the true and
 predicted outcome variables in the labeled data subset and see that
 81.8% observations are correctly predicted:</p>
-<p><img src="ipd_files/figure-html/plot2-1.png" width="6300"></p>
+<p><img src="ipd_files/figure-html/plot2-1.png" class="r-plt" alt="" width="6300"></p>
 </div>
 </div>
 <div class="section level3">
@@ -430,8 +430,8 @@ using the provided wrapper function, <code><a href="../reference/ipd.html">ipd()
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)    0.880      0.182    4.83  1.3e-06 ***</span></span>
-<span><span class="co">#&gt; X1             1.114      0.186    5.98  2.2e-09 ***</span></span>
+<span><span class="co">#&gt; (Intercept)    0.880      0.182    4.83  1.4e-06 ***</span></span>
+<span><span class="co">#&gt; X1             1.115      0.195    5.72  1.0e-08 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
@@ -924,9 +924,9 @@ request on <a href="https://github.com/ipd-tools/ipd" class="external-link">GitH
 </h3>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.5.0 (2025-04-11)</span></span>
+<span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 24.04.2 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -945,40 +945,41 @@ request on <a href="https://github.com/ipd-tools/ipd" class="external-link">GitH
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] caret_7.0-1      lattice_0.22-6   patchwork_1.3.0  lubridate_1.9.4 </span></span>
-<span><span class="co">#&gt;  [5] forcats_1.0.0    stringr_1.5.1    dplyr_1.1.4      purrr_1.0.4     </span></span>
-<span><span class="co">#&gt;  [9] readr_2.1.5      tidyr_1.3.1      tibble_3.2.1     ggplot2_3.5.2   </span></span>
-<span><span class="co">#&gt; [13] tidyverse_2.0.0  ipd_0.99.0       BiocStyle_2.36.0</span></span>
+<span><span class="co">#&gt;  [1] caret_7.0-1      lattice_0.22-7   patchwork_1.3.2  lubridate_1.9.5 </span></span>
+<span><span class="co">#&gt;  [5] forcats_1.0.1    stringr_1.6.0    dplyr_1.2.0      purrr_1.2.1     </span></span>
+<span><span class="co">#&gt;  [9] readr_2.2.0      tidyr_1.3.2      tibble_3.3.1     ggplot2_4.0.2   </span></span>
+<span><span class="co">#&gt; [13] tidyverse_2.0.0  ipd_0.99.1       BiocStyle_2.38.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] tidyselect_1.2.1     timeDate_4041.110    farver_2.1.2        </span></span>
-<span><span class="co">#&gt;  [4] fastmap_1.2.0        pROC_1.18.5          digest_0.6.37       </span></span>
-<span><span class="co">#&gt;  [7] rpart_4.1.24         timechange_0.3.0     lifecycle_1.0.4     </span></span>
-<span><span class="co">#&gt; [10] survival_3.8-3       magrittr_2.0.3       compiler_4.5.0      </span></span>
-<span><span class="co">#&gt; [13] rlang_1.1.6          sass_0.4.10          tools_4.5.0         </span></span>
-<span><span class="co">#&gt; [16] utf8_1.2.5           yaml_2.3.10          data.table_1.17.4   </span></span>
-<span><span class="co">#&gt; [19] knitr_1.50           labeling_0.4.3       plyr_1.8.9          </span></span>
-<span><span class="co">#&gt; [22] RColorBrewer_1.1-3   withr_3.0.2          BiocGenerics_0.54.0 </span></span>
-<span><span class="co">#&gt; [25] desc_1.4.3           nnet_7.3-20          grid_4.5.0          </span></span>
-<span><span class="co">#&gt; [28] stats4_4.5.0         e1071_1.7-16         future_1.49.0       </span></span>
-<span><span class="co">#&gt; [31] globals_0.18.0       scales_1.4.0         iterators_1.0.14    </span></span>
-<span><span class="co">#&gt; [34] MASS_7.3-65          cli_3.6.5            rmarkdown_2.29      </span></span>
-<span><span class="co">#&gt; [37] ragg_1.4.0           generics_0.1.4       future.apply_1.11.3 </span></span>
-<span><span class="co">#&gt; [40] tzdb_0.5.0           reshape2_1.4.4       proxy_0.4-27        </span></span>
-<span><span class="co">#&gt; [43] cachem_1.1.0         splines_4.5.0        parallel_4.5.0      </span></span>
-<span><span class="co">#&gt; [46] BiocManager_1.30.25  vctrs_0.6.5          hardhat_1.4.1       </span></span>
-<span><span class="co">#&gt; [49] Matrix_1.7-3         jsonlite_2.0.0       bookdown_0.43       </span></span>
-<span><span class="co">#&gt; [52] hms_1.1.3            listenv_0.9.1        systemfonts_1.2.3   </span></span>
-<span><span class="co">#&gt; [55] foreach_1.5.2        gam_1.22-5           gower_1.0.2         </span></span>
-<span><span class="co">#&gt; [58] jquerylib_0.1.4      recipes_1.3.1        glue_1.8.0          </span></span>
-<span><span class="co">#&gt; [61] parallelly_1.45.0    pkgdown_2.1.3        codetools_0.2-20    </span></span>
-<span><span class="co">#&gt; [64] stringi_1.8.7        gtable_0.3.6         pillar_1.10.2       </span></span>
-<span><span class="co">#&gt; [67] htmltools_0.5.8.1    ipred_0.9-15         randomForest_4.7-1.2</span></span>
-<span><span class="co">#&gt; [70] lava_1.8.1           R6_2.6.1             textshaping_1.0.1   </span></span>
-<span><span class="co">#&gt; [73] evaluate_1.0.3       bslib_0.9.0          class_7.3-23        </span></span>
-<span><span class="co">#&gt; [76] Rcpp_1.0.14          nlme_3.1-168         prodlim_2025.04.28  </span></span>
-<span><span class="co">#&gt; [79] mgcv_1.9-1           ranger_0.17.0        xfun_0.52           </span></span>
-<span><span class="co">#&gt; [82] fs_1.6.6             pkgconfig_2.0.3      ModelMetrics_1.2.2.2</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] tidyselect_1.2.1     timeDate_4052.112    farver_2.1.2        </span></span>
+<span><span class="co">#&gt;  [4] S7_0.2.1             fastmap_1.2.0        pROC_1.19.0.1       </span></span>
+<span><span class="co">#&gt;  [7] digest_0.6.39        rpart_4.1.24         timechange_0.4.0    </span></span>
+<span><span class="co">#&gt; [10] lifecycle_1.0.5      survival_3.8-3       magrittr_2.0.4      </span></span>
+<span><span class="co">#&gt; [13] compiler_4.5.2       rlang_1.1.7          sass_0.4.10         </span></span>
+<span><span class="co">#&gt; [16] tools_4.5.2          utf8_1.2.6           yaml_2.3.12         </span></span>
+<span><span class="co">#&gt; [19] data.table_1.18.2.1  knitr_1.51           labeling_0.4.3      </span></span>
+<span><span class="co">#&gt; [22] plyr_1.8.9           RColorBrewer_1.1-3   withr_3.0.2         </span></span>
+<span><span class="co">#&gt; [25] BiocGenerics_0.56.0  desc_1.4.3           nnet_7.3-20         </span></span>
+<span><span class="co">#&gt; [28] grid_4.5.2           stats4_4.5.2         e1071_1.7-17        </span></span>
+<span><span class="co">#&gt; [31] future_1.69.0        globals_0.19.0       scales_1.4.0        </span></span>
+<span><span class="co">#&gt; [34] iterators_1.0.14     MASS_7.3-65          cli_3.6.5           </span></span>
+<span><span class="co">#&gt; [37] rmarkdown_2.30       ragg_1.5.0           generics_0.1.4      </span></span>
+<span><span class="co">#&gt; [40] future.apply_1.20.2  tzdb_0.5.0           reshape2_1.4.5      </span></span>
+<span><span class="co">#&gt; [43] proxy_0.4-29         cachem_1.1.0         splines_4.5.2       </span></span>
+<span><span class="co">#&gt; [46] parallel_4.5.2       BiocManager_1.30.27  vctrs_0.7.1         </span></span>
+<span><span class="co">#&gt; [49] hardhat_1.4.2        Matrix_1.7-4         jsonlite_2.0.0      </span></span>
+<span><span class="co">#&gt; [52] bookdown_0.46        hms_1.1.4            listenv_0.10.0      </span></span>
+<span><span class="co">#&gt; [55] systemfonts_1.3.1    foreach_1.5.2        gam_1.22-7          </span></span>
+<span><span class="co">#&gt; [58] gower_1.0.2          jquerylib_0.1.4      recipes_1.3.1       </span></span>
+<span><span class="co">#&gt; [61] glue_1.8.0           parallelly_1.46.1    pkgdown_2.2.0       </span></span>
+<span><span class="co">#&gt; [64] codetools_0.2-20     stringi_1.8.7        gtable_0.3.6        </span></span>
+<span><span class="co">#&gt; [67] pillar_1.11.1        htmltools_0.5.9      randomForest_4.7-1.2</span></span>
+<span><span class="co">#&gt; [70] ipred_0.9-15         lava_1.8.2           R6_2.6.1            </span></span>
+<span><span class="co">#&gt; [73] textshaping_1.0.4    evaluate_1.0.5       bslib_0.10.0        </span></span>
+<span><span class="co">#&gt; [76] class_7.3-23         Rcpp_1.1.1           nlme_3.1-168        </span></span>
+<span><span class="co">#&gt; [79] prodlim_2025.04.28   mgcv_1.9-3           ranger_0.18.0       </span></span>
+<span><span class="co">#&gt; [82] xfun_0.56            fs_1.6.6             pkgconfig_2.0.3     </span></span>
+<span><span class="co">#&gt; [85] ModelMetrics_1.2.2.2</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -992,7 +993,7 @@ request on <a href="https://github.com/ipd-tools/ipd" class="external-link">GitH
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

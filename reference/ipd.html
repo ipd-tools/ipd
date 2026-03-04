@@ -9,7 +9,7 @@ and models, and returns a list of fitted model components."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -267,6 +267,9 @@ unless explicitly referenced in the <code>formula</code> argument or in the
 <dd><p>Miao et al. (2023) Assumption-Lean and Data-Adaptive
 Post-Prediction Inference (PSPA)</p></dd>
 
+<dt>"pdc"</dt>
+<dd><p>Gan et al. (2024) Prediction-Decorrelated Inference (PDC)</p></dd>
+
 
 </dl><p><strong>4. Model:</strong></p>
 <p>Use the <code>model</code> argument to specify the type of downstream inferential
@@ -307,13 +310,13 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="simdat.html">simdat</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">300</span>, <span class="fl">300</span><span class="op">)</span>, effect <span class="op">=</span> <span class="fl">1</span>, sigma_Y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            X1          X2         X3         X4          Y  f set_label</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.91295168  0.82805181  0.9800060 -1.3185450  1.9821781 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.34629713  0.95618711  1.5572516 -0.4150736  1.9104987 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.01794417 -0.02357563 -0.6602489  1.7181628 -0.5284219 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.42511788 -0.20367165 -0.4274529  0.3139744  0.6832558 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.98476232 -0.66591755 -1.4923011 -0.2940388  0.3307442 NA  training</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.57141674 -0.34011487  0.8388489  0.7944130 -2.2485908 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            X1          X2         X3         X4           Y  f set_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.34629713  0.95618711  1.5572516 -0.4150736  1.91049873 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.01794417 -0.02357563 -0.6602489  1.7181628 -0.52842185 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.42511788 -0.20367165 -0.4274529  0.3139744  0.68325583 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.98476232 -0.66591755 -1.4923011 -0.2940388  0.33074420 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.57141674 -0.34011487  0.8388489  0.7944130 -2.24859082 NA  training</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.70878170 -0.29902833 -1.2888088  0.8397953  0.07677904 NA  training</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">f</span> <span class="op">~</span> <span class="va">X1</span></span></span>
 <span class="r-in"><span></span></span>
@@ -330,8 +333,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.653826   0.084891   7.702  1.34e-14 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.041654   0.096085  10.841 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.639050   0.084513  7.5616 3.982e-14 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.032733   0.098240 10.5124 &lt; 2.2e-16 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -348,8 +351,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  0.69068    0.11352  6.0843 1.170e-09 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1           1.03082    0.13585  7.5877 3.255e-14 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  0.69152    0.11292  6.1237 9.143e-10 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1           1.02300    0.13542  7.5544 4.210e-14 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -368,8 +371,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.635274   0.095072   6.682 2.357e-11 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.024740   0.094036  10.897 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.628173   0.094585  6.6413 3.109e-11 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.013765   0.093400 10.8540 &lt; 2.2e-16 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -386,8 +389,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.636905   0.093397  6.8194 9.145e-12 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.032763   0.100322 10.2945 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.625916   0.093451  6.6978 2.116e-11 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.024555   0.100847 10.1595 &lt; 2.2e-16 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -404,8 +407,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.655324   0.084638  7.7426 9.737e-15 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.046635   0.093822 11.1555 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.640060   0.084631   7.563  3.94e-14 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.036886   0.094164  11.011 &lt; 2.2e-16 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -422,8 +425,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.652305   0.085908  7.5931 3.123e-14 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.044527   0.096407 10.8346 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.637986   0.085632  7.4503 9.313e-14 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.035298   0.096451 10.7339 &lt; 2.2e-16 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -440,8 +443,8 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.656443   0.085606  7.6682 1.744e-14 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.039811   0.096154 10.8141 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.640841   0.085370  7.5067 6.065e-14 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.030892   0.096237 10.7120 &lt; 2.2e-16 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
@@ -456,7 +459,7 @@ other method-specific arguments, will have defaults.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
