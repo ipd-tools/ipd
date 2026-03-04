@@ -443,12 +443,13 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 
 | Method                                                          | Mean Estimation    | Quantile Estimation | Linear Regression  | Logistic Regression | Poisson Regression |
 |----------------|----------|----------|----------|----------|----------|----------|
-| [Chen and Chen](https://arxiv.org/pdf/2411.19908)               | :x:                | :x:                 | :white_check_mark: | :x:                 | :x:                |
+| [Chen and Chen](https://arxiv.org/pdf/2411.19908)               | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
+| [PDC](https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429)   |                    | :x:                 | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
 | [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x:                | :x:                 | :white_check_mark: | :white_check_mark:  | :x:                | 
 | [PPI](https://www.science.org/doi/10.1126/science.adi6000)      | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                |
 | [PPI++](https://arxiv.org/abs/2311.01453)                       | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :x:                |
 | [PPIa](https://arxiv.org/pdf/2411.19908)                        | :x:                | :x:                 | :white_check_mark: | :x:                 | :x:                |
-| [PSPA](https://arxiv.org/abs/2311.14220)                        | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
+| [PSPA](https://www.jmlr.org/papers/volume26/24-0056/24-0056.pdf)| :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
 
 ## License
 
