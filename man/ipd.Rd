@@ -178,6 +178,7 @@ Use the \code{method} argument to specify the fitting method:
 \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
 \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
 Post-Prediction Inference (PSPA)}
+\item{"pdc"}{Gan et al. (2024) Prediction-Decorrelated Inference (PDC)}
 }
 
 \strong{4. Model:}

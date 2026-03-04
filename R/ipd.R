@@ -134,6 +134,7 @@
 #'    \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
 #'    \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
 #'    Post-Prediction Inference (PSPA)}
+#'    \item{"pdc"}{Gan et al. (2024) Prediction-Decorrelated Inference (PDC)}
 #' }
 #'
 #' \strong{4. Model:}
@@ -274,7 +275,7 @@ ipd <- function(
 
     valid_methods <- c("chen", "postpi_analytic", "postpi_boot", "ppi",
 
-        "ppi_a", "ppi_plusplus", "pspa")
+        "ppi_a", "ppi_plusplus", "pspa", "pdc")
 
     valid_models <- c("mean", "quantile", "ols", "logistic", "poisson")
 

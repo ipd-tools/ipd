@@ -54,84 +54,52 @@
 #' @import stats
 #'
 #' @export
-
 chen_ols <- function(
-    X_l,
-    Y_l,
-    f_l,
-    X_u,
-    f_u,
-    intercept = TRUE) {
+        X_l,
+        Y_l,
+        f_l,
+        X_u,
+        f_u,
+        intercept = TRUE) {
+
+    #- Input checks
+
+    if (!intercept) {
+        stop(
+            "ipd currently supplies design matrices with intercept; set intercept=TRUE.",
+            call. = FALSE
+        )
+    }
 
     #- Full Data Vectors/Matrices
 
     f_a <- rbind(f_l, f_u)
     X_a <- rbind(X_l, X_u)
 
-    #- Sample Sizes
-
-    n_l <- nrow(Y_l)  # Number of Labeled Samples
-    n_a <- nrow(f_a)  # Total Number of Samples (Labeled + Unlabeled)
-
     #- Fit Models and Extract Coefficients
 
-    if (intercept){
+    beta_lab  <- .fit_glm_from_matrix(Y_l, X_l, family = "gaussian")
+    gamma_lab <- .fit_glm_from_matrix(f_l, X_l, family = "gaussian")
+    gamma_all <- .fit_glm_from_matrix(f_a, X_a, family = "gaussian")
 
-        fit_beta_l  <- lm(Y_l ~ X_l - 1)
-        fit_gamma_l <- lm(f_l ~ X_l - 1)
-        fit_gamma_a <- lm(f_a ~ X_a - 1)
+    #- Compute Chen–Chen (min-MSE) estimator + covariance
 
-    } else {
+    cc <- compute_min_mse_est(
+        Y_lab     = as.numeric(Y_l),
+        pred_lab  = as.numeric(f_l),
+        X_lab_int = X_l,
+        X_all_int = X_a,
+        beta_lab  = beta_lab,
+        gamma_lab = gamma_lab,
+        gamma_all = gamma_all,
+        family    = "gaussian"
+    )
 
-        fit_beta_l  <- lm(Y_l ~ X_l)
-        fit_gamma_l <- lm(f_l ~ X_l)
-        fit_gamma_a <- lm(f_a ~ X_a)
-    }
+    #- Standard Errors
 
-    coef_beta_l  <- coef(fit_beta_l)   # Observed Outcomes in Labeled Data
-    coef_gamma_l <- coef(fit_gamma_l)  # Predictions in Labeled Data
-    coef_gamma_a <- coef(fit_gamma_a)  # Predictions in All Data
+    se_beta <- sqrt(diag(cc$theta_hat_cov))
 
-    #- Derivative Matrices
+    #- Return Results
 
-    D1 <- D2 <- -crossprod(X_a, X_a) / n_a
-
-    #- Score Matrices
-
-    score_beta  <- X_l * residuals(fit_beta_l)
-    score_gamma <- X_l * residuals(fit_gamma_l)
-
-    #- Covariance Matrices
-
-    C11 <- crossprod(score_beta,  score_beta)  / n_l
-    C12 <- crossprod(score_beta,  score_gamma) / n_l
-    C22 <- crossprod(score_gamma, score_gamma) / n_l
-
-    #- Matrix Inverses
-
-    D1_inv  <- solve(D1)
-    C22_inv <- solve(C22)
-
-    #- Correction Terms
-
-    D1_C12     <- D1_inv %*% C12
-    D1_C12_C22 <- D1_C12 %*% C22_inv
-
-    #- Adjusted Coefficient Estimates
-
-    theta_hat <- coef_beta_l -
-        D1_C12_C22 %*% D2 %*% (coef_gamma_l - coef_gamma_a)
-
-    #- Variance/Covariance Matrix
-
-    Omega <- (D1_inv %*% C11 %*% D1_inv -
-        (1 - n_l / n_a) * D1_C12_C22 %*% t(D1_C12)) / n_l
-
-    #-- Standard Errors
-
-    se_beta <- sqrt(diag(Omega))
-
-    #-- Return Results
-
-    return(list(est = theta_hat, se = se_beta))
+    return(list(est = cc$theta_hat, se = se_beta))
 }
