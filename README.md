@@ -186,7 +186,7 @@ the labeled and unlabeled datasets, though in practice the observed
 outcomes are not in the unlabeled set. We can visualize the
 relationships between these variables:
 
-<img src="man/figures/README-plot-1.png" width="100%" />
+<img src="man/figures/README-plot-1.png" alt="" width="100%" />
 
 We can see that:
 
@@ -578,12 +578,13 @@ method/model combinations are currently implemented:
 
 | Method | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression |  |
 |----|----|----|----|----|----|----|
-| [Chen and Chen](https://arxiv.org/pdf/2411.19908) | :x: | :x: | :white_check_mark: | :x: | :x: |  |
+| [Chen and Chen](https://arxiv.org/pdf/2411.19908) | :x: | :x: | :white_check_mark: | :white_check_mark: | :white_check_mark: |  |
+| [PDC](https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429) |  | :x: | :white_check_mark: | :white_check_mark: | :white_check_mark: |  |
 | [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117) | :x: | :x: | :white_check_mark: | :white_check_mark: | :x: |  |
 | [PPI](https://www.science.org/doi/10.1126/science.adi6000) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: |  |
 | [PPI++](https://arxiv.org/abs/2311.01453) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: |  |
 | [PPIa](https://arxiv.org/pdf/2411.19908) | :x: | :x: | :white_check_mark: | :x: | :x: |  |
-| [PSPA](https://arxiv.org/abs/2311.14220) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |  |
+| [PSPA](https://www.jmlr.org/papers/volume26/24-0056/24-0056.pdf) | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |  |
 
 ## License
 
@@ -593,12 +594,12 @@ This package is licensed under the MIT License.
 
 ``` r
 sessionInfo()
-#> R version 4.4.1 (2024-06-14 ucrt)
+#> R version 4.5.2 (2025-10-31 ucrt)
 #> Platform: x86_64-w64-mingw32/x64
-#> Running under: Windows 11 x64 (build 22631)
+#> Running under: Windows 10 x64 (build 19045)
 #> 
 #> Matrix products: default
-#> 
+#>   LAPACK version 3.12.1
 #> 
 #> locale:
 #> [1] LC_COLLATE=English_United States.utf8 
@@ -607,41 +608,41 @@ sessionInfo()
 #> [4] LC_NUMERIC=C                          
 #> [5] LC_TIME=English_United States.utf8    
 #> 
-#> time zone: America/New_York
+#> time zone: America/Los_Angeles
 #> tzcode source: internal
 #> 
 #> attached base packages:
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] patchwork_1.3.0 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  
-#>  [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
-#>  [9] tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0 ipd_0.99.0     
+#>  [1] patchwork_1.3.2 lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0  
+#>  [5] dplyr_1.2.0     purrr_1.2.1     readr_2.1.6     tidyr_1.3.2    
+#>  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.99.0     
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6         xfun_0.52            recipes_1.2.1       
-#>  [4] lattice_0.22-6       tzdb_0.5.0           vctrs_0.6.5         
-#>  [7] tools_4.4.1          generics_0.1.3       stats4_4.4.1        
-#> [10] parallel_4.4.1       pkgconfig_2.0.3      ModelMetrics_1.2.2.2
-#> [13] Matrix_1.7-0         data.table_1.17.0    lifecycle_1.0.4     
-#> [16] farver_2.1.2         compiler_4.4.1       munsell_0.5.1       
-#> [19] codetools_0.2-20     htmltools_0.5.8.1    class_7.3-22        
-#> [22] yaml_2.3.10          prodlim_2024.06.25   pillar_1.10.2       
-#> [25] MASS_7.3-60.2        gower_1.0.2          iterators_1.0.14    
-#> [28] rpart_4.1.23         foreach_1.5.2        nlme_3.1-164        
-#> [31] parallelly_1.43.0    lava_1.8.1           tidyselect_1.2.1    
-#> [34] digest_0.6.37        stringi_1.8.7        future_1.40.0       
-#> [37] reshape2_1.4.4       listenv_0.9.1        labeling_0.4.3      
-#> [40] splines_4.4.1        fastmap_1.2.0        grid_4.4.1          
-#> [43] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
-#> [46] utf8_1.2.4           randomForest_4.7-1.2 survival_3.8-3      
-#> [49] future.apply_1.11.3  withr_3.0.2          scales_1.3.0        
-#> [52] timechange_0.3.0     rmarkdown_2.29       globals_0.16.3      
-#> [55] nnet_7.3-19          timeDate_4041.110    ranger_0.17.0       
-#> [58] hms_1.1.3            gam_1.22-5           evaluate_1.0.3      
-#> [61] knitr_1.50           hardhat_1.4.1        caret_7.0-1         
-#> [64] mgcv_1.9-1           rlang_1.1.4          Rcpp_1.0.13-1       
-#> [67] glue_1.8.0           BiocGenerics_0.50.0  pROC_1.18.5         
-#> [70] ipred_0.9-15         rstudioapi_0.17.1    R6_2.6.1            
-#> [73] plyr_1.8.9
+#>  [1] gtable_0.3.6         xfun_0.56            recipes_1.3.1       
+#>  [4] lattice_0.22-7       tzdb_0.5.0           vctrs_0.7.1         
+#>  [7] tools_4.5.2          generics_0.1.4       stats4_4.5.2        
+#> [10] parallel_4.5.2       pkgconfig_2.0.3      ModelMetrics_1.2.2.2
+#> [13] Matrix_1.7-4         data.table_1.18.2.1  RColorBrewer_1.1-3  
+#> [16] S7_0.2.1             lifecycle_1.0.5      compiler_4.5.2      
+#> [19] farver_2.1.2         codetools_0.2-20     htmltools_0.5.9     
+#> [22] class_7.3-23         yaml_2.3.12          prodlim_2025.04.28  
+#> [25] pillar_1.11.1        MASS_7.3-65          gower_1.0.2         
+#> [28] iterators_1.0.14     rpart_4.1.24         foreach_1.5.2       
+#> [31] nlme_3.1-168         parallelly_1.46.1    lava_1.8.2          
+#> [34] tidyselect_1.2.1     digest_0.6.39        stringi_1.8.7       
+#> [37] future_1.69.0        reshape2_1.4.5       listenv_0.10.0      
+#> [40] labeling_0.4.3       splines_4.5.2        fastmap_1.2.0       
+#> [43] grid_4.5.2           cli_3.6.5            magrittr_2.0.4      
+#> [46] utf8_1.2.6           randomForest_4.7-1.2 survival_3.8-3      
+#> [49] future.apply_1.20.1  withr_3.0.2          scales_1.4.0        
+#> [52] timechange_0.4.0     rmarkdown_2.30       globals_0.19.0      
+#> [55] otel_0.2.0           nnet_7.3-20          timeDate_4052.112   
+#> [58] ranger_0.18.0        hms_1.1.4            gam_1.22-7          
+#> [61] evaluate_1.0.5       knitr_1.51           hardhat_1.4.2       
+#> [64] caret_7.0-1          mgcv_1.9-3           rlang_1.1.7         
+#> [67] Rcpp_1.1.1           glue_1.8.0           BiocGenerics_0.56.0 
+#> [70] pROC_1.19.0.1        ipred_0.9-15         rstudioapi_0.18.0   
+#> [73] R6_2.6.1             plyr_1.8.9
 ```
