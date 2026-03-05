@@ -1,25 +1,58 @@
-## Summary of new changes
+# R CMD check results
 
-* Added a help topic for the package itself (`man/ipd-package.Rd`) via `R/ipd-package.R` and `roxygen2`
-
-* Updated the documentation for `ipd()`:
-
-  * Provided a more explicit description of the `model` argument, which is meant to specify the downstream inferential model or parameter to be estimated.
-  
-  * Clarified that not all columns in data are used in prediction unless explicitly referenced in the `formula` argument or in the `label` argument if the data are passed as one stacked data frame. 
-
-* Updated the documentation for `simdat()` to include a more thorough explanation of how to simulate data with this function. 
-
-* `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
-
-
-## R CMD check results
-
-── R CMD check results ────────────────────────────────────────────────────────────────────────────────── ipd 0.1.4 ────
-Duration: 3m 51.3s
+── R CMD check results ────────────────────────────────────────────────────────────────────────── ipd 0.3.0 ────
+Duration: 2m 29s
 
 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 
-## Downstream dependencies
+# Downstream dependencies
 
 character(0)
+
+# ipd 0.3.0
+
+## Summary:
+
+* Refactored internal Chen-Chen and PDC functions to centralize matrix-based estimators and reduce duplicated logic across models.
+
+* Added thin ipd-compatible wrappers for OLS, logistic, and Poisson Chen-Chen and PDC methods.
+
+* Improved internal GLM handling and documentation to support ongoing methodological development.
+
+## Specific Changes:
+
+* **Chen / PDC Refactor**
+
+  * Added new internal utilities file `utils_chen.R` housing shared score/Hessian computation and matrix-based estimators.
+  * Centralized core augmented estimators:
+
+    * `compute_min_mse_est()`: Chen-Chen min-MSE form
+    * `compute_pdc_est()`: PDC augmentation
+    * `compute_min_mse_est_new()`: experimental Chen-Chen variant with separate auxiliary design/family
+  * Added shared internal helpers:
+
+    * `compute_residuals()`: GLM residual and Hessian computation
+    * `.fit_glm_from_matrix()`: GLM fitting directly from design matrices
+    * `.resolve_family()`: robust family resolution for Gaussian, Binomial, and Poisson models
+    * `expit()` and `expit_derivative()`
+
+* **Thin Wrapper Functions (ipd helpers)**
+
+  * Rewrote `chen_ols()` to use centralized matrix-based estimators.
+  * Added thin wrappers preserving existing `ipd()` method lookup:
+
+    * `chen_logistic()`
+    * `chen_poisson()`
+    * `pdc_ols()`
+    * `pdc_logistic()`
+    * `pdc_poisson()`
+  * All wrappers maintain backward compatibility with the existing helper contract (`list(est, se)`).
+
+* **Internal Documentation**
+
+  * Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).
+  * Introduced consistent section headers for estimator components and wrappers.
+
+* **Development Notes**
+
+  * `compute_min_mse_est_new()` is currently internal-only and not yet wired into the `ipd()` method registry; future work will determine exposure via a new method (e.g., `chen_new`) or argument toggle.

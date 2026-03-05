@@ -210,7 +210,7 @@ followed by the specific calls for each method:
     #>                    Estimate Std. Error
     #> Naive                  0.49      0.015
     #> Classic                1.10      0.192
-    #> Chen and Chen          1.11      0.186
+    #> Chen and Chen          1.11      0.195
     #> PostPI (Bootstrap)     1.16      0.183
     #> PostPI (Analytic)      1.13      0.191
     #> PPI                    1.11      0.195
@@ -309,8 +309,8 @@ ipd::ipd(formula, method = "chen", model = "ols",
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    0.880      0.182    4.83  1.3e-06 ***
-#> X1             1.114      0.186    5.98  2.2e-09 ***
+#> (Intercept)    0.880      0.182    4.83  1.4e-06 ***
+#> X1             1.115      0.195    5.72  1.0e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -617,7 +617,7 @@ sessionInfo()
 #> other attached packages:
 #>  [1] patchwork_1.3.2 lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0  
 #>  [5] dplyr_1.2.0     purrr_1.2.1     readr_2.1.6     tidyr_1.3.2    
-#>  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.99.0     
+#>  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.99.1     
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] gtable_0.3.6         xfun_0.56            recipes_1.3.1       

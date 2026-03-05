@@ -28,7 +28,7 @@
 
 * `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
 
-# ipd 0.99.0
+# ipd 0.2.0
 
 ## Summary:
 
@@ -92,7 +92,7 @@
   - Branch created, tag `v0.99.0` applied.  
   - Will request CRAN archiving of the CRAN version upon successful Bioconductor acceptance.
 
-# ipd 0.99.1
+# ipd 0.3.0
 
 ## Summary:
 
