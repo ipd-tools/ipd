@@ -9,10 +9,6 @@
 [![CRAN
 Status](https://www.r-pkg.org/badges/version/ipd)](https://CRAN.R-project.org/package=ipd)
 [![Downloads](https://cranlogs.r-pkg.org/badges/ipd)](https://CRAN.R-project.org/package=ipd)
-[![🇬🇧
-English](https://img.shields.io/badge/English-EN-blue)](/README.md)
-[![🇯🇵
-日本語](https://img.shields.io/badge/日本語-JP-blue)](/README-JPN.md)
 <!-- badges: end -->
 
 ## <img src="man/figures/ipd.png" align="right" height="200" style="float:right; height:200px;"/>
