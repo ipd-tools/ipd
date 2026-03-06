@@ -36,9 +36,9 @@ ipd(
 - method:
 
   The IPD method to be used for fitting the model. Must be one of
-  `"chen"`, `"postpi_analytic"`, `"postpi_boot"`, `"ppi"`, `"ppi_a"`,
-  `"ppi_plusplus"`, or `"pspa"`. See **3. Method** in the **Details**
-  below for more information.
+  `"chen"`, `"pdc"`, `"postpi_analytic"`, `"postpi_boot"`, `"ppi"`,
+  `"ppi_a"`, `"ppi_plusplus"`, or `"pspa"`. See **3. Method** in the
+  **Details** below for more information.
 
 - model:
 
@@ -231,7 +231,11 @@ Use the `method` argument to specify the fitting method:
 
 - "chen":
 
-  Gronsbell et al. (2025) Chen and Chen Correction
+  Gronsbell et al. (2026) Chen and Chen Correction
+
+- "pdc":
+
+  Gan et al. (2024) Prediction Decorrelated Inference
 
 - "postpi_analytic":
 
@@ -259,10 +263,6 @@ Use the `method` argument to specify the fitting method:
 
   Miao et al. (2023) Assumption-Lean and Data-Adaptive Post-Prediction
   Inference (PSPA)
-
-- "pdc":
-
-  Gan et al. (2024) Prediction-Decorrelated Inference (PDC)
 
 **4. Model:**
 
@@ -323,7 +323,25 @@ head(dat)
 
 formula <- Y - f ~ X1
 
-#-- Chen and Chen Correction (Gronsbell et al., 2025)
+#-- Chen and Chen Correction (Gronsbell et al., 2026)
+
+ipd(formula,
+  method = "chen", model = "ols",
+  data = dat, label = "set_label"
+)
+#> IPD inference summary
+#>   Method:   chen 
+#>   Model:    ols 
+#>   Formula:  Y - f ~ X1 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value  Pr(>|z|)    
+#> (Intercept) 0.639050   0.084513  7.5616 3.982e-14 ***
+#> X1          1.032733   0.098240 10.5124 < 2.2e-16 ***
+#> ---
+#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#-- Prediction Decorrelated Inference (Gan et al., 2024)
 
 ipd(formula,
   method = "chen", model = "ols",

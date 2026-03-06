@@ -45,10 +45,10 @@ ppi_plusplus_mean(
 - lhat:
 
   (float, optional): Power-tuning parameter (see
-  <https://arxiv.org/abs/2311.01453>). The default value, `NULL`, will
-  estimate the optimal value from the data. Setting `lhat = 1` recovers
-  PPI with no power tuning, and setting `lhat = 0` recovers the
-  classical point estimate.
+  [doi:10.48550/arXiv.2311.01453](https://doi.org/10.48550/arXiv.2311.01453)
+  ). The default value, `NULL`, will estimate the optimal value from the
+  data. Setting `lhat = 1` recovers PPI with no power tuning, and
+  setting `lhat = 0` recovers the classical point estimate.
 
 - coord:
 
@@ -74,7 +74,8 @@ interval for the mean.
 ## Details
 
 PPI++: Efficient Prediction Powered Inference (Angelopoulos et al.,
-2023) <https://arxiv.org/abs/2311.01453>\`
+2023)
+[doi:10.48550/arXiv.2311.01453](https://doi.org/10.48550/arXiv.2311.01453)
 
 ## Examples
 

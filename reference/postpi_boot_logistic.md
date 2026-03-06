@@ -50,7 +50,7 @@ bootstrap methods.
 
 Methods for correcting inference based on outcomes predicted by machine
 learning (Wang et al., 2020)
-<https://www.pnas.org/doi/abs/10.1073/pnas.2001238117>
+[doi:10.1073/pnas.2001238117](https://doi.org/10.1073/pnas.2001238117)
 
 ## Examples
 

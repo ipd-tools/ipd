@@ -57,7 +57,8 @@ ppi_plusplus_quantile_est(
 ## Details
 
 PPI++: Efficient Prediction Powered Inference (Angelopoulos et al.,
-2023) <https://arxiv.org/abs/2311.01453>\`
+2023)
+[doi:10.48550/arXiv.2311.01453](https://doi.org/10.48550/arXiv.2311.01453)
 
 ## Examples
 

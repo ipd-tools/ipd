@@ -50,8 +50,9 @@ chen_poisson(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 
 ## Details
 
-Another look at inference after prediction (Gronsbell et al., 2025)
-<https://arxiv.org/pdf/2411.19908>
+Another look at statistical inference with machine learning-imputed data
+(Gronsbell et al., 2026)
+[doi:10.48550/arXiv.2411.19908](https://doi.org/10.48550/arXiv.2411.19908)
 
 ## Examples
 

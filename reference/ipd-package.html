@@ -19,7 +19,7 @@ real-world applications."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@ package integrates methods designed to address these challenges.</p>
     <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a></h2>
 
 
-<ul><li><p>Multiple IPD methods: <code>PostPI</code>, <code>PPI</code>, <code>PPI++</code>, and <code>PSPA</code> currently.</p></li>
+<ul><li><p>Multiple IPD methods: <code>Chen and Chen</code>, <code>PDC</code>, <code>PostPI</code>, <code>PPI</code>, <code>PPI++</code>, and <code>PSPA</code> currently.</p></li>
 <li><p>Flexible wrapper functions for ease of use.</p></li>
 <li><p>Custom methods for model inspection and evaluation.</p></li>
 <li><p>Seamless integration with common data structures in R.</p></li>
@@ -105,19 +105,8 @@ workflows and applications of the package.</p>
 
 
 <p>For details on the statistical methods implemented in this package, please
-refer to the associated manuscripts at the following references:</p><ul><li><p><strong>PostPI</strong>: Wang, S., McCormick, T. H., &amp; Leek, J. T. (2020). Methods
-for correcting inference based on outcomes predicted by machine learning.
-Proceedings of the National Academy of Sciences, 117(48), 30266-30275.</p></li>
-<li><p><strong>PPI</strong>: Angelopoulos, A. N., Bates, S., Fannjiang, C., Jordan,
-M. I., &amp; Zrnic, T. (2023). Prediction-powered inference. Science,
-382(6671), 669-674.</p></li>
-<li><p><strong>PPI++</strong>: Angelopoulos, A. N., Duchi, J. C., &amp; Zrnic, T. (2023).
-PPI++: Efficient prediction-powered inference. arXiv preprint
-arXiv:2311.01453.</p></li>
-<li><p><strong>PSPA</strong>: Miao, J., Miao, X., Wu, Y., Zhao, J., &amp; Lu, Q. (2023).
-Assumption-lean and data-adaptive post-prediction inference. arXiv
-preprint arXiv:2311.14220.</p></li>
-</ul></div>
+refer to the vignette.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Useful links:</p><ul><li><p><a href="https://github.com/ipd-tools/ipd" class="external-link">https://github.com/ipd-tools/ipd</a></p></li>
@@ -193,6 +182,20 @@ preprint arXiv:2311.14220.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit_pspa</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"pspa"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#-- Chen and Chen (Gronsbell et al., 2026)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">fit_chen</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"chen"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#-- Prediction Decorrelated Inference (Gan et al., 2024)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">fit_chen</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipd.html">ipd</a></span><span class="op">(</span><span class="va">formula</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"pdc"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

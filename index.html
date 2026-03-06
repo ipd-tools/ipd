@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,9 +70,9 @@
 <li>Quantifying the robustness of the AI/ML models to resampling or uncertainty about the training data.</li>
 <li>Appropriately propagating both bias and uncertainty from predictions into downstream inferential tasks.</li>
 </ol>
-<p>Several works have proposed methods for IPD, including post-prediction inference (PostPI) by <a href="https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117" class="external-link">Wang et al., 2020</a>, prediction-powered inference (PPI) and PPI++ by <a href="https://www.science.org/doi/10.1126/science.adi6000" class="external-link">Angelopoulos et al., 2023a</a> and <a href="https://arxiv.org/abs/2311.01453" class="external-link">Angelopoulos et al., 2023b</a>, post-prediction adaptive inference (PSPA) by <a href="https://arxiv.org/abs/2311.14220" class="external-link">Miao et al., 2023</a>, and a correction based on the Chen and Chen method and alternate PPI “All” by <a href="https://arxiv.org/pdf/2411.19908" class="external-link">Gronsbell et al., 2025</a>. Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:</p>
+<p>Several works have proposed methods for IPD, including post-prediction inference (PostPI) by <a href="https://doi.org/10.1073/pnas.2001238117" class="external-link">Wang et al., 2020</a>, prediction-powered inference (PPI) and PPI++ by <a href="https://doi.org/10.1126/science.adi6000" class="external-link">Angelopoulos et al., 2023a</a> and <a href="https://doi.org/10.48550/arXiv.2311.01453" class="external-link">Angelopoulos et al., 2023b</a>, post-prediction adaptive inference (PSPA) by <a href="https://doi.org/10.48550/arXiv.2311.14220" class="external-link">Miao et al., 2023</a>, and a correction based on the Chen and Chen method and alternate PPI “All” by <a href="https://doi.org/10.48550/arXiv.2411.19908" class="external-link">Gronsbell et al., 2026</a>. Each method was developed to perform inference on a quantity such as the outcome mean or quantile, or a regression coefficient, when we have:</p>
 <ol style="list-style-type: decimal">
-<li>A dataset consisting of our outcome and features of interst, where the outcome is only observed for a small ‘labeled’ subset and missing for a, typically larger, ‘unlabeled’ subset.</li>
+<li>A dataset consisting of our outcome and features of interest, where the outcome is only observed for a small ‘labeled’ subset and missing for a, typically larger, ‘unlabeled’ subset.</li>
 <li>Access to an algorithm to predict the missing outcome in the entire dataset using the fully observed features.</li>
 </ol>
 <figure><img src="reference/figures/ipd_overview.png" alt="Overview of data and setup for IPD"><figcaption aria-hidden="true">
@@ -84,18 +84,11 @@ Overview of data and setup for IPD
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>To install the <code>ipd</code> package from <a href="https://www.bioconductor.org/" class="external-link">Bioconductor</a>, you can use the <code>BiocManager</code> package:</p>
+<p>To install the <code>ipd</code> package from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#-- Install BiocManager if it is not already installed</span></span>
+<code class="sourceCode R"><span><span class="co">#-- Install the ipd package from CRAN</span></span>
 <span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://bioconductor.github.io/BiocManager/" class="external-link">"BiocManager"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span>version <span class="op">=</span> <span class="st">"3.21"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#-- Install the ipd package from Bioconductor</span></span>
-<span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"ipd"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ipd"</span><span class="op">)</span></span></code></pre></div>
 <p>Or, to install the development version of <code>ipd</code> from <a href="https://github.com/ipd-tools/ipd" class="external-link">GitHub</a>, you can use the <code>devtools</code> package:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#-- Install devtools if it is not already installed</span></span>
@@ -532,13 +525,12 @@ Overview of data and setup for IPD
 <p>Contributions are welcome! Please open an issue or submit a pull request on <a href="https://github.com/ipd-tools/ipd" class="external-link">GitHub</a>. The following method/model combinations are currently implemented:</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
 <th>Method</th>
@@ -547,71 +539,63 @@ Overview of data and setup for IPD
 <th>Linear Regression</th>
 <th>Logistic Regression</th>
 <th>Poisson Regression</th>
-<th></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><a href="https://arxiv.org/pdf/2411.19908" class="external-link">Chen and Chen</a></td>
+<td><a href="https://doi.org/10.48550/arXiv.2411.19908" class="external-link">Chen and Chen</a></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
-<td></td>
 </tr>
 <tr class="even">
-<td><a href="https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429" class="external-link">PDC</a></td>
-<td></td>
+<td><a href="https://doi.org/10.1111/anzs.12429" class="external-link">PDC</a></td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
-<td></td>
 </tr>
 <tr class="odd">
-<td><a href="https://www.pnas.org/doi/full/10.1073/pnas.2001238117" class="external-link">PostPI</a></td>
+<td><a href="https://doi.org/10.1073/pnas.2001238117" class="external-link">PostPI</a></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
-<td></td>
 </tr>
 <tr class="even">
-<td><a href="https://www.science.org/doi/10.1126/science.adi6000" class="external-link">PPI</a></td>
+<td><a href="https://doi.org/10.1126/science.adi6000" class="external-link">PPI</a></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
-<td></td>
 </tr>
 <tr class="odd">
-<td><a href="https://arxiv.org/abs/2311.01453" class="external-link">PPI++</a></td>
+<td><a href="https://doi.org/10.48550/arXiv.2311.01453" class="external-link">PPI++</a></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
-<td></td>
 </tr>
 <tr class="even">
-<td><a href="https://arxiv.org/pdf/2411.19908" class="external-link">PPIa</a></td>
+<td><a href="https://doi.org/10.48550/arXiv.2411.19908" class="external-link">PPIa</a></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
 <td><span class="emoji" data-emoji="x">❌</span></td>
-<td></td>
 </tr>
 <tr class="odd">
-<td><a href="https://www.jmlr.org/papers/volume26/24-0056/24-0056.pdf" class="external-link">PSPA</a></td>
+<td><a href="https://doi.org/10.48550/arXiv.2311.14220" class="external-link">PSPA</a></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
 <td><span class="emoji" data-emoji="white_check_mark">✅</span></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -649,7 +633,7 @@ Overview of data and setup for IPD
 <span><span class="co">#&gt; other attached packages:</span></span>
 <span><span class="co">#&gt;  [1] patchwork_1.3.2 lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0  </span></span>
 <span><span class="co">#&gt;  [5] dplyr_1.2.0     purrr_1.2.1     readr_2.1.6     tidyr_1.3.2    </span></span>
-<span><span class="co">#&gt;  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.99.1     </span></span>
+<span><span class="co">#&gt;  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.4.0      </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] gtable_0.3.6         xfun_0.56            recipes_1.3.1       </span></span>

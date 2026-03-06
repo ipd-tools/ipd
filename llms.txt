@@ -29,18 +29,18 @@ inference on predicted data (IPD) include:
 
 Several works have proposed methods for IPD, including post-prediction
 inference (PostPI) by [Wang et al.,
-2020](https://www.pnas.org/doi/suppl/10.1073/pnas.2001238117),
-prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al.,
-2023a](https://www.science.org/doi/10.1126/science.adi6000) and
-[Angelopoulos et al., 2023b](https://arxiv.org/abs/2311.01453),
-post-prediction adaptive inference (PSPA) by [Miao et al.,
-2023](https://arxiv.org/abs/2311.14220), and a correction based on the
-Chen and Chen method and alternate PPI “All” by [Gronsbell et al.,
-2025](https://arxiv.org/pdf/2411.19908). Each method was developed to
-perform inference on a quantity such as the outcome mean or quantile, or
-a regression coefficient, when we have:
+2020](https://doi.org/10.1073/pnas.2001238117), prediction-powered
+inference (PPI) and PPI++ by [Angelopoulos et al.,
+2023a](https://doi.org/10.1126/science.adi6000) and [Angelopoulos et
+al., 2023b](https://doi.org/10.48550/arXiv.2311.01453), post-prediction
+adaptive inference (PSPA) by [Miao et al.,
+2023](https://doi.org/10.48550/arXiv.2311.14220), and a correction based
+on the Chen and Chen method and alternate PPI “All” by [Gronsbell et
+al., 2026](https://doi.org/10.48550/arXiv.2411.19908). Each method was
+developed to perform inference on a quantity such as the outcome mean or
+quantile, or a regression coefficient, when we have:
 
-1.  A dataset consisting of our outcome and features of interst, where
+1.  A dataset consisting of our outcome and features of interest, where
     the outcome is only observed for a small ‘labeled’ subset and
     missing for a, typically larger, ‘unlabeled’ subset.
 2.  Access to an algorithm to predict the missing outcome in the entire
@@ -65,21 +65,12 @@ package.
 
 ## Installation
 
-To install the `ipd` package from
-[Bioconductor](https://www.bioconductor.org/), you can use the
-`BiocManager` package:
+To install the `ipd` package from CRAN:
 
 ``` r
-#-- Install BiocManager if it is not already installed
+#-- Install the ipd package from CRAN
 
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install(version = "3.21")
-
-#-- Install the ipd package from Bioconductor
-
-BiocManager::install("ipd")
+install.packages("ipd")
 ```
 
 Or, to install the development version of `ipd` from
@@ -562,15 +553,15 @@ Contributions are welcome! Please open an issue or submit a pull request
 on [GitHub](https://github.com/ipd-tools/ipd). The following
 method/model combinations are currently implemented:
 
-| Method                                                           | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression |     |
-|------------------------------------------------------------------|-----------------|---------------------|-------------------|---------------------|--------------------|-----|
-| [Chen and Chen](https://arxiv.org/pdf/2411.19908)                | ❌              | ❌                  | ✅                | ✅                  | ✅                 |     |
-| [PDC](https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429)    |                 | ❌                  | ✅                | ✅                  | ✅                 |     |
-| [PostPI](https://www.pnas.org/doi/full/10.1073/pnas.2001238117)  | ❌              | ❌                  | ✅                | ✅                  | ❌                 |     |
-| [PPI](https://www.science.org/doi/10.1126/science.adi6000)       | ✅              | ✅                  | ✅                | ✅                  | ❌                 |     |
-| [PPI++](https://arxiv.org/abs/2311.01453)                        | ✅              | ✅                  | ✅                | ✅                  | ❌                 |     |
-| [PPIa](https://arxiv.org/pdf/2411.19908)                         | ❌              | ❌                  | ✅                | ❌                  | ❌                 |     |
-| [PSPA](https://www.jmlr.org/papers/volume26/24-0056/24-0056.pdf) | ✅              | ✅                  | ✅                | ✅                  | ✅                 |     |
+| Method                                                     | Mean Estimation | Quantile Estimation | Linear Regression | Logistic Regression | Poisson Regression |
+|------------------------------------------------------------|-----------------|---------------------|-------------------|---------------------|--------------------|
+| [Chen and Chen](https://doi.org/10.48550/arXiv.2411.19908) | ❌              | ❌                  | ✅                | ✅                  | ✅                 |
+| [PDC](https://doi.org/10.1111/anzs.12429)                  | ❌              | ❌                  | ✅                | ✅                  | ✅                 |
+| [PostPI](https://doi.org/10.1073/pnas.2001238117)          | ❌              | ❌                  | ✅                | ✅                  | ❌                 |
+| [PPI](https://doi.org/10.1126/science.adi6000)             | ✅              | ✅                  | ✅                | ✅                  | ❌                 |
+| [PPI++](https://doi.org/10.48550/arXiv.2311.01453)         | ✅              | ✅                  | ✅                | ✅                  | ❌                 |
+| [PPIa](https://doi.org/10.48550/arXiv.2411.19908)          | ❌              | ❌                  | ✅                | ❌                  | ❌                 |
+| [PSPA](https://doi.org/10.48550/arXiv.2311.14220)          | ✅              | ✅                  | ✅                | ✅                  | ✅                 |
 
 ## License
 
@@ -603,7 +594,7 @@ sessionInfo()
 #> other attached packages:
 #>  [1] patchwork_1.3.2 lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0  
 #>  [5] dplyr_1.2.0     purrr_1.2.1     readr_2.1.6     tidyr_1.3.2    
-#>  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.99.1     
+#>  [9] tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0 ipd_0.4.0      
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] gtable_0.3.6         xfun_0.56            recipes_1.3.1       

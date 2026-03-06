@@ -9,9 +9,10 @@ learning (AI/ML), researchers from a wide range of disciplines
 increasingly use predictions from pre-trained algorithms as outcome
 variables in statistical analyses. However, reifying
 algorithmically-derived values as measured outcomes may lead to biased
-estimates and anti-conservative inference ([Hoffman et al.,
-2023](https://arxiv.org/abs/2401.08702)). The statistical challenges
-encountered when drawing inference on predicted data (IPD) include:
+estimates and anti-conservative inference ([Salerno et al.,
+2025](https://doi.org/10.48550/arXiv.2512.05456)). The statistical
+challenges encountered when drawing inference on predicted data (IPD)
+include:
 
 1.  Understanding the relationship between predicted outcomes and their
     true, unobserved counterparts
@@ -22,18 +23,17 @@ encountered when drawing inference on predicted data (IPD) include:
 
 Several works have proposed methods for IPD, including post-prediction
 inference (PostPI) by [Wang et al.,
-2020](https://ipd-tools.github.io/ipd/articles/www.pnas.org/doi/suppl/10.1073/pnas.2001238117),
-prediction-powered inference (PPI) and PPI++ by [Angelopoulos et al.,
-2023a](https://ipd-tools.github.io/ipd/articles/www.science.org/doi/10.1126/science.adi6000)
-and [Angelopoulos et al.,
-2023b](https://ipd-tools.github.io/ipd/articles/arxiv.org/abs/2311.01453),
-post-prediction adaptive inference (PSPA) by [Miao et al.,
-2023](https://arxiv.org/abs/2311.14220), and a correction based on the
-Chen and Chen method and alternate PPI “All” by [Gronsbell et al.,
-2025](https://arxiv.org/pdf/2411.19908). To enable researchers and
-practitioners interested in these state-of-the-art methods, we have
-developed `ipd`, a open-source `R` package that implements these methods
-under the umbrella of IPD.
+2020](https://doi.org/10.1073/pnas.2001238117), prediction-powered
+inference (PPI) and PPI++ by [Angelopoulos et al.,
+2023a](https://doi.org/10.1126/science.adi6000) and [Angelopoulos et
+al., 2023b](https://doi.org/10.48550/arXiv.2311.01453), post-prediction
+adaptive inference (PSPA) by [Miao et al.,
+2023](https://doi.org/10.48550/arXiv.2311.14220), and a correction based
+on the Chen and Chen method and alternate PPI “All” by [Gronsbell et
+al., 2025](https://doi.org/10.48550/arXiv.2411.19908). To enable
+researchers and practitioners interested in these state-of-the-art
+methods, we have developed `ipd`, a open-source `R` package that
+implements these methods under the umbrella of IPD.
 
 This vignette provides a guide to using the `ipd` package, including
 installation instructions, examples of data generation, model fitting,
@@ -43,8 +43,8 @@ functionality.
 ### Notation
 
 Following the notation of [Miao et al.,
-2023](https://ipd-tools.github.io/ipd/articles/arxiv.org/abs/2311.14220),
-we assume we have the following data structure:
+2023](https://doi.org/10.48550/arXiv.2311.14220), we assume we have the
+following data structure:
 
 1.  Labeled data $L = \{ Y^{L},X^{L},f\left( X^{L} \right)\}$; unlabeled
     data $U = \{ X^{U},f\left( X^{U} \right)\}$.
@@ -360,6 +360,33 @@ ipd::ipd(formula, method = "chen", model = "ols",
 #>             Estimate Std. Error z value Pr(>|z|)    
 #> (Intercept)    0.880      0.182    4.83  1.4e-06 ***
 #> X1             1.115      0.195    5.72  1.0e-08 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+##### Prediction Decorrelated Inference (Gan et al., 2024)
+
+``` r
+
+#-- Fit the PDC Correction
+
+ipd::ipd(formula, method = "pdc", model = "ols", 
+
+    data = dat_ols, label = "set_label") |>
+
+    summary()
+#> 
+#> Call:
+#>   Y - f ~ X1 
+#> 
+#> Method:    pdc 
+#> Model:     ols 
+#> Intercept: Yes 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    0.902      0.185    4.87  1.1e-06 ***
+#> X1             1.097      0.198    5.53  3.2e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -876,7 +903,7 @@ sessionInfo()
 #>  [1] caret_7.0-1      lattice_0.22-7   patchwork_1.3.2  lubridate_1.9.5 
 #>  [5] forcats_1.0.1    stringr_1.6.0    dplyr_1.2.0      purrr_1.2.1     
 #>  [9] readr_2.2.0      tidyr_1.3.2      tibble_3.3.1     ggplot2_4.0.2   
-#> [13] tidyverse_2.0.0  ipd_0.3.0        BiocStyle_2.38.0
+#> [13] tidyverse_2.0.0  ipd_0.4.0        BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] tidyselect_1.2.1     timeDate_4052.112    farver_2.1.2        

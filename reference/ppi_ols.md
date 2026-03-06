@@ -60,7 +60,7 @@ ppi_ols(X_l, Y_l, f_l, X_u, f_u, w_l = NULL, w_u = NULL)
 ## Details
 
 Prediction Powered Inference (Angelopoulos et al., 2023)
-<https://www.science.org/doi/10.1126/science.adi6000>
+[doi:10.1126/science.adi6000](https://doi.org/10.1126/science.adi6000)
 
 ## Examples
 

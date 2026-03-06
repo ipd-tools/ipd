@@ -1,5 +1,7 @@
 # Changelog
 
+## ipd 0.4.0
+
 ## ipd 0.1.3
 
 CRAN release: 2024-12-03
@@ -193,6 +195,9 @@ CRAN release: 2025-01-07
     non-exported helpers).
   - Introduced consistent section headers for estimator components and
     wrappers.
+  - Adding PDC method examples to documentation and vignette.
+  - Updating urls throughout to use doi.org links instead of
+    journal-specific links.
 
 - **Development Notes**
 

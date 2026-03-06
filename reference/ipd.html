@@ -9,7 +9,7 @@ and models, and returns a list of fitted model components."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,9 +74,10 @@ See <strong>1. Formula</strong> in the <strong>Details</strong> below for more i
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>The IPD method to be used for fitting the model. Must be one
-of <code>"chen"</code>, <code>"postpi_analytic"</code>, <code>"postpi_boot"</code>,
-<code>"ppi"</code>, <code>"ppi_a"</code>, <code>"ppi_plusplus"</code>, or <code>"pspa"</code>.
-See <strong>3. Method</strong> in the <strong>Details</strong> below for more information.</p></dd>
+of <code>"chen"</code>, <code>"pdc"</code>, <code>"postpi_analytic"</code>,
+<code>"postpi_boot"</code>, <code>"ppi"</code>, <code>"ppi_a"</code>, <code>"ppi_plusplus"</code>,
+or <code>"pspa"</code>. See <strong>3. Method</strong> in the <strong>Details</strong> below for
+more information.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
@@ -243,7 +244,10 @@ unless explicitly referenced in the <code>formula</code> argument or in the
 <p><strong>3. Method:</strong></p>
 <p>Use the <code>method</code> argument to specify the fitting method:</p>
 <dl><dt>"chen"</dt>
-<dd><p>Gronsbell et al. (2025) Chen and Chen Correction</p></dd>
+<dd><p>Gronsbell et al. (2026) Chen and Chen Correction</p></dd>
+
+<dt>"pdc"</dt>
+<dd><p>Gan et al. (2024) Prediction Decorrelated Inference</p></dd>
 
 <dt>"postpi_analytic"</dt>
 <dd><p>Wang et al. (2020) Post-Prediction Inference
@@ -266,9 +270,6 @@ unless explicitly referenced in the <code>formula</code> argument or in the
 <dt>"pspa"</dt>
 <dd><p>Miao et al. (2023) Assumption-Lean and Data-Adaptive
 Post-Prediction Inference (PSPA)</p></dd>
-
-<dt>"pdc"</dt>
-<dd><p>Gan et al. (2024) Prediction-Decorrelated Inference (PDC)</p></dd>
 
 
 </dl><p><strong>4. Model:</strong></p>
@@ -320,7 +321,25 @@ other method-specific arguments, will have defaults.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">f</span> <span class="op">~</span> <span class="va">X1</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#-- Chen and Chen Correction (Gronsbell et al., 2025)</span></span></span>
+<span class="r-in"><span><span class="co">#-- Chen and Chen Correction (Gronsbell et al., 2026)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">ipd</span><span class="op">(</span><span class="va">formula</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"chen"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">dat</span>, label <span class="op">=</span> <span class="st">"set_label"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IPD inference summary</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Method:   chen </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Model:    ols </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Formula:  Y - f ~ X1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error z value  Pr(&gt;|z|)    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.639050   0.084513  7.5616 3.982e-14 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1          1.032733   0.098240 10.5124 &lt; 2.2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#-- Prediction Decorrelated Inference (Gan et al., 2024)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">ipd</span><span class="op">(</span><span class="va">formula</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"chen"</span>, model <span class="op">=</span> <span class="st">"ols"</span>,</span></span>

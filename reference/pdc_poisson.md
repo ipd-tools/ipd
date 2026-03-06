@@ -51,7 +51,7 @@ pdc_poisson(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 
 Prediction de-correlated inference: A safe approach for post-prediction
 inference (Gan et al., 2024)
-<https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429>
+[doi:10.1111/anzs.12429](https://doi.org/10.1111/anzs.12429)
 
 ## Examples
 

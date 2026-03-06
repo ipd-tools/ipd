@@ -47,8 +47,8 @@ corresponding standard error.
 
 ## Details
 
-Post-prediction adaptive inference (Miao et al. 2023)
-<https://arxiv.org/abs/2311.14220>
+Post-prediction adaptive inference (Miao et al., 2023)
+[doi:10.48550/arXiv.2311.14220](https://doi.org/10.48550/arXiv.2311.14220)
 
 ## Examples
 
