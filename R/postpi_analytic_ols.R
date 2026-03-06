@@ -7,8 +7,7 @@
 #'
 #' @details
 #' Methods for correcting inference based on outcomes predicted by machine
-#' learning (Wang et al., 2020)
-#' <https://www.pnas.org/doi/abs/10.1073/pnas.2001238117>
+#' learning (Wang et al., 2020) \doi{10.1073/pnas.2001238117}
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'

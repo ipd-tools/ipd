@@ -46,7 +46,7 @@ Helper function for PPI++ quantile estimation
 }
 \details{
 PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
-\url{https://arxiv.org/abs/2311.01453}
+\doi{10.48550/arXiv.2311.01453}
 }
 \examples{
 

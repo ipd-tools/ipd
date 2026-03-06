@@ -32,8 +32,7 @@ Helper function for PDC OLS estimation.
 }
 \details{
 Prediction de-correlated inference: A safe approach for post-prediction
-inference (Gan et al., 2024)
-\url{https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429}
+inference (Gan et al., 2024) \doi{10.1111/anzs.12429}
 }
 \examples{
 

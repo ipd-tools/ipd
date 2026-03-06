@@ -14,9 +14,10 @@
 #' See \strong{1. Formula} in the \strong{Details} below for more information.
 #'
 #' @param method The IPD method to be used for fitting the model. Must be one
-#' of \code{"chen"}, \code{"postpi_analytic"}, \code{"postpi_boot"},
-#' \code{"ppi"}, \code{"ppi_a"}, \code{"ppi_plusplus"}, or \code{"pspa"}.
-#' See \strong{3. Method} in the \strong{Details} below for more information.
+#' of \code{"chen"}, \code{"pdc"}, \code{"postpi_analytic"},
+#' \code{"postpi_boot"}, \code{"ppi"}, \code{"ppi_a"}, \code{"ppi_plusplus"},
+#' or \code{"pspa"}. See \strong{3. Method} in the \strong{Details} below for
+#' more information.
 #'
 #' @param model The type of downstream inferential model to be fitted, or the
 #' parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
@@ -123,7 +124,8 @@
 #' Use the \code{method} argument to specify the fitting method:
 #'
 #' \describe{
-#'    \item{"chen"}{Gronsbell et al. (2025) Chen and Chen Correction}
+#'    \item{"chen"}{Gronsbell et al. (2026) Chen and Chen Correction}
+#'    \item{"pdc"}{Gan et al. (2024) Prediction Decorrelated Inference}
 #'    \item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
 #'    (PostPI) Analytic Correction}
 #'    \item{"postpi_boot"}{Wang et al. (2020) Post-Prediction Inference
@@ -134,7 +136,6 @@
 #'    \item{"ppi_plusplus"}{Angelopoulos et al. (2023) PPI++}
 #'    \item{"pspa"}{Miao et al. (2023) Assumption-Lean and Data-Adaptive
 #'    Post-Prediction Inference (PSPA)}
-#'    \item{"pdc"}{Gan et al. (2024) Prediction-Decorrelated Inference (PDC)}
 #' }
 #'
 #' \strong{4. Model:}
@@ -202,7 +203,14 @@
 #'
 #' formula <- Y - f ~ X1
 #'
-#' #-- Chen and Chen Correction (Gronsbell et al., 2025)
+#' #-- Chen and Chen Correction (Gronsbell et al., 2026)
+#'
+#' ipd(formula,
+#'   method = "chen", model = "ols",
+#'   data = dat, label = "set_label"
+#' )
+#'
+#' #-- Prediction Decorrelated Inference (Gan et al., 2024)
 #'
 #' ipd(formula,
 #'   method = "chen", model = "ols",
@@ -273,9 +281,9 @@ ipd <- function(
 
     #- Implemented Methods and Models
 
-    valid_methods <- c("chen", "postpi_analytic", "postpi_boot", "ppi",
+    valid_methods <- c("chen", "pdc", "postpi_analytic", "postpi_boot", "ppi",
 
-        "ppi_a", "ppi_plusplus", "pspa", "pdc")
+        "ppi_a", "ppi_plusplus", "pspa")
 
     valid_models <- c("mean", "quantile", "ols", "logistic", "poisson")
 

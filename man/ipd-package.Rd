@@ -22,7 +22,7 @@ package integrates methods designed to address these challenges.
 \section{Features}{
 
 \itemize{
-\item Multiple IPD methods: \code{PostPI}, \code{PPI}, \verb{PPI++}, and \code{PSPA} currently.
+\item Multiple IPD methods: \verb{Chen and Chen}, \code{PDC}, \code{PostPI}, \code{PPI}, \verb{PPI++}, and \code{PSPA} currently.
 \item Flexible wrapper functions for ease of use.
 \item Custom methods for model inspection and evaluation.
 \item Seamless integration with common data structures in R.
@@ -59,21 +59,7 @@ workflows and applications of the package.
 \section{References}{
 
 For details on the statistical methods implemented in this package, please
-refer to the associated manuscripts at the following references:
-\itemize{
-\item \strong{PostPI}: Wang, S., McCormick, T. H., & Leek, J. T. (2020). Methods
-for correcting inference based on outcomes predicted by machine learning.
-Proceedings of the National Academy of Sciences, 117(48), 30266-30275.
-\item \strong{PPI}: Angelopoulos, A. N., Bates, S., Fannjiang, C., Jordan,
-M. I., & Zrnic, T. (2023). Prediction-powered inference. Science,
-382(6671), 669-674.
-\item \strong{PPI++}: Angelopoulos, A. N., Duchi, J. C., & Zrnic, T. (2023).
-PPI++: Efficient prediction-powered inference. arXiv preprint
-arXiv:2311.01453.
-\item \strong{PSPA}: Miao, J., Miao, X., Wu, Y., Zhao, J., & Lu, Q. (2023).
-Assumption-lean and data-adaptive post-prediction inference. arXiv
-preprint arXiv:2311.14220.
-}
+refer to the vignette.
 }
 
 \examples{
@@ -121,6 +107,20 @@ fit_plusplus <- ipd(formula,
 
 fit_pspa <- ipd(formula,
   method = "pspa", model = "ols",
+  data = dat, label = "set_label"
+)
+
+#-- Chen and Chen (Gronsbell et al., 2026)
+
+fit_chen <- ipd(formula,
+  method = "chen", model = "ols",
+  data = dat, label = "set_label"
+)
+
+#-- Prediction Decorrelated Inference (Gan et al., 2024)
+
+fit_chen <- ipd(formula,
+  method = "pdc", model = "ols",
   data = dat, label = "set_label"
 )
 

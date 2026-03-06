@@ -7,7 +7,7 @@
 #'
 #' @details
 #' Prediction Powered Inference (Angelopoulos et al., 2023)
-#' <https://www.science.org/doi/10.1126/science.adi6000>
+#' \doi{10.1126/science.adi6000}
 #'
 #' @param Y_l (vector): n-vector of labeled outcomes.
 #'

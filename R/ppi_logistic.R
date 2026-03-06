@@ -7,7 +7,7 @@
 #'
 #' @details
 #' Prediction Powered Inference (Angelopoulos et al., 2023)
-#' <https://www.science.org/doi/10.1126/science.adi6000>
+#' \doi{10.1126/science.adi6000}
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #'

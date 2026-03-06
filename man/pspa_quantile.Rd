@@ -30,7 +30,7 @@ Helper function for PSPA quantile estimation
 }
 \details{
 Post-prediction adaptive inference
-(Miao et al. 2023) \url{https://arxiv.org/abs/2311.14220}
+(Miao et al., 2023) \doi{10.48550/arXiv.2311.14220}
 }
 \examples{
 

@@ -7,7 +7,7 @@
 #'
 #' @details
 #' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
-#' <https://arxiv.org/abs/2311.01453>`
+#' \doi{10.48550/arXiv.2311.01453}
 #'
 #' @param Y_l (vector): n-vector of labeled outcomes.
 #'
@@ -101,7 +101,7 @@ ppi_plusplus_quantile_est <- function(
 #'
 #' @details
 #' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
-#' <https://arxiv.org/abs/2311.01453>
+#' \doi{10.48550/arXiv.2311.01453}
 #'
 #' @param Y_l (vector): n-vector of labeled outcomes.
 #'

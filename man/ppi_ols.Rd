@@ -39,7 +39,7 @@ Helper function for prediction-powered inference for OLS estimation
 }
 \details{
 Prediction Powered Inference (Angelopoulos et al., 2023)
-\url{https://www.science.org/doi/10.1126/science.adi6000}
+\doi{10.1126/science.adi6000}
 }
 \examples{
 

@@ -7,8 +7,7 @@
 #'
 #' @details
 #' Prediction de-correlated inference: A safe approach for post-prediction
-#' inference (Gan et al., 2024)
-#' <https://onlinelibrary.wiley.com/doi/10.1111/anzs.12429>
+#' inference (Gan et al., 2024) \doi{10.1111/anzs.12429}
 #'
 #' @param X_l (matrix): n x p matrix of covariates in the labeled data.
 #' @param Y_l (vector): n-vector of labeled outcomes.

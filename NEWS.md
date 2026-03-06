@@ -137,6 +137,8 @@
 
   * Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).
   * Introduced consistent section headers for estimator components and wrappers.
+  * Adding PDC method examples to documentation and vignette.
+  * Updating urls throughout to use doi.org links instead of journal-specific links.
 
 * **Development Notes**
 

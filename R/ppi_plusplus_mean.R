@@ -7,7 +7,7 @@
 #'
 #' @details
 #' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
-#' <https://arxiv.org/abs/2311.01453>
+#' \doi{10.48550/arXiv.2311.01453}
 #'
 #' @param Y_l (vector): n-vector of labeled outcomes.
 #'
@@ -16,7 +16,7 @@
 #' @param f_u (vector): N-vector of predictions in the unlabeled data.
 #'
 #' @param lhat (float, optional): Power-tuning parameter (see
-#' <https://arxiv.org/abs/2311.01453>). The default value, \code{NULL},
+#' \doi{10.48550/arXiv.2311.01453}). The default value, \code{NULL},
 #' will estimate the optimal value from the data. Setting \code{lhat = 1}
 #' recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
 #' the classical point estimate.
@@ -107,7 +107,7 @@ ppi_plusplus_mean_est <- function(
 #'
 #' @details
 #' PPI++: Efficient Prediction Powered Inference (Angelopoulos et al., 2023)
-#' <https://arxiv.org/abs/2311.01453>`
+#' \doi{10.48550/arXiv.2311.01453}
 #'
 #' @param Y_l (vector): n-vector of labeled outcomes.
 #'
@@ -122,7 +122,7 @@ ppi_plusplus_mean_est <- function(
 #' \code{"two-sided"}, \code{"less"}, or \code{"greater"}.
 #'
 #' @param lhat (float, optional): Power-tuning parameter (see
-#' <https://arxiv.org/abs/2311.01453>). The default value, \code{NULL},
+#' \doi{10.48550/arXiv.2311.01453}). The default value, \code{NULL},
 #' will estimate the optimal value from the data. Setting \code{lhat = 1}
 #' recovers PPI with no power tuning, and setting \code{lhat = 0} recovers
 #' the classical point estimate.
