@@ -60,5 +60,5 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 ppi_mean(Y_l, f_l, f_u)
 #>          lower    upper
-#> [1,] 0.8507672 1.234159
+#> [1,] 0.7840516 1.177333
 ```

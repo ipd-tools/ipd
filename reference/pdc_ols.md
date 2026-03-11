@@ -75,10 +75,10 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 pdc_ols(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 #> $est
-#> [1] 0.7938463 0.9716511
+#> [1] 0.7330714 0.9886075
 #> 
 #> $se
 #> (Intercept)          X1 
-#>  0.09953721  0.08688491 
+#>  0.09244948  0.09773401 
 #> 
 ```

@@ -84,5 +84,5 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
   matrix(ncol = 1)
 
 ppi_plusplus_mean_est(Y_l, f_l, f_u)
-#> [1] 0.9967101
+#> [1] 0.9486031
 ```

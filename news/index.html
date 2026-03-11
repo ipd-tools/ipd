@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,31 +34,74 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.0" id="ipd-040">ipd 0.4.0<a class="anchor" aria-label="anchor" href="#ipd-040"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.0" id="ipd-040">ipd 0.4.0<a class="anchor" aria-label="anchor" href="#ipd-040"></a></h2><p class="text-muted">CRAN release: 2026-03-06</p>
+<div class="section level3">
+<h3 id="summary-0-4-0">Summary:<a class="anchor" aria-label="anchor" href="#summary-0-4-0"></a></h3>
+<ul><li>Downgrading dependence on <code>BiocGenerics</code> to prevent error on CRAN install.</li>
+</ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.3" id="ipd-013">ipd 0.1.3<a class="anchor" aria-label="anchor" href="#ipd-013"></a></h2><p class="text-muted">CRAN release: 2024-12-03</p>
-<ul><li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
-<li><p>Added a <code>pkgdown</code> site for the package.</p></li>
-<li><p><code><a href="../reference/ipd.html">ipd()</a></code> now allows for regression through the origin with <code>intercept = FALSE</code> argument.</p></li>
-<li>
-<p><code><a href="../reference/ipd.html">ipd()</a></code> now takes an additional argument, <code>na_action</code>, to handle missing covariate data.</p>
-<ul><li><p>Currently supports <code>"na.fail"</code> and <code>"na.omit"</code>. Defaults to <code>na.fail</code>.</p></li>
-<li><p>Provides a more informative error message and lists which covariates are missing observations.</p></li>
-</ul></li>
-<li><p><code><a href="../reference/ipd.html">ipd()</a></code> now takes an additional argument, <code>n_t</code>, which denotes the (optional) size of the training set used to generate the prediction rule. Defaults to <code>Inf</code> but is necessary for the <code>postpi_X</code> methods if <code>n_t</code> &lt; <code>n</code>, <code>N</code>, the number of labeled and unlabeled observations, respectively, in the data being analyzed.</p></li>
+<h2 class="pkg-version" data-toc-text="0.4.0" id="ipd-040-1">ipd 0.4.0<a class="anchor" aria-label="anchor" href="#ipd-040-1"></a></h2><p class="text-muted">CRAN release: 2026-03-06</p>
+<div class="section level3">
+<h3 id="summary-0-4-0-1">Summary:<a class="anchor" aria-label="anchor" href="#summary-0-4-0-1"></a></h3>
+<ul><li><p>Refactored internal Chen-Chen and PDC functions to centralize matrix-based estimators and reduce duplicated logic across models.</p></li>
+<li><p>Added thin ipd-compatible wrappers for OLS, logistic, and Poisson Chen-Chen and PDC methods.</p></li>
+<li><p>Improved internal GLM handling and documentation to support ongoing methodological development.</p></li>
 </ul></div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.4" id="ipd-014">ipd 0.1.4<a class="anchor" aria-label="anchor" href="#ipd-014"></a></h2><p class="text-muted">CRAN release: 2025-01-07</p>
-<ul><li><p>Added a help topic for the package itself (<code>man/ipd-package.Rd</code>) via <code>R/ipd-package.R</code> and <code>roxygen2</code></p></li>
+<div class="section level3">
+<h3 id="specific-changes-0-4-0">Specific Changes:<a class="anchor" aria-label="anchor" href="#specific-changes-0-4-0"></a></h3>
+<ul><li>
+<p><strong>Chen / PDC Refactor</strong></p>
+<ul><li><p>Added new internal utilities file <code>utils_chen.R</code> housing shared score/Hessian computation and matrix-based estimators.</p></li>
 <li>
-<p>Updated the documentation for <code><a href="../reference/ipd.html">ipd()</a></code>:</p>
-<ul><li><p>Provided a more explicit description of the <code>model</code> argument, which is meant to specify the downstream inferential model or parameter to be estimated.</p></li>
-<li><p>Clarified that not all columns in data are used in prediction unless explicitly referenced in the <code>formula</code> argument or in the <code>label</code> argument if the data are passed as one stacked data frame.</p></li>
+<p>Centralized core augmented estimators:</p>
+<ul><li>
+<code>compute_min_mse_est()</code>: Chen-Chen min-MSE form</li>
+<li>
+<code>compute_pdc_est()</code>: PDC augmentation</li>
+<li>
+<code>compute_min_mse_est_new()</code>: experimental Chen-Chen variant with separate auxiliary design/family</li>
 </ul></li>
-<li><p>Updated the documentation for <code><a href="../reference/simdat.html">simdat()</a></code> to include a more thorough explanation of how to simulate data with this function.</p></li>
-<li><p><code><a href="../reference/simdat.html">simdat()</a></code> now outputs a <code>data.frame</code> with a column named <code>"set_label"</code> instead of <code>"set"</code> to denote the labeled/unlabeled observation indicator.</p></li>
+<li>
+<p>Added shared internal helpers:</p>
+<ul><li>
+<code>compute_residuals()</code>: GLM residual and Hessian computation</li>
+<li>
+<code>.fit_glm_from_matrix()</code>: GLM fitting directly from design matrices</li>
+<li>
+<code>.resolve_family()</code>: robust family resolution for Gaussian, Binomial, and Poisson models</li>
+<li>
+<code>expit()</code> and <code>expit_derivative()</code>
+</li>
+</ul></li>
+</ul></li>
+<li>
+<p><strong>Thin Wrapper Functions (ipd helpers)</strong></p>
+<ul><li><p>Rewrote <code><a href="../reference/chen_ols.html">chen_ols()</a></code> to use centralized matrix-based estimators.</p></li>
+<li>
+<p>Added thin wrappers preserving existing <code><a href="../reference/ipd.html">ipd()</a></code> method lookup:</p>
+<ul><li><code><a href="../reference/chen_logistic.html">chen_logistic()</a></code></li>
+<li><code><a href="../reference/chen_poisson.html">chen_poisson()</a></code></li>
+<li><code><a href="../reference/pdc_ols.html">pdc_ols()</a></code></li>
+<li><code><a href="../reference/pdc_logistic.html">pdc_logistic()</a></code></li>
+<li><code><a href="../reference/pdc_poisson.html">pdc_poisson()</a></code></li>
+</ul></li>
+<li><p>All wrappers maintain backward compatibility with the existing helper contract (<code>list(est, se)</code>).</p></li>
+</ul></li>
+<li>
+<p><strong>Internal Documentation</strong></p>
+<ul><li>Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).</li>
+<li>Introduced consistent section headers for estimator components and wrappers.</li>
+<li>Adding PDC method examples to documentation and vignette.</li>
+<li>Updating urls throughout to use doi.org links instead of journal-specific links.</li>
+</ul></li>
+<li>
+<p><strong>Development Notes</strong></p>
+<ul><li>
+<code>compute_min_mse_est_new()</code> is currently internal-only and not yet wired into the <code><a href="../reference/ipd.html">ipd()</a></code> method registry; future work will determine exposure via a new method (e.g., <code>chen_new</code>) or argument toggle.</li>
+</ul></li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="ipd-020">ipd 0.2.0<a class="anchor" aria-label="anchor" href="#ipd-020"></a></h2>
 <div class="section level3">
@@ -70,10 +113,6 @@
 <div class="section level3">
 <h3 id="specific-changes-0-2-0">Specific Changes:<a class="anchor" aria-label="anchor" href="#specific-changes-0-2-0"></a></h3>
 <ul><li>
-<strong>Version bump</strong>
-<ul><li>Pre‑release version set to <strong>0.99.0</strong> for Bioconductor devel.</li>
-</ul></li>
-<li>
 <strong>DESCRIPTION updates</strong>
 <ul><li>
 <code>Depends: R (&gt;= 4.4.0)</code><br></li>
@@ -147,67 +186,28 @@
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0" id="ipd-030">ipd 0.3.0<a class="anchor" aria-label="anchor" href="#ipd-030"></a></h2>
-<div class="section level3">
-<h3 id="summary-0-3-0">Summary:<a class="anchor" aria-label="anchor" href="#summary-0-3-0"></a></h3>
-<ul><li><p>Refactored internal Chen-Chen and PDC functions to centralize matrix-based estimators and reduce duplicated logic across models.</p></li>
-<li><p>Added thin ipd-compatible wrappers for OLS, logistic, and Poisson Chen-Chen and PDC methods.</p></li>
-<li><p>Improved internal GLM handling and documentation to support ongoing methodological development.</p></li>
+<h2 class="pkg-version" data-toc-text="0.1.4" id="ipd-014">ipd 0.1.4<a class="anchor" aria-label="anchor" href="#ipd-014"></a></h2><p class="text-muted">CRAN release: 2025-01-07</p>
+<ul><li><p>Added a help topic for the package itself (<code>man/ipd-package.Rd</code>) via <code>R/ipd-package.R</code> and <code>roxygen2</code></p></li>
+<li>
+<p>Updated the documentation for <code><a href="../reference/ipd.html">ipd()</a></code>:</p>
+<ul><li><p>Provided a more explicit description of the <code>model</code> argument, which is meant to specify the downstream inferential model or parameter to be estimated.</p></li>
+<li><p>Clarified that not all columns in data are used in prediction unless explicitly referenced in the <code>formula</code> argument or in the <code>label</code> argument if the data are passed as one stacked data frame.</p></li>
+</ul></li>
+<li><p>Updated the documentation for <code><a href="../reference/simdat.html">simdat()</a></code> to include a more thorough explanation of how to simulate data with this function.</p></li>
+<li><p><code><a href="../reference/simdat.html">simdat()</a></code> now outputs a <code>data.frame</code> with a column named <code>"set_label"</code> instead of <code>"set"</code> to denote the labeled/unlabeled observation indicator.</p></li>
 </ul></div>
-<div class="section level3">
-<h3 id="specific-changes-0-3-0">Specific Changes:<a class="anchor" aria-label="anchor" href="#specific-changes-0-3-0"></a></h3>
-<ul><li>
-<p><strong>Chen / PDC Refactor</strong></p>
-<ul><li><p>Added new internal utilities file <code>utils_chen.R</code> housing shared score/Hessian computation and matrix-based estimators.</p></li>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.3" id="ipd-013">ipd 0.1.3<a class="anchor" aria-label="anchor" href="#ipd-013"></a></h2><p class="text-muted">CRAN release: 2024-12-03</p>
+<ul><li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
+<li><p>Added a <code>pkgdown</code> site for the package.</p></li>
+<li><p><code><a href="../reference/ipd.html">ipd()</a></code> now allows for regression through the origin with <code>intercept = FALSE</code> argument.</p></li>
 <li>
-<p>Centralized core augmented estimators:</p>
-<ul><li>
-<code>compute_min_mse_est()</code>: Chen-Chen min-MSE form</li>
-<li>
-<code>compute_pdc_est()</code>: PDC augmentation</li>
-<li>
-<code>compute_min_mse_est_new()</code>: experimental Chen-Chen variant with separate auxiliary design/family</li>
+<p><code><a href="../reference/ipd.html">ipd()</a></code> now takes an additional argument, <code>na_action</code>, to handle missing covariate data.</p>
+<ul><li><p>Currently supports <code>"na.fail"</code> and <code>"na.omit"</code>. Defaults to <code>na.fail</code>.</p></li>
+<li><p>Provides a more informative error message and lists which covariates are missing observations.</p></li>
 </ul></li>
-<li>
-<p>Added shared internal helpers:</p>
-<ul><li>
-<code>compute_residuals()</code>: GLM residual and Hessian computation</li>
-<li>
-<code>.fit_glm_from_matrix()</code>: GLM fitting directly from design matrices</li>
-<li>
-<code>.resolve_family()</code>: robust family resolution for Gaussian, Binomial, and Poisson models</li>
-<li>
-<code>expit()</code> and <code>expit_derivative()</code>
-</li>
-</ul></li>
-</ul></li>
-<li>
-<p><strong>Thin Wrapper Functions (ipd helpers)</strong></p>
-<ul><li><p>Rewrote <code><a href="../reference/chen_ols.html">chen_ols()</a></code> to use centralized matrix-based estimators.</p></li>
-<li>
-<p>Added thin wrappers preserving existing <code><a href="../reference/ipd.html">ipd()</a></code> method lookup:</p>
-<ul><li><code><a href="../reference/chen_logistic.html">chen_logistic()</a></code></li>
-<li><code><a href="../reference/chen_poisson.html">chen_poisson()</a></code></li>
-<li><code><a href="../reference/pdc_ols.html">pdc_ols()</a></code></li>
-<li><code><a href="../reference/pdc_logistic.html">pdc_logistic()</a></code></li>
-<li><code><a href="../reference/pdc_poisson.html">pdc_poisson()</a></code></li>
-</ul></li>
-<li><p>All wrappers maintain backward compatibility with the existing helper contract (<code>list(est, se)</code>).</p></li>
-</ul></li>
-<li>
-<p><strong>Internal Documentation</strong></p>
-<ul><li>Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).</li>
-<li>Introduced consistent section headers for estimator components and wrappers.</li>
-<li>Adding PDC method examples to documentation and vignette.</li>
-<li>Updating urls throughout to use doi.org links instead of journal-specific links.</li>
-</ul></li>
-<li>
-<p><strong>Development Notes</strong></p>
-<ul><li>
-<code>compute_min_mse_est_new()</code> is currently internal-only and not yet wired into the <code><a href="../reference/ipd.html">ipd()</a></code> method registry; future work will determine exposure via a new method (e.g., <code>chen_new</code>) or argument toggle.</li>
-</ul></li>
+<li><p><code><a href="../reference/ipd.html">ipd()</a></code> now takes an additional argument, <code>n_t</code>, which denotes the (optional) size of the training set used to generate the prediction rule. Defaults to <code>Inf</code> but is necessary for the <code>postpi_X</code> methods if <code>n_t</code> &lt; <code>n</code>, <code>N</code>, the number of labeled and unlabeled observations, respectively, in the data being analyzed.</p></li>
 </ul></div>
-</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -37,6 +37,6 @@ tidy(fit)
 #> # A tibble: 2 × 5
 #>   term        estimate std.error conf.low conf.high
 #>   <chr>          <dbl>     <dbl>    <dbl>     <dbl>
-#> 1 (Intercept)    0.773    0.0843    0.608     0.938
-#> 2 X1             0.947    0.0874    0.776     1.12 
+#> 1 (Intercept)    0.740     0.107    0.529     0.950
+#> 2 X1             1.13      0.130    0.880     1.39 
 ```

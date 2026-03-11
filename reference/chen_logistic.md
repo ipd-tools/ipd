@@ -78,10 +78,10 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 chen_logistic(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 #> $est
-#> [1] 0.4066445 0.9403529
+#> [1] 0.498323 1.047256
 #> 
 #> $se
 #> (Intercept)          X1 
-#>   0.1277054   0.1558677 
+#>   0.1314948   0.1537046 
 #> 
 ```

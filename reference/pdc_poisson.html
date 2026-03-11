@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ipd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,6 @@ inference (Gan et al., 2024) <a href="https://doi.org/10.1111/anzs.12429" class=
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="simdat.html">simdat</a></span><span class="op">(</span>model <span class="op">=</span> <span class="st">"poisson"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>glm.fit: fitted rates numerically 0 occurred</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">form</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">f</span> <span class="op">~</span> <span class="va">X1</span></span></span>
 <span class="r-in"><span></span></span>
@@ -110,12 +109,13 @@ inference (Gan et al., 2024) <a href="https://doi.org/10.1111/anzs.12429" class=
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">pdc_poisson</span><span class="op">(</span><span class="va">X_l</span>, <span class="va">Y_l</span>, <span class="va">f_l</span>, <span class="va">X_u</span>, <span class="va">f_u</span>, intercept <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>glm.fit: algorithm did not converge</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.8426168 0.4497063</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16.7629213 -0.4667849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $se</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)          X1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.3095964   0.2846968 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.9258988   0.1479120 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

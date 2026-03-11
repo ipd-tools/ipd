@@ -75,10 +75,10 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 pdc_logistic(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 #> $est
-#> [1] 0.5824391 0.8989684
+#> [1] 0.4910017 0.7564819
 #> 
 #> $se
 #> (Intercept)          X1 
-#>   0.1322460   0.1403956 
+#>    0.128485    0.136995 
 #> 
 ```

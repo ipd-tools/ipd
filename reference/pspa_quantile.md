@@ -62,9 +62,9 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 pspa_quantile(Y_l = Y_l, f_l = f_l, f_u = f_u, q = 0.5)
 #> $est
-#> [1] 0.9097137
+#> [1] 1.070928
 #> 
 #> $se
-#> [1] 0.07011959
+#> [1] 0.08592232
 #> 
 ```

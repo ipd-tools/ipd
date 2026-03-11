@@ -60,9 +60,9 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 pspa_mean(Y_l = Y_l, f_l = f_l, f_u = f_u)
 #> $est
-#> [1] 1.004022
+#> [1] 0.990302
 #> 
 #> $se
-#> [1] 0.06009168
+#> [1] 0.05814381
 #> 
 ```

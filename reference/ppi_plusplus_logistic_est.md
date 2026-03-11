@@ -106,6 +106,6 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 ppi_plusplus_logistic_est(X_l, Y_l, f_l, X_u, f_u)
 #>           [,1]
-#> [1,] 0.6398217
-#> [2,] 0.7103406
+#> [1,] 0.4458863
+#> [2,] 0.6481211
 ```

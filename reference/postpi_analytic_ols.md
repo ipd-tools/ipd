@@ -68,9 +68,9 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 postpi_analytic_ols(X_l, Y_l, f_l, X_u, f_u)
 #> $est
-#> [1] 0.7235620 0.9788081
+#> [1] 0.9176000 0.9908865
 #> 
 #> $se
-#> [1] 0.1243780 0.1376308
+#> [1] 0.1119704 0.1547319
 #> 
 ```

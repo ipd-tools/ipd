@@ -100,5 +100,5 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 ppi_plusplus_ols_est(X_l, Y_l, f_l, X_u, f_u)
 #> X(Intercept)          XX1 
-#>     0.789964     1.015628 
+#>     0.622627     1.241944 
 ```

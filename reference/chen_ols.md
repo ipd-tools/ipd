@@ -75,10 +75,10 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 chen_ols(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
 #> $est
-#> [1] 0.6637123 1.0015489
+#> [1] 0.6376099 0.9841181
 #> 
 #> $se
 #> (Intercept)          X1 
-#>  0.09240834  0.09422155 
+#>  0.08821565  0.08621685 
 #> 
 ```

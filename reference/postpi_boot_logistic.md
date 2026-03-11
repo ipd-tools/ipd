@@ -74,9 +74,9 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 
 postpi_boot_logistic(X_l, Y_l, f_l, X_u, f_u, nboot = 200)
 #> $est
-#> [1] 0.5288651 0.2912145
+#> [1] 0.5406575 0.2721251
 #> 
 #> $se
-#> [1] 0.1211724 0.1306551
+#> [1] 0.1212930 0.1317698
 #> 
 ```

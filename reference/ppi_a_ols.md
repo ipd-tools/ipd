@@ -89,16 +89,16 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
 ppi_a_ols(X_l, Y_l, f_l, X_u, f_u)
 #> $est
 #>                  [,1]
-#> (Intercept) 0.7524312
-#> X1          1.2743293
+#> (Intercept) 0.8096252
+#> X1          0.8531261
 #> 
 #> $se
 #> (Intercept)          X1 
-#>  0.09985817  0.11738334 
+#>  0.08616897  0.09473810 
 #> 
 #> $rectifier_est
 #>                    [,1]
-#> (Intercept)  0.16640753
-#> X1          -0.05876525
+#> (Intercept) -0.20867554
+#> X1          -0.01512583
 #> 
 ```

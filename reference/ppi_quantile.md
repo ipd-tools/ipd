@@ -67,5 +67,5 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
   matrix(ncol = 1)
 
 ppi_quantile(Y_l, f_l, f_u, q = 0.5)
-#> [1] 0.6735866 1.3890045
+#> [1] 0.8377598 1.4303978
 ```

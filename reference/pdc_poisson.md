@@ -57,7 +57,6 @@ inference (Gan et al., 2024)
 
 ``` r
 dat <- simdat(model = "poisson")
-#> Warning: glm.fit: fitted rates numerically 0 occurred
 
 form <- Y - f ~ X1
 
@@ -75,11 +74,12 @@ f_u <- dat[dat$set_label == "unlabeled", all.vars(form)[2]] |>
   matrix(ncol = 1)
 
 pdc_poisson(X_l, Y_l, f_l, X_u, f_u, intercept = TRUE)
+#> Warning: glm.fit: algorithm did not converge
 #> $est
-#> [1] 1.8426168 0.4497063
+#> [1] 16.7629213 -0.4667849
 #> 
 #> $se
 #> (Intercept)          X1 
-#>   0.3095964   0.2846968 
+#>   0.9258988   0.1479120 
 #> 
 ```
