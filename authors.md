@@ -28,7 +28,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/ipd-tools/ipd/blob/master/inst/CITATION)
+[`inst/CITATION`](https://github.com/ipd-tools/ipd/blob/v0.4.1/inst/CITATION)
 
 Salerno, Stephen, Miao, Jiacheng, Afiaz, Awan, Hoffman, Kentaro,
 Neufeld, Anna, Lu, Qiongshi, McCormick, H T, Leek, T J (2025). “ipd: An
