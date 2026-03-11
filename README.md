@@ -629,7 +629,7 @@ sessionInfo()
 #> [58] ranger_0.18.0        hms_1.1.4            gam_1.22-7          
 #> [61] evaluate_1.0.5       knitr_1.51           hardhat_1.4.2       
 #> [64] caret_7.0-1          mgcv_1.9-3           rlang_1.1.7         
-#> [67] Rcpp_1.1.1           glue_1.8.0           BiocGenerics_0.56.0 
-#> [70] pROC_1.19.0.1        ipred_0.9-15         rstudioapi_0.18.0   
-#> [73] R6_2.6.1             plyr_1.8.9
+#> [67] Rcpp_1.1.1           glue_1.8.0           pROC_1.19.0.1       
+#> [70] ipred_0.9-15         rstudioapi_0.18.0    R6_2.6.1            
+#> [73] plyr_1.8.9
 ```

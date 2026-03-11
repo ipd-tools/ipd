@@ -50,8 +50,6 @@
 #'
 #' @keywords package
 #'
-#' @importFrom BiocGenerics combine
-#'
 #' @examples
 #' #-- Generate Example Data
 #'

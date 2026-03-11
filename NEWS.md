@@ -1,34 +1,58 @@
 # ipd 0.4.0
 
-# ipd 0.1.3
+## Summary:
 
-* Added a `NEWS.md` file to track changes to the package.
+* Downgrading dependence on `BiocGenerics` to prevent error on CRAN install.
 
-* Added a `pkgdown` site for the package.
+# ipd 0.4.0
 
-* `ipd()` now allows for regression through the origin with `intercept = FALSE` argument.
-  
-* `ipd()` now takes an additional argument, `na_action`, to handle missing covariate data.
+## Summary:
 
-  * Currently supports `"na.fail"` and `"na.omit"`. Defaults to `na.fail`.
-  
-  * Provides a more informative error message and lists which covariates are missing observations.
-  
-* `ipd()` now takes an additional argument, `n_t`, which denotes the (optional) size of the training set used to generate the prediction rule. Defaults to `Inf` but is necessary for the `postpi_X` methods if `n_t` < `n`, `N`, the number of labeled and unlabeled observations, respectively, in the data being analyzed.
+* Refactored internal Chen-Chen and PDC functions to centralize matrix-based estimators and reduce duplicated logic across models.
 
-# ipd 0.1.4
+* Added thin ipd-compatible wrappers for OLS, logistic, and Poisson Chen-Chen and PDC methods.
 
-* Added a help topic for the package itself (`man/ipd-package.Rd`) via `R/ipd-package.R` and `roxygen2`
+* Improved internal GLM handling and documentation to support ongoing methodological development.
 
-* Updated the documentation for `ipd()`:
+## Specific Changes:
 
-  * Provided a more explicit description of the `model` argument, which is meant to specify the downstream inferential model or parameter to be estimated.
-  
-  * Clarified that not all columns in data are used in prediction unless explicitly referenced in the `formula` argument or in the `label` argument if the data are passed as one stacked data frame. 
+* **Chen / PDC Refactor**
 
-* Updated the documentation for `simdat()` to include a more thorough explanation of how to simulate data with this function. 
+  * Added new internal utilities file `utils_chen.R` housing shared score/Hessian computation and matrix-based estimators.
+  * Centralized core augmented estimators:
 
-* `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
+    * `compute_min_mse_est()`: Chen-Chen min-MSE form
+    * `compute_pdc_est()`: PDC augmentation
+    * `compute_min_mse_est_new()`: experimental Chen-Chen variant with separate auxiliary design/family
+  * Added shared internal helpers:
+
+    * `compute_residuals()`: GLM residual and Hessian computation
+    * `.fit_glm_from_matrix()`: GLM fitting directly from design matrices
+    * `.resolve_family()`: robust family resolution for Gaussian, Binomial, and Poisson models
+    * `expit()` and `expit_derivative()`
+
+* **Thin Wrapper Functions (ipd helpers)**
+
+  * Rewrote `chen_ols()` to use centralized matrix-based estimators.
+  * Added thin wrappers preserving existing `ipd()` method lookup:
+
+    * `chen_logistic()`
+    * `chen_poisson()`
+    * `pdc_ols()`
+    * `pdc_logistic()`
+    * `pdc_poisson()`
+  * All wrappers maintain backward compatibility with the existing helper contract (`list(est, se)`).
+
+* **Internal Documentation**
+
+  * Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).
+  * Introduced consistent section headers for estimator components and wrappers.
+  * Adding PDC method examples to documentation and vignette.
+  * Updating urls throughout to use doi.org links instead of journal-specific links.
+
+* **Development Notes**
+
+  * `compute_min_mse_est_new()` is currently internal-only and not yet wired into the `ipd()` method registry; future work will determine exposure via a new method (e.g., `chen_new`) or argument toggle.
 
 # ipd 0.2.0
 
@@ -41,9 +65,6 @@
 * Added PPIa, Chen and Chen methods from Gronsbell et al. (2025) "Another look at inference after prediction."
 
 ## Specific Changes: 
-
-- **Version bump**  
-  - Pre‑release version set to **0.99.0** for Bioconductor devel.
 
 - **DESCRIPTION updates**  
   - `Depends: R (>= 4.4.0)`  
@@ -94,52 +115,32 @@
   - Branch created, tag `v0.99.0` applied.  
   - Will request CRAN archiving of the CRAN version upon successful Bioconductor acceptance.
 
-# ipd 0.3.0
+# ipd 0.1.4
 
-## Summary:
+* Added a help topic for the package itself (`man/ipd-package.Rd`) via `R/ipd-package.R` and `roxygen2`
 
-* Refactored internal Chen-Chen and PDC functions to centralize matrix-based estimators and reduce duplicated logic across models.
+* Updated the documentation for `ipd()`:
 
-* Added thin ipd-compatible wrappers for OLS, logistic, and Poisson Chen-Chen and PDC methods.
+  * Provided a more explicit description of the `model` argument, which is meant to specify the downstream inferential model or parameter to be estimated.
+  
+  * Clarified that not all columns in data are used in prediction unless explicitly referenced in the `formula` argument or in the `label` argument if the data are passed as one stacked data frame. 
 
-* Improved internal GLM handling and documentation to support ongoing methodological development.
+* Updated the documentation for `simdat()` to include a more thorough explanation of how to simulate data with this function. 
 
-## Specific Changes:
+* `simdat()` now outputs a `data.frame` with a column named `"set_label"` instead of `"set"` to denote the labeled/unlabeled observation indicator.
 
-* **Chen / PDC Refactor**
+# ipd 0.1.3
 
-  * Added new internal utilities file `utils_chen.R` housing shared score/Hessian computation and matrix-based estimators.
-  * Centralized core augmented estimators:
+* Added a `NEWS.md` file to track changes to the package.
 
-    * `compute_min_mse_est()`: Chen-Chen min-MSE form
-    * `compute_pdc_est()`: PDC augmentation
-    * `compute_min_mse_est_new()`: experimental Chen-Chen variant with separate auxiliary design/family
-  * Added shared internal helpers:
+* Added a `pkgdown` site for the package.
 
-    * `compute_residuals()`: GLM residual and Hessian computation
-    * `.fit_glm_from_matrix()`: GLM fitting directly from design matrices
-    * `.resolve_family()`: robust family resolution for Gaussian, Binomial, and Poisson models
-    * `expit()` and `expit_derivative()`
+* `ipd()` now allows for regression through the origin with `intercept = FALSE` argument.
+  
+* `ipd()` now takes an additional argument, `na_action`, to handle missing covariate data.
 
-* **Thin Wrapper Functions (ipd helpers)**
-
-  * Rewrote `chen_ols()` to use centralized matrix-based estimators.
-  * Added thin wrappers preserving existing `ipd()` method lookup:
-
-    * `chen_logistic()`
-    * `chen_poisson()`
-    * `pdc_ols()`
-    * `pdc_logistic()`
-    * `pdc_poisson()`
-  * All wrappers maintain backward compatibility with the existing helper contract (`list(est, se)`).
-
-* **Internal Documentation**
-
-  * Added Roxygen2 documentation to all Chen/PDC utilities (including non-exported helpers).
-  * Introduced consistent section headers for estimator components and wrappers.
-  * Adding PDC method examples to documentation and vignette.
-  * Updating urls throughout to use doi.org links instead of journal-specific links.
-
-* **Development Notes**
-
-  * `compute_min_mse_est_new()` is currently internal-only and not yet wired into the `ipd()` method registry; future work will determine exposure via a new method (e.g., `chen_new`) or argument toggle.
+  * Currently supports `"na.fail"` and `"na.omit"`. Defaults to `na.fail`.
+  
+  * Provides a more informative error message and lists which covariates are missing observations.
+  
+* `ipd()` now takes an additional argument, `n_t`, which denotes the (optional) size of the training set used to generate the prediction rule. Defaults to `Inf` but is necessary for the `postpi_X` methods if `n_t` < `n`, `N`, the number of labeled and unlabeled observations, respectively, in the data being analyzed.
