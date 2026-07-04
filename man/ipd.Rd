@@ -28,10 +28,10 @@ corresponds to the features of interest (i.e., \code{X = X1 + ... + Xp}).
 See \strong{1. Formula} in the \strong{Details} below for more information.}
 
 \item{method}{The IPD method to be used for fitting the model. Must be one
-of \code{"chen"}, \code{"pdc"}, \code{"postpi_analytic"},
-\code{"postpi_boot"}, \code{"ppi"}, \code{"ppi_a"}, \code{"ppi_plusplus"},
-or \code{"pspa"}. See \strong{3. Method} in the \strong{Details} below for
-more information.}
+of \code{"chen"}, \code{"efron_boot"}, \code{"pdc"},
+\code{"postpi_analytic"}, \code{"postpi_boot"}, \code{"ppi"},
+\code{"ppi_a"}, \code{"ppi_plusplus"}, or \code{"pspa"}. See
+\strong{3. Method} in the \strong{Details} below for more information.}
 
 \item{model}{The type of downstream inferential model to be fitted, or the
 parameter being estimated. Must be one of \code{"mean"}, \code{"quantile"},
@@ -169,6 +169,8 @@ Use the \code{method} argument to specify the fitting method:
 
 \describe{
 \item{"chen"}{Gronsbell et al. (2026) Chen and Chen Correction}
+\item{"efron_boot"}{Efron (2025) PPboot bootstrap prediction-powered
+inference}
 \item{"pdc"}{Gan et al. (2024) Prediction Decorrelated Inference}
 \item{"postpi_analytic"}{Wang et al. (2020) Post-Prediction Inference
 (PostPI) Analytic Correction}
@@ -232,6 +234,13 @@ ipd(formula,
 ipd(formula,
   method = "chen", model = "ols",
   data = dat, label = "set_label"
+)
+
+#-- Efron Bootstrap PPI
+
+ipd(formula,
+  method = "efron_boot", model = "ols",
+  data = dat, label = "set_label", nboot = 25, seed = 123
 )
 
 #-- PostPI Analytic Correction (Wang et al., 2020)

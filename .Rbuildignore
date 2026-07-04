@@ -13,3 +13,5 @@
 ^CRAN-SUBMISSION$
 figure
 ^README-JPN\.md$
+^\.positai$
+^\.claude$
